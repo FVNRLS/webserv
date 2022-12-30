@@ -3,4 +3,4 @@ project(webserver)
 
 set(CMAKE_CXX_STANDARD 98)
 
-add_executable(webserver src/main.cpp)
+add_executable(webserver src/main.cpp incl/ConfigParser.hpp src/ConfigParser.cpp)
