@@ -55,10 +55,28 @@ int	Config::count_servers() {
 	if (!config_file.is_open() || config_file.fail())
 		return (-1);
 	while (std::getline(config_file, line)) {
-		if (line.find("server {") == 0)
+		if (line.find("server") == 0)
 			i++;
 	}
 	return (i);
+}
+
+//todo: refactor to scan the file and to find open curly brackets
+void	find_closed_brakets() {
+	std::ifstream config_file("config.conf");
+	std::stringstream config_stream;
+	config_stream << config_file.rdbuf();
+	std::string config = config_stream.str();
+
+	// Search for the pattern "server {" followed by some text and a closing curly bracket
+	size_t server_pos = config.find("server {");
+	if (server_pos != std::string::npos) {
+		size_t closing_bracket_pos = config.find('}', server_pos);
+		if (closing_bracket_pos != std::string::npos) {
+			std::string text = config.substr(server_pos + 8, closing_bracket_pos - server_pos - 8);
+			std::cout << "Text between 'server {' and '}': " << text << std::endl;
+		}
+	}
 }
 
 void	Config::parse(Server &servers) {
