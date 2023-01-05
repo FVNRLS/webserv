@@ -10,7 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once
+
 #include "main.hpp"
 
-#define ARG_ERR	1
+#define ARG_ERR				1
+#define INVALID_EXTENSION	2
+#define NO_SERVERS			3
+
+
+
+int	print_error(int error, const std::string& file);
 

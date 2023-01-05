@@ -10,15 +10,28 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "main.hpp"
+#include "Config.hpp"
+#include "Server.hpp"
 
 int main(int argc, char **argv) {
 
-	if (argc != 2) {
-		std::cerr << "Invalid number of arguments" << std::endl;
-		return (1);
-	}
+	int num_servers;
 
+	if (argc != 2)
+		return (print_error(ARG_ERR, argv[1]));
+
+	Config	conf(argv[1]);
+	if (conf.check_extension() == false)
+		return (print_error(INVALID_EXTENSION, argv[1]));
+
+	num_servers = conf.count_servers();
+	if (num_servers == 0)
+		return (print_error(NO_SERVERS, argv[1]));
+	Server	servers[num_servers];
+
+	conf.parse(*servers);
+	if (conf.get_is_parsed() == false)
+		return (1);
 
 	return (0);
 }

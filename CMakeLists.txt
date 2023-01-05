@@ -18,4 +18,7 @@ add_executable(webserver
         src/Config.cpp
         incl/Config.hpp
 
-        incl/errors.hpp src/errors.cpp)
+        src/error_handler.cpp
+        incl/error_handler.hpp
+
+        )

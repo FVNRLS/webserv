@@ -19,5 +19,10 @@ class Client {
 private:
 
 public:
-
+	//BASIC CLASS SETUP
+	Client();
+	Client(char *path);
+	Client(const Client &src);
+	Client &operator=(const Client &src);
+	~Client();
 };

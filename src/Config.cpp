@@ -10,5 +10,62 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "main.hpp"
+#include "Config.hpp"
+
+//BASIC CLASS SETUP
+Config::Config() : _path(NULL), _is_parsed(false) {}
+
+Config::Config(char *path) : _path(path), _is_parsed(false) {}
+
+Config::Config(const Config &src) {
+	*this = src;
+}
+
+Config &Config::operator=(const Config &src) {
+	if (this == &src)
+		return (*this);
+	_path = src._path;
+	return (*this);
+}
+
+Config::~Config() {}
+
+//GETTERS / SETTERS
+bool	Config::get_is_parsed() const {
+	return (_is_parsed);
+}
+
+//MEMBER FUNCTIONS
+bool	Config::check_extension() {
+	std::size_t dot_pos;
+
+	dot_pos = _path.find_last_of('.');
+	if (_path.empty() || dot_pos == std::string::npos)
+		return (false);
+	if (_path.substr(dot_pos) == ".conf")
+		return (true);
+	return (false);
+}
+
+int	Config::count_servers() {
+	std::ifstream	config_file(_path); //try catch!
+	std::string 	line;
+	int 			i;
+
+	i = 0;
+	while (std::getline(config_file, line)) {
+		if (line.find("server {") == 0)
+			i++;
+	}
+	return (i);
+}
+
+void	Config::parse(Server &servers) {
+
+//	_is_parsed = true; //only if the parsing was successful!
+
+}
+
+
+
 
