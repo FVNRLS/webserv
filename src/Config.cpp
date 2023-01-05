@@ -48,11 +48,12 @@ bool	Config::check_extension() {
 }
 
 int	Config::count_servers() {
-	std::ifstream	config_file(_path); //try catch!
-	std::string 	line;
-	int 			i;
+	std::string		line;
+	std::ifstream	config_file(_path);
+	int 			i = 0;
 
-	i = 0;
+	if (!config_file.is_open() || config_file.fail())
+		return (-1);
 	while (std::getline(config_file, line)) {
 		if (line.find("server {") == 0)
 			i++;
@@ -62,7 +63,7 @@ int	Config::count_servers() {
 
 void	Config::parse(Server &servers) {
 
-//	_is_parsed = true; //only if the parsing was successful!
+	_is_parsed = true; //only if the parsing was successful!
 
 }
 

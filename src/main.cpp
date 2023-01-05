@@ -27,6 +27,8 @@ int main(int argc, char **argv) {
 	num_servers = conf.count_servers();
 	if (num_servers == 0)
 		return (print_error(NO_SERVERS, argv[1]));
+	else if (num_servers == -1)
+		return (print_error(BAD_PERMISSIONS, argv[1]));
 	Server	servers[num_servers];
 
 	conf.parse(*servers);

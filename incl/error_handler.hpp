@@ -17,8 +17,9 @@
 #define ARG_ERR				1
 #define INVALID_EXTENSION	2
 #define NO_SERVERS			3
+#define BAD_PERMISSIONS		4
 
 
 
-int	print_error(int error, const std::string& file);
+int	print_error(int error, const std::string& path);
 
