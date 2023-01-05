@@ -1,24 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   errors.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rmazurit <rmazurit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/05 13:12:08 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/05 13:12:08 by rmazurit         ###   ########.fr       */
+/*   Created: 2023/01/05 14:39:22 by rmazurit          #+#    #+#             */
+/*   Updated: 2023/01/05 14:39:22 by rmazurit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.hpp"
 
-int main(int argc, char **argv) {
+#define ARG_ERR	1
 
-	if (argc != 2) {
-		std::cerr << "Invalid number of arguments" << std::endl;
-		return (1);
-	}
-
-
-	return (0);
-}

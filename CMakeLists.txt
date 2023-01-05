@@ -3,8 +3,19 @@ project(webserver)
 
 set(CMAKE_CXX_STANDARD 98)
 
+include_directories(./incl)
+
 add_executable(webserver
         src/main.cpp
-        src/ConfigParser.cpp
-        incl/ConfigParser.hpp
-        )
+
+        src/Server.cpp
+        incl/Server.hpp
+
+        src/Client.cpp
+        incl/Client.hpp
+
+        incl/main.hpp
+        src/Config.cpp
+        incl/Config.hpp
+
+        incl/errors.hpp src/errors.cpp)
