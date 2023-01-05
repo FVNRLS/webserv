@@ -14,26 +14,34 @@
 
 #include "main.hpp"
 
-typedef struct s_conf_data {
+struct	basic {
+	int			port;
+	std::string	server_name;
+	std::string ip;
+	std::string root;
+	std::string error_page;
+	bool 		autoindex;
+};
+
+struct	location {
 	std::string	directory;
 	bool		GET;
 	bool		POST;
 	bool		DELETE;
 
-	bool		dir_listing;
-	std::string	def_file;
 	std::string	root;	//if root empty -> uses the server_root
-	size_t		id;
-	size_t		upload_size;
-	bool		upload_size_bool;
+	size_t		index;
+	size_t 		lim_cl_body_size; // limit on body sent from client;
+	std::string auth_clients; //limit_client_body_size - authorization header;
+	std::string cgi_path;
 	std::string	redirect;
-} t_conf_data;
+};
 
 class Server {
 
 private:
 	std::string	_name;
-	t_conf_data	_data;
+	location	_loc_data;
 
 public:
 	//BASIC CLASS SETUP
