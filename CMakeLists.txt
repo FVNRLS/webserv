@@ -21,4 +21,7 @@ add_executable(webserver
         src/error_handler.cpp
         incl/error_handler.hpp
 
+        #TOOLS
+        incl/tools.hpp
+        src/tools/trim.cpp
         )

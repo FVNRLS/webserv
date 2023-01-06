@@ -13,9 +13,9 @@
 #include "Config.hpp"
 
 //BASIC CLASS SETUP
-Config::Config() : _path(NULL), _is_parsed(false) {}
+Config::Config() : _config_file(NULL) {}
 
-Config::Config(char *path) : _path(path), _is_parsed(false) {}
+Config::Config(char *path) : _config_file(path) {}
 
 Config::Config(const Config &src) {
 	*this = src;
@@ -24,65 +24,99 @@ Config::Config(const Config &src) {
 Config &Config::operator=(const Config &src) {
 	if (this == &src)
 		return (*this);
-	_path = src._path;
+	_config_file = src._config_file;
 	return (*this);
 }
 
 Config::~Config() {}
 
-//GETTERS / SETTERS
-bool	Config::get_is_parsed() const {
-	return (_is_parsed);
-}
-
 //MEMBER FUNCTIONS
-bool	Config::check_extension() {
+int	Config::check_extension() {
 	std::size_t dot_pos;
 
-	dot_pos = _path.find_last_of('.');
-	if (_path.empty() || dot_pos == std::string::npos)
-		return (false);
-	if (_path.substr(dot_pos) == ".conf")
-		return (true);
-	return (false);
+	dot_pos = _config_file.find_last_of('.');
+	if (_config_file.empty() || dot_pos == std::string::npos)
+		return (EXIT_FAILURE);
+	if (_config_file.substr(dot_pos) == ".conf")
+		return (EXIT_SUCCESS);
+	return (EXIT_FAILURE);
 }
 
-int	Config::count_servers() {
+int	Config::read_conf_file() {
+	std::ifstream	file;
 	std::string		line;
-	std::ifstream	config_file(_path);
-	int 			i = 0;
 
-	if (!config_file.is_open() || config_file.fail())
-		return (-1);
-	while (std::getline(config_file, line)) {
-		if (line.find("server") == 0)
-			i++;
-	}
-	return (i);
-}
-
-//todo: refactor to scan the file and to find open curly brackets
-void	find_closed_brakets() {
-	std::ifstream config_file("config.conf");
-	std::stringstream config_stream;
-	config_stream << config_file.rdbuf();
-	std::string config = config_stream.str();
-
-	// Search for the pattern "server {" followed by some text and a closing curly bracket
-	size_t server_pos = config.find("server {");
-	if (server_pos != std::string::npos) {
-		size_t closing_bracket_pos = config.find('}', server_pos);
-		if (closing_bracket_pos != std::string::npos) {
-			std::string text = config.substr(server_pos + 8, closing_bracket_pos - server_pos - 8);
-			std::cout << "Text between 'server {' and '}': " << text << std::endl;
+	file.open(_config_file);
+	if (!file.is_open() || file.fail())
+		return (EXIT_FAILURE);
+	while (std::getline(file, line)) {
+		if (line.empty())
+			continue;
+		else {
+			line = trim(line);
+			_content += line + '\n';
 		}
 	}
+	file.close();
+	return (EXIT_SUCCESS);
 }
 
-void	Config::parse(Server &servers) {
+int 	Config::find_open_brace() {
+//	while (pos != )
 
-	_is_parsed = true; //only if the parsing was successful!
+	return (EXIT_FAILURE);
+}
 
+
+int Config::search_for_server() {
+	size_t pos;
+
+	pos = _buf.find_first_of("server");
+	if (pos == 0) {
+		_blocks.push_back(_buf);
+		_buf.clear();
+		return (EXIT_SUCCESS);
+	}
+	else if (pos != std::string::npos)
+		return (print_line_error(INVALID_SERVER_DEFINITION, _config_file, _line_num));
+	else
+		return (NOT_FOUND);
+}
+
+int	Config::split_blocks() {
+
+	int 						ret;
+	int 						i;
+	int 						serv_cnt;
+	int 						serv_index;
+	size_t 						serv_pos;
+	size_t 						closed_brace_pos;
+
+	serv_cnt = 0;
+	i = 0;
+	while (i < _content.length()) {
+
+		if (_content[i] != NEWLINE)
+			_buf += _content[i];
+		else if (search_for_server() == EXIT_FAILURE)
+				return (EXIT_FAILURE);
+		_line_num++;
+		i++;
+	}
+	return (EXIT_SUCCESS);
+}
+
+int	Config::parse(std::vector<Server> &servers, const char *config) {
+	_serv = &servers;
+	if (check_extension() == EXIT_FAILURE)
+		return (print_error(INVALID_EXTENSION, config));
+	if (read_conf_file() == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+	if (split_blocks() == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+
+//	std::cout << _content << std::endl;
+	return (EXIT_SUCCESS);
 }
 
 

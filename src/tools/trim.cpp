@@ -1,27 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   trim.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rmazurit <rmazurit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/05 13:12:08 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/05 13:12:08 by rmazurit         ###   ########.fr       */
+/*   Created: 2023/01/06 18:49:10 by rmazurit          #+#    #+#             */
+/*   Updated: 2023/01/06 18:49:10 by rmazurit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Config.hpp"
-#include "Server.hpp"
+#include "main.hpp"
 
-int main(int argc, char **argv) {
-	Config	conf(argv[1]);
-	std::vector<Server> servers;
+std::string trim(std::string &s) {
+	size_t	front_pos;
+	size_t	back_pos;
 
-	if (argc != 2)
-		return (print_error(ARG_ERR, argv[1]));
-
-	if (conf.parse(servers, argv[1]) == EXIT_FAILURE)
-		return (EXIT_FAILURE);
-
-	return (EXIT_SUCCESS);
+	front_pos = s.find_first_not_of(SPACE);
+	back_pos = s.find_last_not_of(SPACE);
+	return (s.substr(front_pos, back_pos + 1));
 }

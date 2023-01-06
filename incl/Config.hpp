@@ -18,8 +18,21 @@
 class Config {
 
 private:
-	std::string	_path;
-	bool 		_is_parsed;
+	std::string					_config_file;
+	std::string 				_content;
+	std::string					_buf;
+	int 						_line_num;
+	size_t 						_pos;
+	std::vector<Server> 		*_serv;
+	std::vector<std::string>	_blocks;  // Vector to store blocks of code
+
+
+	//PRIVATE MEMBER FUNCTIONS
+	int							check_extension();
+	int							read_conf_file();
+	int							search_for_server();
+	int 						find_open_brace();
+	int							split_blocks();
 
 public:
 	//BASIC CLASS SETUP
@@ -29,14 +42,6 @@ public:
 	Config &operator=(const Config &src);
 	~Config();
 
-	//GETTERS / SETTERS
-	bool		get_is_parsed() const;
-
-	//MEMBER FUNCTIONS
-
-	std::string get_extension(const std::string &file_name);
-	bool		check_extension();
-	int 		count_servers();
-	void		parse(Server &servers);
-
+	//PUBLIC MEMBER FUNCTIONS
+	int	parse(std::vector<Server> &servers, const char *config);
 };

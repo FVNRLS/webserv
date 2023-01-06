@@ -14,15 +14,26 @@
 
 #include <iostream>
 #include <fstream>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <map>
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+
+
 #include "error_handler.hpp"
+#include "tools.hpp"
+
+#define NOT_FOUND			(-1)
+
+#define	OPEN_CURLY_BRACE	'{'
+#define	CLOSED_CURLY_BRACE	'}'
+#define NEWLINE				'\n'
+#define SPACE				' '
 
 
 

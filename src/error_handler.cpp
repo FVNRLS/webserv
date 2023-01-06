@@ -26,11 +26,27 @@ int	print_error(int error, const std::string &path) {
 	if (error == ARG_ERR)
 		std::cerr << "Error: invalid number of arguments" << std::endl;
 	else if (error == INVALID_EXTENSION)
-		std::cerr << "Error: invalid extension of path " << filename << std::endl;
-	else if (error == NO_SERVERS)
-		std::cerr << "Error: no server specified in the configuration path " << filename << std::endl;
+		std::cerr << "Error: invalid extension of configuration file " << filename << std::endl;
+//	else if (error == NO_SERVERS)
+//		std::cerr << "Error: no server specified in the configuration file " << filename << std::endl;
 	else if (error == BAD_PERMISSIONS)
 		std::cerr << "Error: invalid permissions of " << filename << std::endl;
 
-	return (1);
+	return (EXIT_FAILURE);
+}
+
+int	print_line_error(int error, const std::string &path, int line) {
+	std::string	filename;
+	size_t 		slash_pos;
+
+	slash_pos = path.find_last_of('/');
+	if (slash_pos == std::string::npos)
+		filename = path;
+	else
+		filename = path.substr(slash_pos + 1);
+
+	if (error == INVALID_SERVER_DEFINITION)
+		std::cerr << "Error: invalid server definition in the configuration file "
+			<< filename <<  "on line: " << line << std::endl;
+	return (EXIT_FAILURE);
 }
