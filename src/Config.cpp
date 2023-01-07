@@ -13,9 +13,9 @@
 #include "Config.hpp"
 
 //BASIC CLASS SETUP
-Config::Config() : _config_file(NULL), _server_mode(false), _line_num(1), _pos(0), _i(0), _serv_cnt(0) {}
+Config::Config() : _config_file(NULL), _server_mode(false), _line_num(1), _pos(0), _i(0), _serv_cnt(0), _serv_def_start(0), _serv_def_end(0) {}
 
-Config::Config(char *path) : _config_file(path), _server_mode(false), _line_num(1), _pos(0), _i(0), _serv_cnt(0) {}
+Config::Config(char *path) : _config_file(path), _server_mode(false), _line_num(1), _pos(0), _i(0), _serv_cnt(0), _serv_def_start(0), _serv_def_end(0) {}
 
 Config::Config(const Config &src) { *this = src; }
 
@@ -94,10 +94,12 @@ int	Config::split_blocks() {
 int Config::search_for_server() {
 	_pos = _buf.find("server");
 	if (_pos == 0) {
-		if (_server_mode)
+		if (_server_mode && find_open_brace() == EXIT_SUCCESS)
 			return (print_line_error(REDEFINITION_OF_SERVER, _config_file, _line_num));
-		if (find_open_brace() == EXIT_FAILURE)
+		else if (!_server_mode && find_open_brace() == EXIT_FAILURE)
 			return (print_line_error(INVALID_SERVER_DEFINITION, _config_file, _line_num));
+		if (check_closed_braces() == EXIT_FAILURE)
+			return (print_line_error(BRACES_NOT_CLOSED, _config_file, _line_num));
 		_server_mode = true;
 		_blocks.push_back(_buf);
 		return (EXIT_SUCCESS);
@@ -111,19 +113,44 @@ int Config::find_open_brace() {
 	size_t	j;
 	size_t	len;
 
-	j = _pos + 7; //offset from the start of the word 'server'
+	j = _i - _buf.length() + 7; //offset from the start of the word 'server'
 	len = _content.length();
 	while (j < len) {
 		if (_content[j] != SPACE && _content[j] != NEWLINE && _content[j] != OPEN_CURLY_BRACE)
 			return (EXIT_FAILURE);
-		else if (_content[j] == OPEN_CURLY_BRACE)
+		else if (_content[j] == OPEN_CURLY_BRACE) {
+			_serv_def_start = j;
 			return (EXIT_SUCCESS);
+		}
 		j++;
 	}
 	return (EXIT_FAILURE);
 }
 
+int	Config::check_closed_braces() {
+	size_t	open_braces;
+	size_t	closed_braces;
+	size_t	j;
 
+	_serv_def_end = _line_num;
+	open_braces = 1;
+	closed_braces = 0;
+	j = _serv_def_start + 1;
+	while (_content[j] < _content.length()) {
+		if (_content[j] == NEWLINE)
+			_serv_def_end++;
+
+		if (_content[j] == OPEN_CURLY_BRACE)
+			open_braces++;
+		else if (_content[j] == CLOSED_CURLY_BRACE)
+			closed_braces++;
+
+		if (open_braces == closed_braces)
+			return (EXIT_SUCCESS);
+		j++;
+	}
+	return (EXIT_FAILURE);
+}
 
 
 

@@ -54,5 +54,8 @@ int	print_line_error(int error, const std::string &config_file, size_t line) {
 	else if (error == REDEFINITION_OF_SERVER)
 		std::cerr << "Error: redefinition of server in the configuration file "
 				  << filename <<  " on line: " << line << std::endl;
+	else if (error == BRACES_NOT_CLOSED)
+		std::cerr << "Error: curly braces not closed in the configuration file "
+				  << filename <<  " on line: " << line << std::endl;
 	return (EXIT_FAILURE);
 }

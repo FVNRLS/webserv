@@ -33,6 +33,7 @@
 #define	CLOSED_CURLY_BRACE	'}'
 #define NEWLINE				'\n'
 #define SPACE				' '
+#define SEMICOLON			';'
 
 
 

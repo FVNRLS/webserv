@@ -26,6 +26,8 @@ private:
 	size_t 						_pos;
 	size_t 						_i;
 	size_t 						_serv_cnt;
+	size_t 						_serv_def_start;
+	size_t 						_serv_def_end;
 	std::vector<Server> 		*_serv;
 	std::vector<std::string>	_blocks;  // Vector to store blocks of code
 
@@ -36,6 +38,7 @@ private:
 	int							split_blocks();
 	int							search_for_server();
 	int 						find_open_brace();
+	int 						check_closed_braces();
 
 public:
 	//BASIC CLASS SETUP
