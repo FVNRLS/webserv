@@ -23,8 +23,9 @@
 //LINE ERRORS
 #define INVALID_SERVER_DEFINITION		5
 #define INVALID_SERVER_CONFIGURATION	6
+#define INVALID_CHARACTERS_FOUND		7
 
 
 
-int	print_error(int error, const std::string& path);
-int	print_line_error(int error, const std::string &path, int line);
+int	print_error(int error, const std::string& config_file);
+int	print_line_error(int error, const std::string &config_file, size_t line);

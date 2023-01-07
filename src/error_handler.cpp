@@ -12,16 +12,16 @@
 
 #include "error_handler.hpp"
 
-int	print_error(int error, const std::string &path) {
+int	print_error(int error, const std::string &config_file) {
 
 	std::string	filename;
 	size_t 		slash_pos;
 
-	slash_pos = path.find_last_of('/');
+	slash_pos = config_file.find_last_of('/');
 	if (slash_pos == std::string::npos)
-		filename = path;
+		filename = config_file;
 	else
-		filename = path.substr(slash_pos + 1);
+		filename = config_file.substr(slash_pos + 1);
 
 	if (error == ARG_ERR)
 		std::cerr << "Error: invalid number of arguments" << std::endl;
@@ -35,18 +35,21 @@ int	print_error(int error, const std::string &path) {
 	return (EXIT_FAILURE);
 }
 
-int	print_line_error(int error, const std::string &path, int line) {
+int	print_line_error(int error, const std::string &config_file, size_t line) {
 	std::string	filename;
 	size_t 		slash_pos;
 
-	slash_pos = path.find_last_of('/');
+	slash_pos = config_file.find_last_of('/');
 	if (slash_pos == std::string::npos)
-		filename = path;
+		filename = config_file;
 	else
-		filename = path.substr(slash_pos + 1);
+		filename = config_file.substr(slash_pos + 1);
 
 	if (error == INVALID_SERVER_DEFINITION)
 		std::cerr << "Error: invalid server definition in the configuration file "
-			<< filename <<  "on line: " << line << std::endl;
+			<< filename <<  " on line: " << line << std::endl;
+	else if (error == INVALID_CHARACTERS_FOUND)
+		std::cerr << "Error: invalid characters found in the configuration file "
+				  << filename <<  " on line: " << line << std::endl;
 	return (EXIT_FAILURE);
 }

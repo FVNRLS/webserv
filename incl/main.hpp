@@ -29,7 +29,6 @@
 #include "tools.hpp"
 
 #define NOT_FOUND			(-1)
-
 #define	OPEN_CURLY_BRACE	'{'
 #define	CLOSED_CURLY_BRACE	'}'
 #define NEWLINE				'\n'

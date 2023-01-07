@@ -21,8 +21,11 @@ private:
 	std::string					_config_file;
 	std::string 				_content;
 	std::string					_buf;
-	int 						_line_num;
+	bool 						_server_mode;
+	size_t 						_line_num;
 	size_t 						_pos;
+	size_t 						_i;
+	size_t 						_serv_cnt;
 	std::vector<Server> 		*_serv;
 	std::vector<std::string>	_blocks;  // Vector to store blocks of code
 
@@ -30,9 +33,9 @@ private:
 	//PRIVATE MEMBER FUNCTIONS
 	int							check_extension();
 	int							read_conf_file();
+	int							split_blocks();
 	int							search_for_server();
 	int 						find_open_brace();
-	int							split_blocks();
 
 public:
 	//BASIC CLASS SETUP

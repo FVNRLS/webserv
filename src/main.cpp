@@ -14,7 +14,7 @@
 #include "Server.hpp"
 
 int main(int argc, char **argv) {
-	Config	conf(argv[1]);
+	Config				conf(argv[1]);
 	std::vector<Server> servers;
 
 	if (argc != 2)
@@ -22,6 +22,7 @@ int main(int argc, char **argv) {
 
 	if (conf.parse(servers, argv[1]) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
+	
 
 	return (EXIT_SUCCESS);
 }
