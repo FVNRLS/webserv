@@ -94,6 +94,8 @@ int	Config::split_blocks() {
 int Config::search_for_server() {
 	_pos = _buf.find("server");
 	if (_pos == 0) {
+		if (_server_mode)
+			return (print_line_error(REDEFINITION_OF_SERVER, _config_file, _line_num));
 		if (find_open_brace() == EXIT_FAILURE)
 			return (print_line_error(INVALID_SERVER_DEFINITION, _config_file, _line_num));
 		_server_mode = true;
@@ -109,12 +111,12 @@ int Config::find_open_brace() {
 	size_t	j;
 	size_t	len;
 
-	j = _pos + 7; //offset from the bgin of the word 'server'
+	j = _pos + 7; //offset from the start of the word 'server'
 	len = _content.length();
 	while (j < len) {
 		if (_content[j] != SPACE && _content[j] != NEWLINE && _content[j] != OPEN_CURLY_BRACE)
 			return (EXIT_FAILURE);
-		else if (_content[j] != OPEN_CURLY_BRACE)
+		else if (_content[j] == OPEN_CURLY_BRACE)
 			return (EXIT_SUCCESS);
 		j++;
 	}
