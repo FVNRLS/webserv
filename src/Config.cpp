@@ -19,7 +19,7 @@ Config::Config(char *path) : _config_file(path), _server_mode(false), _line_num(
 
 Config::Config(const Config &src) { *this = src; }
 
-Config &Config::operator=(const Config &src) {
+Config &Config::operator=(const Config &src) { //todo: complete in the end!
 	if (this == &src)
 		return (*this);
 	_config_file = src._config_file;
@@ -80,6 +80,8 @@ int	Config::split_blocks() {
 
 		while (_content[_i] != NEWLINE && _i < len) {
 			_buf += _content[_i];
+			if ((_i + 1) == _serv_def_end)
+				_server_mode = false;
 			_i++;
 		}
 		if (search_for_server() == EXIT_FAILURE)
@@ -132,21 +134,18 @@ int	Config::check_closed_braces() {
 	size_t	closed_braces;
 	size_t	j;
 
-	_serv_def_end = _line_num;
 	open_braces = 1;
 	closed_braces = 0;
 	j = _serv_def_start + 1;
-	while (_content[j] < _content.length()) {
-		if (_content[j] == NEWLINE)
-			_serv_def_end++;
-
+	while (j < _content.length()) {
 		if (_content[j] == OPEN_CURLY_BRACE)
 			open_braces++;
 		else if (_content[j] == CLOSED_CURLY_BRACE)
 			closed_braces++;
-
-		if (open_braces == closed_braces)
+		if (open_braces == closed_braces) {
+			_serv_def_end = j;
 			return (EXIT_SUCCESS);
+		}
 		j++;
 	}
 	return (EXIT_FAILURE);
