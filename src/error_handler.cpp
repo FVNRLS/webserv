@@ -27,8 +27,8 @@ int	print_error(int error, const std::string &config_file) {
 		std::cerr << "Error: invalid number of arguments" << std::endl;
 	else if (error == INVALID_EXTENSION)
 		std::cerr << "Error: invalid extension of configuration file " << filename << std::endl;
-//	else if (error == NO_SERVERS)
-//		std::cerr << "Error: no server specified in configuration file " << filename << std::endl;
+	else if (error == NO_SERVER)
+		std::cerr << "Error: no server specified in configuration file " << filename << std::endl;
 	else if (error == BAD_PERMISSIONS)
 		std::cerr << "Error: invalid permissions of " << filename << std::endl;
 
@@ -56,6 +56,12 @@ int	print_line_error(int error, const std::string &config_file, size_t line) {
 				  << filename <<  " on line: " << line << std::endl;
 	else if (error == BRACES_NOT_CLOSED)
 		std::cerr << "Error: curly braces are not closed in the definition of a server member in configuration file "
+				  << filename <<  " on line: " << line << std::endl;
+	else if (error == TOO_MANY_ARGS)
+		std::cerr << "Error: Too many arguments in configuration file "
+				  << filename <<  " on line: " << line << std::endl;
+	else if (error == NO_SEMICOLON)
+		std::cerr << "Error: missing ';' in configuration file "
 				  << filename <<  " on line: " << line << std::endl;
 	return (EXIT_FAILURE);
 }

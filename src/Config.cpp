@@ -1,5 +1,3 @@
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "modernize-loop-convert"
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
@@ -15,11 +13,11 @@
 #include "Config.hpp"
 
 //BASIC CLASS SETUP
-Config::Config() : 	_config_file(NULL), _server_mode(false), _line_num(1), _pos(0), _i(0), _serv_cnt(0),
-					_serv_def_start(0), _serv_def_end(0), _i_serv(-1) {}
+Config::Config() : _config_file(NULL), _serv_mode(false), _line_num(1), _pos(0), _i(0), _serv_cnt(0),
+				   _serv_def_start(0), _serv_def_end(0), _i_serv(-1), _i_loc(0) {}
 
-Config::Config(char *path) : 	_config_file(path), _server_mode(false), _line_num(1), _pos(0), _i(0),
-								_serv_cnt(0), _serv_def_start(0), _serv_def_end(0), _i_serv(-1) {
+Config::Config(char *path) : _config_file(path), _serv_mode(false), _line_num(1), _pos(0), _i(0),
+							 _serv_cnt(0), _serv_def_start(0), _serv_def_end(0), _i_serv(-1), _i_loc(0) {
 	_spec_chars.push_back(OPEN_CURLY_BRACE);
 	_spec_chars.push_back(CLOSED_CURLY_BRACE);
 	_spec_chars.push_back(NEWLINE);
@@ -50,9 +48,14 @@ int	Config::parse(std::vector<Server> &servers, const char *config) {
 		return (EXIT_FAILURE);
 	if (split_in_server_blocks() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
-	for (int i = 0; i <= _i_serv; i++) {
-		std::cout << _blocks[i] << std::endl;
-	}
+	if (_serv_cnt == 0)
+		return (print_error(NO_SERVER, _config_file));
+	if (extract_server() == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+
+//	for (int i = 0; i <= _i_serv; i++) {
+//		std::cout << _serv_blocks[i] << std::endl;
+//	}
 	return (EXIT_SUCCESS);
 }
 
@@ -82,11 +85,8 @@ int	Config::read_conf_file() {
 	return (EXIT_SUCCESS);
 }
 
-void	Config::ignore_comments(size_t len) {
-	if (_content[_i] == HASH) {
-		while (_content[_i] != NEWLINE && _i < len)
-			_i++;
-	}
+size_t Config::get_line_num(std::string &str) const {
+	return (_content.find(str));
 }
 
 int	Config::split_in_server_blocks() {
@@ -102,16 +102,23 @@ int	Config::split_in_server_blocks() {
 		else {
 			if (search_for_server() == EXIT_FAILURE)
 				return (EXIT_FAILURE);
-			if (_server_mode)
-				_blocks[_i_serv] += _buf;
+			if (_serv_mode)
+				_serv_blocks[_i_serv] += _buf;
 			_buf.clear();
 			_line_num++;
 		}
 		if (_i == _serv_def_end)
-			_server_mode = false;
+			_serv_mode = false;
 		_i++;
 	}
 	return (EXIT_SUCCESS);
+}
+
+void	Config::ignore_comments(size_t len) {
+	if (_content[_i] == HASH) {
+		while (_content[_i] != NEWLINE && _i < len)
+			_i++;
+	}
 }
 
 int Config::find_spec_chars(char c) const {
@@ -125,21 +132,21 @@ int Config::find_spec_chars(char c) const {
 int Config::search_for_server() {
 	_pos = _buf.find("server");
 	if (_pos == 0) {
-		if (_server_mode && find_open_brace() == EXIT_SUCCESS)
+		if (_serv_mode && find_open_brace() == EXIT_SUCCESS)
 			return (print_line_error(REDEFINITION_OF_SERVER, _config_file, _line_num));
-		else if (_server_mode && find_open_brace() == EXIT_FAILURE)
+		else if (_serv_mode && find_open_brace() == EXIT_FAILURE)
 			return (NOT_FOUND);
-		else if (!_server_mode && find_open_brace() == EXIT_FAILURE)
+		else if (!_serv_mode && find_open_brace() == EXIT_FAILURE)
 			return (print_line_error(INVALID_SERVER_DEFINITION, _config_file, _line_num));
 		if (check_closed_braces() == EXIT_FAILURE)
 			return (print_line_error(BRACES_NOT_CLOSED, _config_file, _line_num));
-		_server_mode = true;
-		_blocks.push_back("");
+		_serv_mode = true;
+		_serv_blocks.push_back("");
 		_i_serv++;
 		_serv_cnt++;
 		return (EXIT_SUCCESS);
 	}
-	else if (!_server_mode && find_spec_chars(_buf[0]) == EXIT_FAILURE)
+	else if (!_serv_mode && find_spec_chars(_buf[0]) == EXIT_FAILURE)
 		return (print_line_error(INVALID_CHARACTERS_FOUND, _config_file, _line_num));
 	return (NOT_FOUND);
 }
@@ -184,8 +191,39 @@ int	Config::check_closed_braces() {
 	return (EXIT_FAILURE);
 }
 
+int	Config::extract_server() {
+	_serv_mode = true;
 
-
-
-
-#pragma clang diagnostic pop
+	_extracted_blocks.push_back("");
+	_i_serv = 0;
+	_i = 0;
+	while (_i < _serv_blocks[0].length()) {
+		if  (_serv_blocks[0][_i] != SEMICOLON)
+			_buf += _serv_blocks[0][_i];
+		else {
+			_buf += SEMICOLON;
+			_pos = _buf.find("location");
+			if (_pos > 0 && _pos < _buf.length()) {
+				std::cout << _buf << std::endl; //todo resolve unfinished with semicolon
+				return (print_line_error(NO_SEMICOLON, _config_file, get_line_num(_buf)));
+			}
+			if (_pos == 0 && (_buf[8] == OPEN_CURLY_BRACE || _buf[8] == SPACE)) {
+				_serv_mode = false;
+				_extracted_blocks.push_back("");
+				_i_loc++;
+			}
+			if (_serv_mode)
+				_extracted_blocks[_i_serv] += _buf;
+			else
+				_extracted_blocks[_i_loc] += _buf;
+			_buf.clear();
+		}
+		if (_serv_blocks[0][_i] == CLOSED_CURLY_BRACE)
+			_serv_mode = true;
+		_i++;
+	}
+	for (int i = 0; i <= _i_loc; i++) {
+		std::cout << _extracted_blocks[i] << std::endl;
+	}
+	return (EXIT_SUCCESS);
+}

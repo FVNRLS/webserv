@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <algorithm>
 #include <string>
 #include <vector>
@@ -36,10 +37,4 @@
 #define SEMICOLON			';'
 #define HASH				'#'
 #define NULL_TERM			'\0'
-
-
-
-
-
-
 

@@ -17,7 +17,7 @@
 //BASIC PARSING ERRORS
 #define ARG_ERR							1
 #define INVALID_EXTENSION				2
-#define NO_SERVERS						3
+#define NO_SERVER						3
 #define BAD_PERMISSIONS					4
 
 //LINE ERRORS
@@ -26,6 +26,8 @@
 #define INVALID_CHARACTERS_FOUND		7
 #define REDEFINITION_OF_SERVER			8
 #define BRACES_NOT_CLOSED				9
+#define TOO_MANY_ARGS					10
+#define NO_SEMICOLON					11
 
 
 
