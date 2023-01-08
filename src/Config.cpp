@@ -13,9 +13,11 @@
 #include "Config.hpp"
 
 //BASIC CLASS SETUP
-Config::Config() : _config_file(NULL), _server_mode(false), _line_num(1), _pos(0), _i(0), _serv_cnt(0), _serv_def_start(0), _serv_def_end(0) {}
+Config::Config() : 	_config_file(NULL), _server_mode(false), _line_num(1), _pos(0), _i(0), _serv_cnt(0),
+					_serv_def_start(0), _serv_def_end(0), _i_serv(-1) {}
 
-Config::Config(char *path) : _config_file(path), _server_mode(false), _line_num(1), _pos(0), _i(0), _serv_cnt(0), _serv_def_start(0), _serv_def_end(0) {}
+Config::Config(char *path) : 	_config_file(path), _server_mode(false), _line_num(1), _pos(0), _i(0),
+								_serv_cnt(0), _serv_def_start(0), _serv_def_end(0), _i_serv(-1) {}
 
 Config::Config(const Config &src) { *this = src; }
 
@@ -37,6 +39,10 @@ int	Config::parse(std::vector<Server> &servers, const char *config) {
 		return (EXIT_FAILURE);
 	if (split_blocks() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
+	for (int i = 0; i < _i_serv; i++) {
+		std::cout << _blocks[i] << std::endl;
+	}
+
 
 //	std::cout << _content << std::endl;
 	return (EXIT_SUCCESS);
@@ -71,23 +77,22 @@ int	Config::read_conf_file() {
 int	Config::split_blocks() {
 
 	size_t	len;
-	int 	serv_index;
-	size_t 	serv_pos;
 
 	len = _content.length();
 	_i = 0;
 	while (_i < len) {
-
-		while (_content[_i] != NEWLINE && _i < len) {
+		if (_content[_i] != NEWLINE)
 			_buf += _content[_i];
-			if ((_i + 1) == _serv_def_end)
-				_server_mode = false;
-			_i++;
-		}
-		if (search_for_server() == EXIT_FAILURE)
+		else {
+			if (search_for_server() == EXIT_FAILURE)
 				return (EXIT_FAILURE);
-		_buf.clear();
-		_line_num++;
+			if (_server_mode)
+				_blocks[_i_serv] += _buf;
+			_buf.clear();
+			_line_num++;
+		}
+		if (_i == _serv_def_end)
+			_server_mode = false;
 		_i++;
 	}
 	return (EXIT_SUCCESS);
@@ -98,15 +103,18 @@ int Config::search_for_server() {
 	if (_pos == 0) {
 		if (_server_mode && find_open_brace() == EXIT_SUCCESS)
 			return (print_line_error(REDEFINITION_OF_SERVER, _config_file, _line_num));
+		else if (_server_mode && find_open_brace() == EXIT_FAILURE)
+			return (NOT_FOUND);
 		else if (!_server_mode && find_open_brace() == EXIT_FAILURE)
 			return (print_line_error(INVALID_SERVER_DEFINITION, _config_file, _line_num));
 		if (check_closed_braces() == EXIT_FAILURE)
 			return (print_line_error(BRACES_NOT_CLOSED, _config_file, _line_num));
 		_server_mode = true;
-		_blocks.push_back(_buf);
+		_blocks.push_back("");
+		_i_serv++;
 		return (EXIT_SUCCESS);
 	}
-	else if (!_server_mode && _buf[0] != '\0')
+	else if (!_server_mode && _buf[0] != '\0' && _buf[0] != NEWLINE && _buf[0] != OPEN_CURLY_BRACE && _buf[0] != CLOSED_CURLY_BRACE)
 		return (print_line_error(INVALID_CHARACTERS_FOUND, _config_file, _line_num));
 	return (NOT_FOUND);
 }
@@ -143,7 +151,7 @@ int	Config::check_closed_braces() {
 		else if (_content[j] == CLOSED_CURLY_BRACE)
 			closed_braces++;
 		if (open_braces == closed_braces) {
-			_serv_def_end = j;
+			_serv_def_end = j + 1;
 			return (EXIT_SUCCESS);
 		}
 		j++;

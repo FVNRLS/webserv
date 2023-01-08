@@ -28,6 +28,7 @@ private:
 	size_t 						_serv_cnt;
 	size_t 						_serv_def_start;
 	size_t 						_serv_def_end;
+	int 						_i_serv;
 	std::vector<Server> 		*_serv;
 	std::vector<std::string>	_blocks;  // Vector to store blocks of code
 
