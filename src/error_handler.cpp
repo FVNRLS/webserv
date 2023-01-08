@@ -28,7 +28,7 @@ int	print_error(int error, const std::string &config_file) {
 	else if (error == INVALID_EXTENSION)
 		std::cerr << "Error: invalid extension of configuration file " << filename << std::endl;
 //	else if (error == NO_SERVERS)
-//		std::cerr << "Error: no server specified in the configuration file " << filename << std::endl;
+//		std::cerr << "Error: no server specified in configuration file " << filename << std::endl;
 	else if (error == BAD_PERMISSIONS)
 		std::cerr << "Error: invalid permissions of " << filename << std::endl;
 
@@ -46,16 +46,16 @@ int	print_line_error(int error, const std::string &config_file, size_t line) {
 		filename = config_file.substr(slash_pos + 1);
 
 	if (error == INVALID_SERVER_DEFINITION)
-		std::cerr << "Error: invalid server definition in the configuration file "
+		std::cerr << "Error: invalid server definition in configuration file "
 			<< filename <<  " on line: " << line << std::endl;
 	else if (error == INVALID_CHARACTERS_FOUND)
-		std::cerr << "Error: invalid characters found in the configuration file "
+		std::cerr << "Error: invalid characters found in configuration file "
 				  << filename <<  " on line: " << line << std::endl;
 	else if (error == REDEFINITION_OF_SERVER)
-		std::cerr << "Error: redefinition of server in the configuration file "
+		std::cerr << "Error: redefinition of server in configuration file "
 				  << filename <<  " on line: " << line << std::endl;
 	else if (error == BRACES_NOT_CLOSED)
-		std::cerr << "Error: curly braces not closed in the configuration file "
+		std::cerr << "Error: curly braces are not closed in the definition of a server member in configuration file "
 				  << filename <<  " on line: " << line << std::endl;
 	return (EXIT_FAILURE);
 }

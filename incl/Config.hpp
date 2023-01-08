@@ -29,6 +29,7 @@ private:
 	size_t 						_serv_def_start;
 	size_t 						_serv_def_end;
 	int 						_i_serv;
+	std::vector<char>			_spec_chars;
 	std::vector<Server> 		*_serv;
 	std::vector<std::string>	_blocks;  // Vector to store blocks of code
 
@@ -36,12 +37,14 @@ private:
 	//PRIVATE MEMBER FUNCTIONS
 	int							check_extension();
 	int							read_conf_file();
-	int							split_blocks();
+	int							split_in_server_blocks();
 	int							search_for_server();
+	void						ignore_comments(size_t len);
 	int 						find_open_brace();
 	int 						check_closed_braces();
+	int 						find_spec_chars(char c) const;
 
-public:
+		public:
 	//BASIC CLASS SETUP
 	Config();
 	Config(char *path);

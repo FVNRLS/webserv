@@ -34,6 +34,8 @@
 #define NEWLINE				'\n'
 #define SPACE				' '
 #define SEMICOLON			';'
+#define HASH				'#'
+#define NULL_TERM			'\0'
 
 
 
