@@ -31,18 +31,21 @@ private:
 	int 						_i_serv;
 	int 						_i_loc;
 	std::vector<char>			_spec_chars;
+	std::vector<std::string>	_valid_members;
 	std::vector<Server> 		*_serv;
 	std::vector<std::string>	_serv_blocks;
 	std::vector<std::string>	_extracted_blocks;
+	std::vector<std::string>	_tokens;
 
 	//PRIVATE MEMBER FUNCTIONS
 	int							check_extension();
 	int							read_conf_file();
-	size_t 						get_line_num(std::string &str) const;
+	size_t 						get_line_num(std::string &str);
 	int							split_in_server_blocks();
 	int							search_for_server();
 	void						ignore_comments(size_t len);
-	int 						find_spec_chars(char c) const;
+	int 						find_in_spec_chars(char c) const;
+	int 						find_in_valid_members(std::string &s) const;
 	int 						find_open_brace();
 	int 						check_closed_braces();
 	int							extract_server();

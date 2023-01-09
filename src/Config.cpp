@@ -18,6 +18,8 @@ Config::Config() : _config_file(NULL), _serv_mode(false), _line_num(1), _pos(0),
 
 Config::Config(char *path) : _config_file(path), _serv_mode(false), _line_num(1), _pos(0), _i(0),
 							 _serv_cnt(0), _serv_def_start(0), _serv_def_end(0), _i_serv(-1), _i_loc(0) {
+
+	//VECTOR OF VALID SPECIAL CHARACTERS
 	_spec_chars.push_back(OPEN_CURLY_BRACE);
 	_spec_chars.push_back(CLOSED_CURLY_BRACE);
 	_spec_chars.push_back(NEWLINE);
@@ -25,6 +27,21 @@ Config::Config(char *path) : _config_file(path), _serv_mode(false), _line_num(1)
 	_spec_chars.push_back(SEMICOLON);
 	_spec_chars.push_back(HASH);
 	_spec_chars.push_back(NULL_TERM);
+
+	//VECTOR OF VALID CONFIGURATION FILE MEMBERS
+	_valid_members.push_back("server");
+	_valid_members.push_back("server_name");
+	_valid_members.push_back("ip-address");
+	_valid_members.push_back("port");
+	_valid_members.push_back("root");
+	_valid_members.push_back("index");
+	_valid_members.push_back("max_client_body_size");
+	_valid_members.push_back("error_pages");
+	_valid_members.push_back("redirection");
+	_valid_members.push_back("location");
+	_valid_members.push_back("allowed_methods");
+	_valid_members.push_back("allowed_scripts");
+	_valid_members.push_back("directory_listing");
 }
 
 Config::Config(const Config &src) { *this = src; }
@@ -53,9 +70,6 @@ int	Config::parse(std::vector<Server> &servers, const char *config) {
 	if (extract_server() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 
-//	for (int i = 0; i <= _i_serv; i++) {
-//		std::cout << _serv_blocks[i] << std::endl;
-//	}
 	return (EXIT_SUCCESS);
 }
 
@@ -85,8 +99,19 @@ int	Config::read_conf_file() {
 	return (EXIT_SUCCESS);
 }
 
-size_t Config::get_line_num(std::string &str) const {
-	return (_content.find(str));
+size_t Config::get_line_num(std::string &str) {
+	size_t pos;
+
+	_line_num = 1;
+	pos = _content.find(str);
+	if (pos != std::string::npos) {
+		for (int i = 0; i < pos; i++) {
+			if (i == pos)
+				return (_line_num);
+			_line_num++;
+		}
+	}
+	return (_line_num);
 }
 
 int	Config::split_in_server_blocks() {
@@ -100,6 +125,8 @@ int	Config::split_in_server_blocks() {
 		if (_content[_i] != NEWLINE)
 			_buf += _content[_i];
 		else {
+			if (_i < len)
+				_buf += SPACE;
 			if (search_for_server() == EXIT_FAILURE)
 				return (EXIT_FAILURE);
 			if (_serv_mode)
@@ -121,9 +148,20 @@ void	Config::ignore_comments(size_t len) {
 	}
 }
 
-int Config::find_spec_chars(char c) const {
+int Config::find_in_spec_chars(char c) const {
 	for (int i = 0; i < _spec_chars.size(); i++) {
 		if (c == _spec_chars[i])
+			return (EXIT_SUCCESS);
+	}
+	return (EXIT_FAILURE);
+}
+
+int Config::find_in_valid_members(std::string &s) const {
+	size_t	len;
+
+	len = _valid_members.size();
+	for (int i = 0; i < len; i++) {
+		if (_valid_members[i] == s)
 			return (EXIT_SUCCESS);
 	}
 	return (EXIT_FAILURE);
@@ -146,7 +184,7 @@ int Config::search_for_server() {
 		_serv_cnt++;
 		return (EXIT_SUCCESS);
 	}
-	else if (!_serv_mode && find_spec_chars(_buf[0]) == EXIT_FAILURE)
+	else if (!_serv_mode && find_in_spec_chars(_buf[0]) == EXIT_FAILURE)
 		return (print_line_error(INVALID_CHARACTERS_FOUND, _config_file, _line_num));
 	return (NOT_FOUND);
 }
@@ -192,38 +230,52 @@ int	Config::check_closed_braces() {
 }
 
 int	Config::extract_server() {
-	_serv_mode = true;
 
-	_extracted_blocks.push_back("");
+	_serv_mode = true;
 	_i_serv = 0;
+	_line_num = 1;
+	_extracted_blocks.push_back("");
 	_i = 0;
+
+
+	size_t pos;
+	while ((pos = _serv_blocks[0].find(OPEN_CURLY_BRACE)) != _serv_blocks[0].npos) {
+		_serv_blocks[0].replace(pos, 1, ";");
+	}
+
 	while (_i < _serv_blocks[0].length()) {
-		if  (_serv_blocks[0][_i] != SEMICOLON)
+		if (_serv_blocks[0][_i] != SEMICOLON) {
 			_buf += _serv_blocks[0][_i];
+		}
 		else {
 			_buf += SEMICOLON;
-			_pos = _buf.find("location");
-			if (_pos > 0 && _pos < _buf.length()) {
-				std::cout << _buf << std::endl; //todo resolve unfinished with semicolon
-				return (print_line_error(NO_SEMICOLON, _config_file, get_line_num(_buf)));
-			}
-			if (_pos == 0 && (_buf[8] == OPEN_CURLY_BRACE || _buf[8] == SPACE)) {
-				_serv_mode = false;
-				_extracted_blocks.push_back("");
-				_i_loc++;
-			}
-			if (_serv_mode)
-				_extracted_blocks[_i_serv] += _buf;
-			else
-				_extracted_blocks[_i_loc] += _buf;
+
+			_tokens = split(_buf, SPACE);
+			print_vector(_tokens, _tokens.size());
+
+			if (find_in_valid_members(_tokens[0]) == EXIT_FAILURE)
+				return (print_line_error(INVALID_MEMBER, _config_file, get_line_num(_tokens[0])));
+
+
+
+//			if (_pos == 0 && (_buf[8] == OPEN_CURLY_BRACE || _buf[8] == SPACE)) {
+//				_serv_mode = false;
+//				_extracted_blocks.push_back("");
+//				_i_loc++;
+//			}
+//			if (_serv_mode)
+//				_extracted_blocks[_i_serv] += _buf;
+//			else {
+//				_extracted_blocks[_i_loc] += _buf;
+//				_buf.clear();
+//			}
+//			if (_serv_blocks[0][_i] == CLOSED_CURLY_BRACE)
+//				_serv_mode = true;
 			_buf.clear();
+			_tokens.clear();
 		}
-		if (_serv_blocks[0][_i] == CLOSED_CURLY_BRACE)
-			_serv_mode = true;
 		_i++;
 	}
-	for (int i = 0; i <= _i_loc; i++) {
-		std::cout << _extracted_blocks[i] << std::endl;
-	}
+
 	return (EXIT_SUCCESS);
 }

@@ -24,4 +24,5 @@ add_executable(webserver
         #TOOLS
         incl/tools.hpp
         src/tools/trim.cpp
+        src/tools/split.cpp
         )

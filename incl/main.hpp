@@ -37,4 +37,5 @@
 #define SEMICOLON			';'
 #define HASH				'#'
 #define NULL_TERM			'\0'
+#define TAB					'\t'
 

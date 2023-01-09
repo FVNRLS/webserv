@@ -63,5 +63,8 @@ int	print_line_error(int error, const std::string &config_file, size_t line) {
 	else if (error == NO_SEMICOLON)
 		std::cerr << "Error: missing ';' in configuration file "
 				  << filename <<  " on line: " << line << std::endl;
+	else if (error == INVALID_MEMBER)
+		std::cerr << "Error: invalid member found in configuration file "
+				  << filename <<  " on line: " << line << std::endl;
 	return (EXIT_FAILURE);
 }

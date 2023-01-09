@@ -28,6 +28,7 @@
 #define BRACES_NOT_CLOSED				9
 #define TOO_MANY_ARGS					10
 #define NO_SEMICOLON					11
+#define INVALID_MEMBER					12
 
 
 
