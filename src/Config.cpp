@@ -45,6 +45,7 @@ Config::Config(char *path) : _config_file(path), _serv_mode(false), _line_num(1)
 	_valid_members.push_back("allowed_methods");
 	_valid_members.push_back("allowed_scripts");
 	_valid_members.push_back("directory_listing");
+	_valid_members.push_back("autoindex");
 }
 
 Config::Config(const Config &src) { *this = src; }
@@ -62,6 +63,7 @@ Config::~Config() {}
 
 int	Config::parse(std::vector<Server> &servers, const char *config) {
 	_serv = &servers;
+
 	if (check_extension() == EXIT_FAILURE)
 		return (print_error(INVALID_EXTENSION, config));
 	if (read_conf_file() == EXIT_FAILURE)
@@ -70,6 +72,9 @@ int	Config::parse(std::vector<Server> &servers, const char *config) {
 		return (EXIT_FAILURE);
 	if (_serv_cnt == 0)
 		return (print_error(NO_SERVER, _config_file));
+
+	create_servers();
+
 	if (extract_servers() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 
@@ -144,6 +149,13 @@ int	Config::split_in_server_blocks() {
 		_conf_pos++;
 	}
 	return (EXIT_SUCCESS);
+}
+
+void	Config::create_servers() {
+	for (int i = 0; i < _serv_cnt; i++) {
+		Server	serv;
+		_serv->push_back(serv);
+	}
 }
 
 void	Config::ignore_comments(size_t len) {
@@ -277,11 +289,11 @@ int Config::extract_server_block(int i) {
 
 
 
+
 			_buf.clear();
 			_tokens.clear();
 		}
 		j++;
 	}
-//	_tokens.clear();
 	return (EXIT_SUCCESS);
 }

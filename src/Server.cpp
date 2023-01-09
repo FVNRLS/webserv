@@ -25,5 +25,11 @@ Server &Server::operator=(const Server &src) {
 	return (*this);
 }
 
+//TODO: finish stream overload -> print all server information!
+std::ostream	&operator<<(std::ostream &o, Server *a) {
+
+	return (o);
+}
+
 Server::~Server() {}
 
