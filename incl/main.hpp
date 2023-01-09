@@ -18,13 +18,13 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <list>
 #include <map>
 
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
-
 
 #include "error_handler.hpp"
 #include "tools.hpp"

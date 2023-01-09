@@ -34,7 +34,6 @@ private:
 	std::vector<std::string>	_valid_members;
 	std::vector<Server> 		*_serv;
 	std::vector<std::string>	_serv_blocks;
-	std::vector<std::string>	_extracted_blocks;
 	std::vector<std::string>	_tokens;
 
 	//PRIVATE MEMBER FUNCTIONS
@@ -48,8 +47,10 @@ private:
 	int 						find_in_valid_members(std::string &s) const;
 	int 						find_open_brace();
 	int 						check_closed_braces();
-	int							extract_server();
-
+	int							extract_servers();
+	void						replace_open_braces(std::vector<std::string> &v);
+	void 						create_servers();
+	int 						extract_server_block(int i);
 
 public:
 	//BASIC CLASS SETUP
