@@ -70,7 +70,7 @@ int	Config::parse(std::vector<Server> &servers, const char *config) {
 		return (EXIT_FAILURE);
 	if (_serv_cnt == 0)
 		return (print_error(NO_SERVER, _config_file));
-	if (extract_server() == EXIT_FAILURE)
+	if (extract_servers() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 
 	return (EXIT_SUCCESS);
@@ -234,23 +234,40 @@ int	Config::check_closed_braces() {
 	return (EXIT_FAILURE);
 }
 
-int	Config::extract_server() {
+int	Config::extract_servers() {
+	int i;
+
+	_line_num = 1;
+	replace_open_braces(_serv_blocks);
+	i = 0;
+	while (i < _serv_blocks.size()) {
+		if (extract_server_block(i) == EXIT_FAILURE)
+			return (EXIT_FAILURE);
+		i++;
+	}
+	return (EXIT_SUCCESS);
+}
+
+void	Config::replace_open_braces(std::vector<std::string> &v) {
+	size_t	pos;
+
+	for (int i = 0; i < v.size(); i++) {
+		while ((pos = v[i].find(OPEN_CURLY_BRACE)) != _serv_blocks[0].npos) {
+			v[i].replace(pos, 1, STR_SEMICOLON);
+		}
+	}
+}
+
+int Config::extract_server_block(int i) {
+	int j;
 
 	_serv_mode = true;
 	_i_serv = 0;
-	_line_num = 1;
-	_extracted_blocks.push_back("");
-	_conf_pos = 0;
-
-	size_t pos;
-	while ((pos = _serv_blocks[0].find(OPEN_CURLY_BRACE)) != _serv_blocks[0].npos) {
-		_serv_blocks[0].replace(pos, 1, ";");
-	}
-
-	while (_conf_pos < _serv_blocks[0].length()) {
-		if (_serv_blocks[0][_conf_pos] != SEMICOLON) {
-			_buf += _serv_blocks[0][_conf_pos];
-		}
+	_buf.clear();
+	j = 0;
+	while (j < _serv_blocks[i].length()) {
+		if (_serv_blocks[i][j] != SEMICOLON)
+			_buf += _serv_blocks[0][j];
 		else {
 			_tokens = split(_buf, SPACE);
 			print_vector(_tokens, _tokens.size());
@@ -258,19 +275,13 @@ int	Config::extract_server() {
 			if (find_in_valid_members(_tokens[0]) == EXIT_FAILURE)
 				return (print_line_error(INVALID_MEMBER, _config_file, get_line_num(_tokens[0])));
 
-//			if (_serv_mode)
-//				_extracted_blocks[_i_serv] += _buf;
-//			else {
-//				_extracted_blocks[_i_loc] += _buf;
-//				_buf.clear();
-//			}
-//			if (_serv_blocks[0][_conf_pos] == CLOSED_CURLY_BRACE)
-//				_serv_mode = true;
+
+
 			_buf.clear();
 			_tokens.clear();
 		}
-		_conf_pos++;
+		j++;
 	}
-
+//	_tokens.clear();
 	return (EXIT_SUCCESS);
 }
