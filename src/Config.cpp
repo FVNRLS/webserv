@@ -13,10 +13,10 @@
 #include "Config.hpp"
 
 //BASIC CLASS SETUP
-Config::Config() : _config_file(NULL), _serv_mode(false), _line_num(1), _pos(0), _i(0), _serv_cnt(0),
+Config::Config() : _config_file(NULL), _serv_mode(false), _line_num(1), _pos(0), _conf_pos(0), _serv_cnt(0),
 				   _serv_def_start(0), _serv_def_end(0), _i_serv(-1), _i_loc(0) {}
 
-Config::Config(char *path) : _config_file(path), _serv_mode(false), _line_num(1), _pos(0), _i(0),
+Config::Config(char *path) : _config_file(path), _serv_mode(false), _line_num(1), _pos(0), _conf_pos(0),
 							 _serv_cnt(0), _serv_def_start(0), _serv_def_end(0), _i_serv(-1), _i_loc(0) {
 
 	//VECTOR OF VALID SPECIAL CHARACTERS
@@ -29,9 +29,12 @@ Config::Config(char *path) : _config_file(path), _serv_mode(false), _line_num(1)
 	_spec_chars.push_back(NULL_TERM);
 
 	//VECTOR OF VALID CONFIGURATION FILE MEMBERS
+	_valid_members.push_back(STR_CLOSED_CURLY_BRACE);
+	_valid_members.push_back(STR_SEMICOLON);
 	_valid_members.push_back("server");
 	_valid_members.push_back("server_name");
 	_valid_members.push_back("ip-address");
+	_valid_members.push_back("ip_address");
 	_valid_members.push_back("port");
 	_valid_members.push_back("root");
 	_valid_members.push_back("index");
@@ -100,15 +103,17 @@ int	Config::read_conf_file() {
 }
 
 size_t Config::get_line_num(std::string &str) {
-	size_t pos;
+	size_t	pos;
+	int 	i;
 
 	_line_num = 1;
+	i = 0;
 	pos = _content.find(str);
 	if (pos != std::string::npos) {
-		for (int i = 0; i < pos; i++) {
-			if (i == pos)
-				return (_line_num);
-			_line_num++;
+		while (i != pos) {
+			if (_content[i] == NEWLINE)
+				_line_num++;
+			i++;
 		}
 	}
 	return (_line_num);
@@ -119,13 +124,13 @@ int	Config::split_in_server_blocks() {
 	size_t	len;
 
 	len = _content.length();
-	_i = 0;
-	while (_i < len) {
+	_conf_pos = 0;
+	while (_conf_pos < len) {
 		ignore_comments(len);
-		if (_content[_i] != NEWLINE)
-			_buf += _content[_i];
+		if (_content[_conf_pos] != NEWLINE)
+			_buf += _content[_conf_pos];
 		else {
-			if (_i < len)
+			if (_conf_pos < len)
 				_buf += SPACE;
 			if (search_for_server() == EXIT_FAILURE)
 				return (EXIT_FAILURE);
@@ -134,17 +139,17 @@ int	Config::split_in_server_blocks() {
 			_buf.clear();
 			_line_num++;
 		}
-		if (_i == _serv_def_end)
+		if (_conf_pos == _serv_def_end)
 			_serv_mode = false;
-		_i++;
+		_conf_pos++;
 	}
 	return (EXIT_SUCCESS);
 }
 
 void	Config::ignore_comments(size_t len) {
-	if (_content[_i] == HASH) {
-		while (_content[_i] != NEWLINE && _i < len)
-			_i++;
+	if (_content[_conf_pos] == HASH) {
+		while (_content[_conf_pos] != NEWLINE && _conf_pos < len)
+			_conf_pos++;
 	}
 }
 
@@ -193,7 +198,7 @@ int Config::find_open_brace() {
 	size_t	j;
 	size_t	len;
 
-	j = _i - _buf.length() + 7; //offset from the start of the word 'server'
+	j = _conf_pos - _buf.length() + 7; //offset from the start of the word 'server'
 	len = _content.length();
 	while (j < len) {
 		if (_content[j] != SPACE && _content[j] != NEWLINE && _content[j] != OPEN_CURLY_BRACE)
@@ -235,46 +240,36 @@ int	Config::extract_server() {
 	_i_serv = 0;
 	_line_num = 1;
 	_extracted_blocks.push_back("");
-	_i = 0;
-
+	_conf_pos = 0;
 
 	size_t pos;
 	while ((pos = _serv_blocks[0].find(OPEN_CURLY_BRACE)) != _serv_blocks[0].npos) {
 		_serv_blocks[0].replace(pos, 1, ";");
 	}
 
-	while (_i < _serv_blocks[0].length()) {
-		if (_serv_blocks[0][_i] != SEMICOLON) {
-			_buf += _serv_blocks[0][_i];
+	while (_conf_pos < _serv_blocks[0].length()) {
+		if (_serv_blocks[0][_conf_pos] != SEMICOLON) {
+			_buf += _serv_blocks[0][_conf_pos];
 		}
 		else {
-			_buf += SEMICOLON;
-
 			_tokens = split(_buf, SPACE);
 			print_vector(_tokens, _tokens.size());
 
 			if (find_in_valid_members(_tokens[0]) == EXIT_FAILURE)
 				return (print_line_error(INVALID_MEMBER, _config_file, get_line_num(_tokens[0])));
 
-
-
-//			if (_pos == 0 && (_buf[8] == OPEN_CURLY_BRACE || _buf[8] == SPACE)) {
-//				_serv_mode = false;
-//				_extracted_blocks.push_back("");
-//				_i_loc++;
-//			}
 //			if (_serv_mode)
 //				_extracted_blocks[_i_serv] += _buf;
 //			else {
 //				_extracted_blocks[_i_loc] += _buf;
 //				_buf.clear();
 //			}
-//			if (_serv_blocks[0][_i] == CLOSED_CURLY_BRACE)
+//			if (_serv_blocks[0][_conf_pos] == CLOSED_CURLY_BRACE)
 //				_serv_mode = true;
 			_buf.clear();
 			_tokens.clear();
 		}
-		_i++;
+		_conf_pos++;
 	}
 
 	return (EXIT_SUCCESS);

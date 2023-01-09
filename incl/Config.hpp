@@ -24,7 +24,7 @@ private:
 	bool 						_serv_mode;
 	size_t 						_line_num;
 	size_t 						_pos;
-	size_t 						_i;
+	size_t 						_conf_pos;
 	size_t 						_serv_cnt;
 	size_t 						_serv_def_start;
 	size_t 						_serv_def_end;
@@ -51,7 +51,7 @@ private:
 	int							extract_server();
 
 
-		public:
+public:
 	//BASIC CLASS SETUP
 	Config();
 	Config(char *path);

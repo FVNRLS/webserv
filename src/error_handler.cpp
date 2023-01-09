@@ -55,7 +55,7 @@ int	print_line_error(int error, const std::string &config_file, size_t line) {
 		std::cerr << "Error: redefinition of server in configuration file "
 				  << filename <<  " on line: " << line << std::endl;
 	else if (error == BRACES_NOT_CLOSED)
-		std::cerr << "Error: curly braces are not closed in the definition of a server member in configuration file "
+		std::cerr << "Error: curly braces are not closed in server definition in configuration file "
 				  << filename <<  " on line: " << line << std::endl;
 	else if (error == TOO_MANY_ARGS)
 		std::cerr << "Error: Too many arguments in configuration file "

@@ -13,18 +13,25 @@
 #include "main.hpp"
 
 std::string trim(std::string &s) {
-	size_t	front_pos;
-	size_t	back_pos;
+	size_t 	front_pos;
+	size_t 	back_pos;
 
 	if (s.empty())
 		return ("");
 	front_pos = s.find_first_not_of(SPACE);
+	if (front_pos == std::string::npos)
+		return (s);
 	back_pos = s.find_last_not_of(SPACE);
-	s = s.substr(front_pos, back_pos + 1);
+//	std::cout << front_pos << " , " << back_pos <<  " , " << s.substr(front_pos, back_pos + 1) << std::endl;
+	if (front_pos != back_pos)
+		s = s.substr(front_pos, back_pos + 1);
 
 	front_pos = s.find_first_not_of(TAB);
+	if (front_pos == std::string::npos)
+		return (s);
 	back_pos = s.find_last_not_of(TAB);
-	s = s.substr(front_pos, back_pos + 1);
+	if (front_pos != back_pos)
+		s = s.substr(front_pos, back_pos + 1);
 
-	return (s.substr(front_pos, back_pos + 1));
+	return (s);
 }

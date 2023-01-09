@@ -29,13 +29,17 @@
 #include "error_handler.hpp"
 #include "tools.hpp"
 
-#define NOT_FOUND			(-1)
-#define	OPEN_CURLY_BRACE	'{'
-#define	CLOSED_CURLY_BRACE	'}'
-#define NEWLINE				'\n'
-#define SPACE				' '
-#define SEMICOLON			';'
-#define HASH				'#'
-#define NULL_TERM			'\0'
-#define TAB					'\t'
+//CHARACTERS
+#define NOT_FOUND				(-1)
+#define	OPEN_CURLY_BRACE		'{'
+#define	CLOSED_CURLY_BRACE		'}'
+#define NEWLINE					'\n'
+#define SPACE					' '
+#define SEMICOLON				';'
+#define HASH					'#'
+#define NULL_TERM				'\0'
+#define TAB						'\t'
 
+//STRINGS
+#define	STR_CLOSED_CURLY_BRACE	"}"
+#define STR_SEMICOLON			";"
