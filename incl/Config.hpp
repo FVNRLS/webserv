@@ -35,6 +35,8 @@ private:
 	std::vector<Server> 		*_serv;
 	std::vector<std::string>	_serv_blocks;
 	std::vector<std::string>	_tokens;
+	typedef int 				(Config::*_func)();
+	std::vector<_func>			_func_tab;
 
 	//PRIVATE MEMBER FUNCTIONS
 	int							check_extension();
@@ -47,14 +49,29 @@ private:
 	int 						find_in_valid_members(std::string &s) const;
 	int 						find_open_brace();
 	int 						check_closed_braces();
+
 	int							extract_servers();
 	void						replace_open_braces(std::vector<std::string> &v);
 	void 						create_servers();
 	int 						extract_server_block(int i);
-	void 						replace_newlines_with_spaces();
 	void						set_mode();
 
-		public:
+	int							set_server_parameters();
+	int 						set_server_name();
+	int 						set_ip_address();
+	int 						set_port();
+	int 						set_root();
+	int 						set_index();
+	int 						set_max_client_body_size();
+	int 						set_error_pages();
+	int 						set_redirection();
+	int 						set_allowed_methods();
+	int 						set_allowed_scripts();
+	int 						set_directory_listing();
+	int 						set_autoindex();
+
+
+public:
 	//BASIC CLASS SETUP
 	Config();
 	Config(char *path);

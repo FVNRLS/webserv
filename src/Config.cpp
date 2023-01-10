@@ -29,11 +29,7 @@ Config::Config(char *path) : _config_file(path), _serv_mode(false), _line_num(1)
 	_spec_chars.push_back(NULL_TERM);
 
 	//VECTOR OF VALID CONFIGURATION FILE MEMBERS
-	_valid_members.push_back(STR_CLOSED_CURLY_BRACE);
-	_valid_members.push_back(STR_SEMICOLON);
-	_valid_members.push_back("server");
 	_valid_members.push_back("server_name");
-	_valid_members.push_back("ip-address");
 	_valid_members.push_back("ip_address");
 	_valid_members.push_back("port");
 	_valid_members.push_back("root");
@@ -41,11 +37,29 @@ Config::Config(char *path) : _config_file(path), _serv_mode(false), _line_num(1)
 	_valid_members.push_back("max_client_body_size");
 	_valid_members.push_back("error_pages");
 	_valid_members.push_back("redirection");
-	_valid_members.push_back("location");
 	_valid_members.push_back("allowed_methods");
 	_valid_members.push_back("allowed_scripts");
 	_valid_members.push_back("directory_listing");
 	_valid_members.push_back("autoindex");
+
+	_valid_members.push_back("server");
+	_valid_members.push_back("location");
+	_valid_members.push_back(STR_CLOSED_CURLY_BRACE);
+	_valid_members.push_back(STR_SEMICOLON);
+
+	//VECTOR OF FUNCTION POINTERS
+	_func_tab.push_back(&Config::set_server_name);
+	_func_tab.push_back(&Config::set_ip_address);
+	_func_tab.push_back(&Config::set_port);
+	_func_tab.push_back(&Config::set_root);
+	_func_tab.push_back(&Config::set_index);
+	_func_tab.push_back(&Config::set_max_client_body_size);
+	_func_tab.push_back(&Config::set_error_pages);
+	_func_tab.push_back(&Config::set_redirection);
+	_func_tab.push_back(&Config::set_allowed_methods);
+	_func_tab.push_back(&Config::set_allowed_scripts);
+	_func_tab.push_back(&Config::set_directory_listing);
+	_func_tab.push_back(&Config::set_autoindex);
 }
 
 Config::Config(const Config &src) { *this = src; }
@@ -277,33 +291,22 @@ int Config::extract_server_block(int i) {
 	j = 0;
 	while (j < _serv_blocks[i].length()) {
 		if (_serv_blocks[i][j] == SEMICOLON) {
-			replace_newlines_with_spaces();
 			_tokens = split(_buf, SPACE);
 			set_mode();
 			print_vector(_tokens, _tokens.size());
 			if (!_tokens.empty() && find_in_valid_members(_tokens[0]) == EXIT_FAILURE)
 				return (print_line_error(INVALID_MEMBER, _config_file, get_line_num(_tokens[0])));
-
+			if (set_server_parameters() == EXIT_FAILURE)
+				return (EXIT_FAILURE);
 
 			_buf.clear();
 			_tokens.clear();
 		}
-//		else if (_serv_blocks[i][j] == NEWLINE)
-//			_line_num++;
-		else
+		else if (_serv_blocks[i][j] != NEWLINE)
 			_buf += _serv_blocks[0][j];
 		j++;
 	}
 	return (EXIT_SUCCESS);
-}
-
-void 	Config::replace_newlines_with_spaces() {
-	size_t	pos;
-
-	for (int i = 0; i < _buf.length(); i++) {
-		while ((pos = _buf.find(NEWLINE)) != _serv_blocks[0].npos)
-			_buf.replace(pos, 1, STR_SPACE);
-	}
 }
 
 void	Config::set_mode() {
@@ -313,4 +316,58 @@ void	Config::set_mode() {
 		_serv_mode = true;
 		_tokens.erase(_tokens.begin());
 	}
+}
+
+int	Config::set_server_parameters() {
+
+
+	return (EXIT_SUCCESS);
+}
+
+int Config::set_server_name() {
+	return (EXIT_SUCCESS);
+}
+
+int Config::set_ip_address() {
+	return (EXIT_SUCCESS);
+}
+
+int Config::set_port() {
+	return (EXIT_SUCCESS);
+}
+
+int Config::set_root() {
+	return (EXIT_SUCCESS);
+}
+
+int Config::set_index() {
+	return (EXIT_SUCCESS);
+}
+
+int Config::set_max_client_body_size() {
+	return (EXIT_SUCCESS);
+}
+
+int Config::set_error_pages() {
+	return (EXIT_SUCCESS);
+}
+
+int Config::set_redirection() {
+	return (EXIT_SUCCESS);
+}
+
+int Config::set_allowed_methods() {
+	return (EXIT_SUCCESS);
+}
+
+int Config::set_allowed_scripts() {
+	return (EXIT_SUCCESS);
+}
+
+int Config::set_directory_listing() {
+	return (EXIT_SUCCESS);
+}
+
+int Config::set_autoindex() {
+	return (EXIT_SUCCESS);
 }
