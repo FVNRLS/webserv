@@ -42,10 +42,10 @@ Config::Config(char *path) : _config_file(path), _serv_mode(false), _line_num(1)
 	_valid_members.push_back("directory_listing");
 	_valid_members.push_back("autoindex");
 
-	_valid_members.push_back("server");
-	_valid_members.push_back("location");
-	_valid_members.push_back(STR_CLOSED_CURLY_BRACE);
-	_valid_members.push_back(STR_SEMICOLON);
+	_spec_valid_members.push_back("server");
+	_spec_valid_members.push_back("location");
+	_spec_valid_members.push_back(STR_CLOSED_CURLY_BRACE);
+	_spec_valid_members.push_back(STR_SEMICOLON);
 
 	//VECTOR OF FUNCTION POINTERS
 	_func_tab.push_back(&Config::set_server_name);
@@ -197,6 +197,11 @@ int Config::find_in_valid_members(std::string &s) const {
 		if (_valid_members[i] == s)
 			return (EXIT_SUCCESS);
 	}
+	len = _spec_valid_members.size();
+	for (int i = 0; i < len; i++) {
+		if (_spec_valid_members[i] == s)
+			return (EXIT_SUCCESS);
+	}
 	return (EXIT_FAILURE);
 }
 
@@ -296,7 +301,7 @@ int Config::extract_server_block(int i) {
 			print_vector(_tokens, _tokens.size());
 			if (!_tokens.empty() && find_in_valid_members(_tokens[0]) == EXIT_FAILURE)
 				return (print_line_error(INVALID_MEMBER, _config_file, get_line_num(_tokens[0])));
-			if (set_server_parameters() == EXIT_FAILURE)
+			else if (set_server_parameter() == EXIT_FAILURE)
 				return (EXIT_FAILURE);
 
 			_buf.clear();
@@ -318,10 +323,25 @@ void	Config::set_mode() {
 	}
 }
 
-int	Config::set_server_parameters() {
+int	Config::set_server_parameter() {
+	int i;
 
+	i = get_func_index();
+	if (i == SPEC_MEMBER)
+		return (EXIT_SUCCESS);
+	else
+		return ((Config::*_func->_func_tab)()); //todo: complete!
+}
 
-	return (EXIT_SUCCESS);
+int	Config::get_func_index() {
+	std::string	member;
+
+	member = _tokens[0];
+	for (int i = 0; i < _valid_members.size(); i++) {
+		if (member == _valid_members[i])
+			return (i);
+	}
+	return (SPEC_MEMBER);
 }
 
 int Config::set_server_name() {

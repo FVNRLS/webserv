@@ -32,6 +32,7 @@ private:
 	int 						_i_loc;
 	std::vector<char>			_spec_chars;
 	std::vector<std::string>	_valid_members;
+	std::vector<std::string>	_spec_valid_members;
 	std::vector<Server> 		*_serv;
 	std::vector<std::string>	_serv_blocks;
 	std::vector<std::string>	_tokens;
@@ -56,7 +57,8 @@ private:
 	int 						extract_server_block(int i);
 	void						set_mode();
 
-	int							set_server_parameters();
+	int							set_server_parameter();
+	int							get_func_index();
 	int 						set_server_name();
 	int 						set_ip_address();
 	int 						set_port();
