@@ -13,21 +13,18 @@
 #include "Server.hpp"
 
 //BASIC CLASS SETUP
-Server::Server() {
-std::cout << "server was created" << std::endl;
-}
+Server::Server() : _max_client_body_size(10), _autoindex(true) {}
 
 Server::Server(const Server &src) {
 	*this = src;
 }
 
-Server &Server::operator=(const Server &src) {
+Server &Server::operator=(const Server &src) { //todo: complete!
 	if (this == &src)
 		return (*this);
 	return (*this);
 }
 
-//TODO: finish stream overload -> print all server information!
 std::ostream	&operator<<(std::ostream &o, Server *s) {
 
 	std::string	s_upper_name;
