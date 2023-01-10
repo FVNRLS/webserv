@@ -78,7 +78,7 @@ int	Config::parse(std::vector<Server> &servers, const char *config) {
 	if (extract_servers() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 
-	std::cout << &servers[0]; //display all server characteristics
+//	std::cout << &servers[0]; //display all server characteristics
 	return (EXIT_SUCCESS);
 }
 
@@ -136,6 +136,7 @@ int	Config::split_in_server_blocks() {
 		if (_content[_conf_pos] != NEWLINE)
 			_buf += _content[_conf_pos];
 		else {
+			_buf += NEWLINE;
 			if (_conf_pos < len)
 				_buf += SPACE;
 			if (search_for_server() == EXIT_FAILURE)
@@ -211,7 +212,7 @@ int Config::find_open_brace() {
 	size_t	j;
 	size_t	len;
 
-	j = _conf_pos - _buf.length() + 7; //offset from the start of the word 'server'
+	j = _conf_pos - _buf.length() + 8; //offset from the start of the word 'server'
 	len = _content.length();
 	while (j < len) {
 		if (_content[j] != SPACE && _content[j] != NEWLINE && _content[j] != OPEN_CURLY_BRACE)
@@ -248,15 +249,10 @@ int	Config::check_closed_braces() {
 }
 
 int	Config::extract_servers() {
-	int i;
-
-	_line_num = 1;
 	replace_open_braces(_serv_blocks);
-	i = 0;
-	while (i < _serv_blocks.size()) {
+	for (int i = 0; i < _serv_blocks.size(); i++) {
 		if (extract_server_block(i) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
-		i++;
 	}
 	return (EXIT_SUCCESS);
 }
@@ -277,24 +273,44 @@ int Config::extract_server_block(int i) {
 	_serv_mode = true;
 	_i_serv = 0;
 	_buf.clear();
+
 	j = 0;
 	while (j < _serv_blocks[i].length()) {
-		if (_serv_blocks[i][j] != SEMICOLON)
-			_buf += _serv_blocks[0][j];
-		else {
+		if (_serv_blocks[i][j] == SEMICOLON) {
+			replace_newlines_with_spaces();
 			_tokens = split(_buf, SPACE);
-//			print_vector(_tokens, _tokens.size());
-
-			if (find_in_valid_members(_tokens[0]) == EXIT_FAILURE)
+			set_mode();
+			print_vector(_tokens, _tokens.size());
+			if (!_tokens.empty() && find_in_valid_members(_tokens[0]) == EXIT_FAILURE)
 				return (print_line_error(INVALID_MEMBER, _config_file, get_line_num(_tokens[0])));
-
-
 
 
 			_buf.clear();
 			_tokens.clear();
 		}
+//		else if (_serv_blocks[i][j] == NEWLINE)
+//			_line_num++;
+		else
+			_buf += _serv_blocks[0][j];
 		j++;
 	}
 	return (EXIT_SUCCESS);
+}
+
+void 	Config::replace_newlines_with_spaces() {
+	size_t	pos;
+
+	for (int i = 0; i < _buf.length(); i++) {
+		while ((pos = _buf.find(NEWLINE)) != _serv_blocks[0].npos)
+			_buf.replace(pos, 1, STR_SPACE);
+	}
+}
+
+void	Config::set_mode() {
+	if (_tokens[0] == "location")
+		_serv_mode = false;
+	else if (_tokens[0] == "}") {
+		_serv_mode = true;
+		_tokens.erase(_tokens.begin());
+	}
 }

@@ -51,8 +51,10 @@ private:
 	void						replace_open_braces(std::vector<std::string> &v);
 	void 						create_servers();
 	int 						extract_server_block(int i);
+	void 						replace_newlines_with_spaces();
+	void						set_mode();
 
-public:
+		public:
 	//BASIC CLASS SETUP
 	Config();
 	Config(char *path);
