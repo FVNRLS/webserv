@@ -78,6 +78,7 @@ int	Config::parse(std::vector<Server> &servers, const char *config) {
 	if (extract_servers() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 
+	std::cout << &servers[0]; //display all server characteristics
 	return (EXIT_SUCCESS);
 }
 
@@ -282,7 +283,7 @@ int Config::extract_server_block(int i) {
 			_buf += _serv_blocks[0][j];
 		else {
 			_tokens = split(_buf, SPACE);
-			print_vector(_tokens, _tokens.size());
+//			print_vector(_tokens, _tokens.size());
 
 			if (find_in_valid_members(_tokens[0]) == EXIT_FAILURE)
 				return (print_line_error(INVALID_MEMBER, _config_file, get_line_num(_tokens[0])));

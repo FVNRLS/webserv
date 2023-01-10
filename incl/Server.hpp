@@ -20,7 +20,7 @@ struct	location {
 	std::vector<std::string>	methods;
 	std::vector<std::string>	scripts;
 	size_t						index;
-	size_t 						lim_cl_body_size; // limit on body sent from client;
+	size_t 						max_client_body_size; // limit on body sent from client;
 	std::string 				auth_clients; //limit_client_body_size - authorization header;
 	std::string					redirect;
 
@@ -39,7 +39,6 @@ private:
 	int 						_max_client_body_size;
 	std::string 				_error_page;
 	bool 						_autoindex;
-
 	std::vector<location>		_locations;
 
 public:
@@ -47,8 +46,8 @@ public:
 	Server();
 	Server(const Server &src);
 	Server &operator=(const Server &src);
+	friend std::ostream	&operator<<(std::ostream &o, Server *a);
 	~Server();
 };
 
-std::ostream	&operator<<(std::ostream &o, Server *a);
 
