@@ -37,6 +37,7 @@
 #define NEWLINE					'\n'
 #define SPACE					' '
 #define SEMICOLON				';'
+#define DOT					'.'
 #define HASH					'#'
 #define NULL_TERM				'\0'
 #define TAB						'\t'

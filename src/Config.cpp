@@ -359,11 +359,20 @@ int Config::set_server_name() {
 	return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
 }
 
-int Config::set_ip_address() { //todo: check octets -> should be 3 dots! ip addr should be valid!
+//todo: CONTINUE HERE: check octets -> should be 3 dots! ip addr should be valid!
+int Config::set_ip_address() {
+
+	std::vector<std::string>	_octets;
+
 	if ((*_serv)[_i_serv]._ip.empty()) {
 		if (_serv_mode) {
 			if (_tokens.size() == 2) {
 				(*_serv)[_i_serv]._ip = _tokens[1];
+
+				_octets = split(_tokens[1], DOT);
+
+				...
+
 				return (EXIT_SUCCESS);
 			}
 			return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
