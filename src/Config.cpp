@@ -124,18 +124,18 @@ int	Config::read_conf_file() {
 
 size_t Config::get_line_num(std::string &str) {
 	size_t 	pos;
-	int 	i;
 
-	pos = _conf_pos - _buf.length();
+	if (static_cast<int>(_conf_pos) - static_cast<int>(_buf.length()) - 20 < 0)
+		pos = 0;
+	else
+		pos = _conf_pos - _buf.length() - 20;
 	pos = _content.find(str, pos);
 
 	_line_num = 1;
-	i = 0;
 	if (pos != std::string::npos) {
-		while (i != pos) {
+		for (int i = 0; i < pos; i++) {
 			if (_content[i] == NEWLINE)
 				_line_num++;
-			i++;
 		}
 	}
 	return (_line_num);
