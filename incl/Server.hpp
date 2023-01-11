@@ -42,6 +42,8 @@ private:
 	std::vector<location>		_locations;
 
 public:
+	friend class Config;
+
 	//BASIC CLASS SETUP
 	Server();
 	Server(const Server &src);

@@ -34,7 +34,7 @@ std::ostream	&operator<<(std::ostream &o, Server *s) {
 	s_upper_name = s->_name;
 	std::transform(s_upper_name.begin(), s_upper_name.end(), s_upper_name.begin(), ::toupper);
 
-	o << std::endl << "\033[31m****** BASIC SERVER " << s_upper_name << " PARAMETERS *******\033[0m" << std::endl << std::endl;
+	o << std::endl << "\033[31m****** SERVER " << s_upper_name << " *******\033[0m" << std::endl << std::endl;
 	o << "\033[33m****** SERVER CONFIGURATION *******\033[0m" << std::endl;
 	o << "NAME:							" << s->_name << std::endl;
 	o << "IP ADDRESS:					" << s->_ip << std::endl;

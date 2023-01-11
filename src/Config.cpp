@@ -14,10 +14,10 @@
 
 //BASIC CLASS SETUP
 Config::Config() : _config_file(NULL), _serv_mode(false), _line_num(1), _pos(0), _conf_pos(0), _serv_cnt(0),
-				   _serv_def_start(0), _serv_def_end(0), _i_serv(-1), _i_loc(0) {}
+				   _serv_def_start(0), _serv_def_end(0), _i_serv(-1), _i_loc(-1) {}
 
 Config::Config(char *path) : _config_file(path), _serv_mode(false), _line_num(1), _pos(0), _conf_pos(0),
-							 _serv_cnt(0), _serv_def_start(0), _serv_def_end(0), _i_serv(-1), _i_loc(0) {
+							 _serv_cnt(0), _serv_def_start(0), _serv_def_end(0), _i_serv(-1), _i_loc(-1) {
 
 	//VECTOR OF VALID SPECIAL CHARACTERS
 	_spec_chars.push_back(OPEN_CURLY_BRACE);
@@ -92,7 +92,7 @@ int	Config::parse(std::vector<Server> &servers, const char *config) {
 	if (extract_servers() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 
-//	std::cout << &servers[0]; //display all server characteristics
+	std::cout << &servers[0]; //display all server characteristics
 	return (EXIT_SUCCESS);
 }
 
@@ -269,8 +269,8 @@ int	Config::check_closed_braces() {
 
 int	Config::extract_servers() {
 	replace_open_braces(_serv_blocks);
-	for (int i = 0; i < _serv_blocks.size(); i++) {
-		if (extract_server_block(i) == EXIT_FAILURE)
+	for (_i_serv = 0;  _i_serv < _serv_blocks.size(); _i_serv++) {
+		if (extract_server_block(_i_serv) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
@@ -290,7 +290,6 @@ int Config::extract_server_block(int i) {
 	int j;
 
 	_serv_mode = true;
-	_i_serv = 0;
 	_buf.clear();
 
 	j = 0;
@@ -298,12 +297,11 @@ int Config::extract_server_block(int i) {
 		if (_serv_blocks[i][j] == SEMICOLON) {
 			_tokens = split(_buf, SPACE);
 			set_mode();
-			print_vector(_tokens, _tokens.size());
+//			print_vector(_tokens, _tokens.size());
 			if (!_tokens.empty() && find_in_valid_members(_tokens[0]) == EXIT_FAILURE)
 				return (print_line_error(INVALID_MEMBER, _config_file, get_line_num(_tokens[0])));
 			else if (set_server_parameter() == EXIT_FAILURE)
 				return (EXIT_FAILURE);
-
 			_buf.clear();
 			_tokens.clear();
 		}
@@ -315,19 +313,18 @@ int Config::extract_server_block(int i) {
 }
 
 void	Config::set_mode() {
-	if (_tokens[0] == "location")
+	if (_tokens[0] == "location") {
 		_serv_mode = false;
+		_i_loc++;
+	}
 	else if (_tokens[0] == "}") {
 		_serv_mode = true;
-		_tokens.erase(_tokens.begin());
+		_tokens.erase(_tokens.begin()); //remove the '}' from the tokens list, so only the parameters are left --> todo: what if there are "} }" ?
 	}
 }
 
 int	Config::set_server_parameter() {
-	int i;
-
-	i = get_func_index();
-	if (i == SPEC_MEMBER)
+	if (get_func_index() == SPEC_MEMBER)
 		return (EXIT_SUCCESS);
 	return ((this->*_func_tab[0])());
 }
@@ -344,7 +341,15 @@ int	Config::get_func_index() {
 }
 
 int Config::set_server_name() {
-	return (EXIT_SUCCESS);
+	if ((*_serv)[0]._name.empty()) {
+		if (_serv_mode) {
+			(*_serv)[0]._name = _tokens[0];
+			return (EXIT_SUCCESS);
+		}
+		else
+			return (print_line_error(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
+	}
+	return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
 }
 
 int Config::set_ip_address() {
