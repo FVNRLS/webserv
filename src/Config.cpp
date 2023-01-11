@@ -292,7 +292,7 @@ int Config::extract_server_block(int i) {
 	_serv_mode = true;
 	_buf.clear();
 
-	j = 0;
+	j = 0; //todo : redo to for loop
 	while (j < _serv_blocks[i].length()) {
 		if (_serv_blocks[i][j] == SEMICOLON) {
 			_tokens = split(_buf, SPACE);
@@ -324,9 +324,12 @@ void	Config::set_mode() {
 }
 
 int	Config::set_server_parameter() {
-	if (get_func_index() == SPEC_MEMBER)
+	int i;
+
+	i = get_func_index();
+	if (i == SPEC_MEMBER)
 		return (EXIT_SUCCESS);
-	return ((this->*_func_tab[0])());
+	return ((this->*_func_tab[i])());
 }
 
 int	Config::get_func_index() {
@@ -340,10 +343,11 @@ int	Config::get_func_index() {
 	return (SPEC_MEMBER);
 }
 
+//todo: ajust to _i_serv iterator!
 int Config::set_server_name() {
 	if ((*_serv)[0]._name.empty()) {
 		if (_serv_mode) {
-			(*_serv)[0]._name = _tokens[0];
+			(*_serv)[0]._name = _tokens[1];
 			return (EXIT_SUCCESS);
 		}
 		else
