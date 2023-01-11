@@ -70,7 +70,7 @@ int	print_line_error(int error, const std::string &config_file, size_t line) {
 		std::cerr << "Error: invalid scope definition of a server parameter in configuration file "
 				  << filename <<  " on line: " << line << std::endl;
 	else if (error == REDEFINITION_OF_SERVER_PARAMETER)
-		std::cerr << "Error: invalid scope definition of a server parameter in configuration file "
+		std::cerr << "Error: server parameter is defined in an invalid scope in configuration file "
 				  << filename <<  " on line: " << line << std::endl;
 	return (EXIT_FAILURE);
 }

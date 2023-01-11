@@ -36,12 +36,12 @@ std::ostream	&operator<<(std::ostream &o, Server *s) {
 
 	o << std::endl << "\033[31m****** SERVER " << s_upper_name << " *******\033[0m" << std::endl << std::endl;
 	o << "\033[33m****** SERVER CONFIGURATION *******\033[0m" << std::endl;
-	o << "NAME:							" << s->_name << std::endl;
-	o << "IP ADDRESS:					" << s->_ip << std::endl;
-	o << "PORT:							" << s->_port << std::endl;
-	o << "ROOT:							" << s->_root << std::endl;
+	o << "NAME:						" << s->_name << std::endl;
+	o << "IP ADDRESS:				" << s->_ip << std::endl;
+	o << "PORT:						" << s->_port << std::endl;
+	o << "ROOT:						" << s->_root << std::endl;
 
-	o << "METHODS:						";
+	o << "METHODS:					";
 	for (int j = 0; j < s->_methods.size(); j++) {
 		if (j < s->_methods.size() - 1)
 			o << s->_methods[j] << ", ";
@@ -49,11 +49,12 @@ std::ostream	&operator<<(std::ostream &o, Server *s) {
 			o << s->_methods[j] << std::endl;
 	}
 
-	o << "INDEX:						" << s->_index << std::endl;
+	std::cout << std::endl;
+
+	o << "INDEX:					" << s->_index << std::endl;
 	o << "MAX. CLIENT BODY SIZE:		" << s->_max_client_body_size << std::endl;
 	o << "ERROR PAGE:					" << s->_error_page << std::endl;
 	o << "AUTOINDEX:					" << s->_autoindex << std::endl;
-	o << "REDIRECT:						" << s->_name << std::endl;
 	std::cout << std::endl;
 
 	//PRINTING OF ALL LOCATIONS

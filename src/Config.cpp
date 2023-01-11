@@ -123,12 +123,14 @@ int	Config::read_conf_file() {
 }
 
 size_t Config::get_line_num(std::string &str) {
-	size_t	pos;
+	size_t 	pos;
 	int 	i;
+
+	pos = _conf_pos - _buf.length();
+	pos = _content.find(str, pos);
 
 	_line_num = 1;
 	i = 0;
-	pos = _content.find(str);
 	if (pos != std::string::npos) {
 		while (i != pos) {
 			if (_content[i] == NEWLINE)
@@ -140,7 +142,6 @@ size_t Config::get_line_num(std::string &str) {
 }
 
 int	Config::split_in_server_blocks() {
-
 	size_t	len;
 
 	len = _content.length();
@@ -268,6 +269,7 @@ int	Config::check_closed_braces() {
 }
 
 int	Config::extract_servers() {
+	_conf_pos = 0;
 	replace_open_braces(_serv_blocks);
 	for (_i_serv = 0;  _i_serv < _serv_blocks.size(); _i_serv++) {
 		if (extract_server_block(_i_serv) == EXIT_FAILURE)
@@ -287,14 +289,11 @@ void	Config::replace_open_braces(std::vector<std::string> &v) {
 }
 
 int Config::extract_server_block(int i) {
-	int j;
-
 	_serv_mode = true;
 	_buf.clear();
 
-	j = 0; //todo : redo to for loop
-	while (j < _serv_blocks[i].length()) {
-		if (_serv_blocks[i][j] == SEMICOLON) {
+	while (_conf_pos < _serv_blocks[i].length()) {
+		if (_serv_blocks[i][_conf_pos] == SEMICOLON) {
 			_tokens = split(_buf, SPACE);
 			set_mode();
 //			print_vector(_tokens, _tokens.size());
@@ -305,9 +304,11 @@ int Config::extract_server_block(int i) {
 			_buf.clear();
 			_tokens.clear();
 		}
-		else if (_serv_blocks[i][j] != NEWLINE)
-			_buf += _serv_blocks[0][j];
-		j++;
+		else if (_serv_blocks[i][_conf_pos] == NEWLINE)
+			_line_num++;
+		else
+			_buf += _serv_blocks[0][_conf_pos];
+		_conf_pos++;
 	}
 	return (EXIT_SUCCESS);
 }
@@ -343,11 +344,10 @@ int	Config::get_func_index() {
 	return (SPEC_MEMBER);
 }
 
-//todo: ajust to _i_serv iterator!
 int Config::set_server_name() {
-	if ((*_serv)[0]._name.empty()) {
+	if ((*_serv)[_i_serv]._name.empty()) {
 		if (_serv_mode) {
-			(*_serv)[0]._name = _tokens[1];
+			(*_serv)[_i_serv]._name = _tokens[1];
 			return (EXIT_SUCCESS);
 		}
 		else
