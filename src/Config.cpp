@@ -359,7 +359,7 @@ int Config::set_server_name() {
 	return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
 }
 
-int Config::set_ip_address() {
+int Config::set_ip_address() { //todo: check octets -> should be 3 dots! ip addr should be valid!
 	if ((*_serv)[_i_serv]._ip.empty()) {
 		if (_serv_mode) {
 			if (_tokens.size() == 2) {
@@ -381,14 +381,12 @@ int Config::set_port() {
 		if (_serv_mode) {
 			if (_tokens.size() == 2) {
 				(*_serv)[_i_serv]._port = strtoll(_tokens[1].c_str(), &endptr, 10);
-
 				if (endptr == _tokens[1])
-					std::cout << "Error: Not a valid number" << std::endl;
+					return (print_line_error(INVALID_PORT_NUMBER, _config_file, get_line_num(_tokens[0])));
 				else if ((*_serv)[_i_serv]._port > MAX_PORT_NUM || (*_serv)[_i_serv]._port < 1)
-					std::cout << "Error: Number out of range" << std::endl;
+					return (print_line_error(PORT_NUMBER_OUT_OF_RANGE, _config_file, get_line_num(_tokens[0])));
 				else if (*endptr != '\0')
-					std::cout << "Error: Trailing non-numeric characters" << std::endl;
-
+					return (print_line_error(PORT_NUMBER_NON_NUMERIC, _config_file, get_line_num(_tokens[0])));
 				return (EXIT_SUCCESS);
 			}
 			return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
