@@ -329,8 +329,7 @@ int	Config::set_server_parameter() {
 	i = get_func_index();
 	if (i == SPEC_MEMBER)
 		return (EXIT_SUCCESS);
-	else
-		return ((Config::*_func->_func_tab)()); //todo: complete!
+	return ((this->*_func_tab[0])());
 }
 
 int	Config::get_func_index() {
