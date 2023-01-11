@@ -320,7 +320,7 @@ void	Config::set_mode() {
 	}
 	else if (_tokens[0] == "}") {
 		_serv_mode = true;
-		_tokens.erase(_tokens.begin()); //remove the '}' from the tokens list, so only the parameters are left --> todo: what if there are "} }" ?
+		_tokens.erase(_tokens.begin()); //remove the '}' from the tokens list, so only the parameters are left
 	}
 }
 
@@ -347,8 +347,11 @@ int	Config::get_func_index() {
 int Config::set_server_name() {
 	if ((*_serv)[_i_serv]._name.empty()) {
 		if (_serv_mode) {
-			(*_serv)[_i_serv]._name = _tokens[1];
-			return (EXIT_SUCCESS);
+			if (_tokens.size() == 2) {
+				(*_serv)[_i_serv]._name = _tokens[1];
+				return (EXIT_SUCCESS);
+			}
+			return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 		}
 		else
 			return (print_line_error(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
@@ -357,11 +360,42 @@ int Config::set_server_name() {
 }
 
 int Config::set_ip_address() {
-	return (EXIT_SUCCESS);
+	if ((*_serv)[_i_serv]._ip.empty()) {
+		if (_serv_mode) {
+			if (_tokens.size() == 2) {
+				(*_serv)[_i_serv]._ip = _tokens[1];
+				return (EXIT_SUCCESS);
+			}
+			return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+		}
+		else
+			return (print_line_error(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
+	}
+	return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
 }
 
 int Config::set_port() {
-	return (EXIT_SUCCESS);
+	char *endptr;
+
+	if ((*_serv)[_i_serv]._port == 0) {
+		if (_serv_mode) {
+			if (_tokens.size() == 2) {
+				(*_serv)[_i_serv]._port = strtoll(_tokens[1].c_str(), &endptr, 10);
+
+				if (endptr == _tokens[1])
+					std::cout << "Error: Not a valid number" << std::endl;
+				else if ((*_serv)[_i_serv]._port > MAX_PORT_NUM || (*_serv)[_i_serv]._port < 1)
+					std::cout << "Error: Number out of range" << std::endl;
+				else if (*endptr != '\0')
+					std::cout << "Error: Trailing non-numeric characters" << std::endl;
+
+				return (EXIT_SUCCESS);
+			}
+			return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+		} else
+			return (print_line_error(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
+	}
+	return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
 }
 
 int Config::set_root() {

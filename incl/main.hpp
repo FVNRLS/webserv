@@ -45,3 +45,4 @@
 #define	STR_CLOSED_CURLY_BRACE	"}"
 #define STR_SEMICOLON			";"
 #define STR_SPACE				" "
+#define MAX_PORT_NUM			65535

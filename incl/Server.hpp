@@ -19,7 +19,7 @@ struct	location {
 	std::string					root;	//if root empty -> uses the server_root
 	std::vector<std::string>	methods;
 	std::vector<std::string>	scripts;
-	size_t						index;
+	std::string					index;
 	size_t 						max_client_body_size; // limit on body sent from client;
 	std::string 				auth_clients; //limit_client_body_size - authorization header;
 	std::string					redirect;
@@ -32,11 +32,11 @@ class Server {
 private:
 	std::string					_name;
 	std::string 				_ip;
-	int							_port;
+	long 						_port;
 	std::string 				_root;
 	std::vector<std::string>	_methods;
 	std::string 				_index;
-	int 						_max_client_body_size;
+	long 						_max_client_body_size;
 	std::string 				_error_page;
 	bool 						_autoindex;
 	std::vector<location>		_locations;

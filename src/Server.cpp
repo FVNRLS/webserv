@@ -13,7 +13,7 @@
 #include "Server.hpp"
 
 //BASIC CLASS SETUP
-Server::Server() : _max_client_body_size(10), _autoindex(true) {}
+Server::Server() : _max_client_body_size(10), _autoindex(true), _port(0) {}
 
 Server::Server(const Server &src) {
 	*this = src;
@@ -22,6 +22,16 @@ Server::Server(const Server &src) {
 Server &Server::operator=(const Server &src) { //todo: complete!
 	if (this == &src)
 		return (*this);
+	_name = src._name;
+	_ip = src._ip;
+	_port = src._port;
+	_root = src._root;
+	_methods = src._methods;
+	_index = src._index;
+	_max_client_body_size = src._max_client_body_size;
+	_error_page = src._error_page;
+	_autoindex = src._autoindex;
+	_locations = src._locations;
 	return (*this);
 }
 
@@ -37,7 +47,7 @@ std::ostream	&operator<<(std::ostream &o, Server *s) {
 	o << std::endl << "\033[31m****** SERVER " << s_upper_name << " *******\033[0m" << std::endl << std::endl;
 	o << "\033[33m****** SERVER CONFIGURATION *******\033[0m" << std::endl;
 	o << "NAME:						" << s->_name << std::endl;
-	o << "IP ADDRESS:				" << s->_ip << std::endl;
+	o << "IP ADDRESS:					" << s->_ip << std::endl;
 	o << "PORT:						" << s->_port << std::endl;
 	o << "ROOT:						" << s->_root << std::endl;
 
