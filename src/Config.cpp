@@ -291,6 +291,7 @@ void	Config::replace_open_braces(std::vector<std::string> &v) {
 int Config::extract_server_block(int i) {
 	_serv_mode = true;
 	_buf.clear();
+	_i_loc = -1;
 
 	while (_conf_pos < _serv_blocks[i].length()) {
 		if (_serv_blocks[i][_conf_pos] == SEMICOLON) {
@@ -359,10 +360,10 @@ int Config::set_server_name() {
 	return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
 }
 
-//todo: CONTINUE HERE: check octets -> should be 3 dots! ip addr should be valid!
 int Config::set_ip_address() {
-
+	char 						*endptr;
 	std::vector<std::string>	_octets;
+	std::vector<long>			_octet_val;
 
 	if ((*_serv)[_i_serv]._ip.empty()) {
 		if (_serv_mode) {
@@ -370,9 +371,16 @@ int Config::set_ip_address() {
 				(*_serv)[_i_serv]._ip = _tokens[1];
 
 				_octets = split(_tokens[1], DOT);
-
-				...
-
+				if (_octets.size() == 4)
+					for (int i = 0; i < 4; i++) {
+						_octet_val.push_back(strtoll(_octets[i].c_str(), &endptr, 10));
+						if ((endptr == _octets[i]) || (*endptr != '\0') || ((_octet_val[i] > 255 || _octet_val[i] < 0)))
+							return (print_line_error(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
+						if (_octet_val[0] == 0)
+							return (print_line_error(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
+					}
+				else
+					return (print_line_error(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
 				return (EXIT_SUCCESS);
 			}
 			return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
@@ -390,12 +398,9 @@ int Config::set_port() {
 		if (_serv_mode) {
 			if (_tokens.size() == 2) {
 				(*_serv)[_i_serv]._port = strtoll(_tokens[1].c_str(), &endptr, 10);
-				if (endptr == _tokens[1])
-					return (print_line_error(INVALID_PORT_NUMBER, _config_file, get_line_num(_tokens[0])));
-				else if ((*_serv)[_i_serv]._port > MAX_PORT_NUM || (*_serv)[_i_serv]._port < 1)
-					return (print_line_error(PORT_NUMBER_OUT_OF_RANGE, _config_file, get_line_num(_tokens[0])));
-				else if (*endptr != '\0')
-					return (print_line_error(PORT_NUMBER_NON_NUMERIC, _config_file, get_line_num(_tokens[0])));
+				if (endptr == _tokens[1] || *endptr != '\0'
+					|| (*_serv)[_i_serv]._port > MAX_PORT_NUM || (*_serv)[_i_serv]._port < 1)
+					return (print_line_error(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
 				return (EXIT_SUCCESS);
 			}
 			return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
@@ -406,7 +411,20 @@ int Config::set_port() {
 }
 
 int Config::set_root() {
-	return (EXIT_SUCCESS);
+	std::string	*target;
+
+	if (_serv_mode)
+		target = &(*_serv)[_i_serv]._root;
+	else
+		target = &(*_serv)[_i_loc]._root;
+
+	if (!target->empty())
+		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+	else if (_tokens.size() == 2) {
+		*target = _tokens[1];
+		return (EXIT_SUCCESS);
+	}
+	return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 }
 
 int Config::set_index() {

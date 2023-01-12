@@ -75,14 +75,8 @@ int	print_line_error(int error, const std::string &config_file, size_t line) {
 	else if (error == INVALID_NUM_OF_PARAMETERS)
 		std::cerr << "Error: invalid number of parameters in the definition of a server member in configuration file "
 				  << filename <<  " on line: " << line << std::endl;
-	else if (error == INVALID_PORT_NUMBER)
-		std::cerr << "Error: invalid port number in the definition of a server member in configuration file "
-				  << filename <<  " on line: " << line << std::endl;
-	else if (error == PORT_NUMBER_OUT_OF_RANGE)
-		std::cerr << "Error: port number out of range in the definition of a server member in configuration file "
-				  << filename <<  " on line: " << line << std::endl;
-	else if (error == PORT_NUMBER_NON_NUMERIC)
-		std::cerr << "Error: trailing non-numeric characters in the definition of a server member in configuration file "
+	else if (error == INVALID_PARAMETER)
+		std::cerr << "Error: invalid parameter in the definition of a server member in configuration file "
 				  << filename <<  " on line: " << line << std::endl;
 	return (EXIT_FAILURE);
 }
