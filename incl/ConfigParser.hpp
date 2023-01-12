@@ -31,8 +31,8 @@ private:
 	int 							_i_serv;
 	int 							_i_loc;
 	std::vector<char>				_spec_chars;
-	std::vector<std::string>		_valid_members;
-	std::vector<std::string>		_spec_valid_members;
+	std::vector<std::string>		_valid_identifiers;
+	std::vector<std::string>		_spec_valid_identifiers;
 	std::vector<Config> 			*_serv;
 	std::vector<std::string>		_serv_blocks;
 	std::vector<std::string>		_tokens;
@@ -46,7 +46,7 @@ private:
 	int								search_for_server();
 	void							ignore_comments(size_t len);
 	int 							find_in_spec_chars(char c) const;
-	int 							find_in_valid_members(std::string &s) const;
+	int 							find_in_valid_identifiers(std::string &s) const;
 	int 							find_open_brace();
 	int 							check_closed_braces();
 

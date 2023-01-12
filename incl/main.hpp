@@ -31,7 +31,7 @@
 
 //CHARACTERS
 #define NOT_FOUND				(-1)
-#define SPEC_MEMBER				(-2)
+#define SPEC_IDENTIFIER			(-2)
 #define	OPEN_CURLY_BRACE		'{'
 #define	CLOSED_CURLY_BRACE		'}'
 #define NEWLINE					'\n'

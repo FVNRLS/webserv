@@ -31,23 +31,23 @@ _i_serv(-1), _i_loc(-1) {
 	_spec_chars.push_back(NULL_TERM);
 
 	//VECTOR OF VALID CONFIGURATION FILE MEMBERS
-	_valid_members.push_back("server_name");
-	_valid_members.push_back("ip_address");
-	_valid_members.push_back("port");
-	_valid_members.push_back("root");
-	_valid_members.push_back("index");
-	_valid_members.push_back("max_client_body_size");
-	_valid_members.push_back("error_pages");
-	_valid_members.push_back("redirection");
-	_valid_members.push_back("allowed_methods");
-	_valid_members.push_back("allowed_scripts");
-	_valid_members.push_back("directory_listing");
-	_valid_members.push_back("autoindex");
+	_valid_identifiers.push_back("server_name");
+	_valid_identifiers.push_back("ip_address");
+	_valid_identifiers.push_back("port");
+	_valid_identifiers.push_back("root");
+	_valid_identifiers.push_back("index");
+	_valid_identifiers.push_back("max_client_body_size");
+	_valid_identifiers.push_back("error_pages");
+	_valid_identifiers.push_back("redirection");
+	_valid_identifiers.push_back("allowed_methods");
+	_valid_identifiers.push_back("allowed_scripts");
+	_valid_identifiers.push_back("directory_listing");
+	_valid_identifiers.push_back("autoindex");
 
-	_spec_valid_members.push_back("server");
-	_spec_valid_members.push_back("location");
-	_spec_valid_members.push_back(STR_CLOSED_CURLY_BRACE);
-	_spec_valid_members.push_back(STR_SEMICOLON);
+	_spec_valid_identifiers.push_back("server");
+	_spec_valid_identifiers.push_back("location");
+	_spec_valid_identifiers.push_back(STR_CLOSED_CURLY_BRACE);
+	_spec_valid_identifiers.push_back(STR_SEMICOLON);
 
 	//VECTOR OF FUNCTION POINTERS
 	_func_tab.push_back(&ConfigParser::set_server_name);
@@ -191,17 +191,17 @@ int ConfigParser::find_in_spec_chars(char c) const {
 	return (EXIT_FAILURE);
 }
 
-int ConfigParser::find_in_valid_members(std::string &s) const {
+int ConfigParser::find_in_valid_identifiers(std::string &s) const {
 	size_t	len;
 
-	len = _valid_members.size();
+	len = _valid_identifiers.size();
 	for (int i = 0; i < len; i++) {
-		if (_valid_members[i] == s)
+		if (_valid_identifiers[i] == s)
 			return (EXIT_SUCCESS);
 	}
-	len = _spec_valid_members.size();
+	len = _spec_valid_identifiers.size();
 	for (int i = 0; i < len; i++) {
-		if (_spec_valid_members[i] == s)
+		if (_spec_valid_identifiers[i] == s)
 			return (EXIT_SUCCESS);
 	}
 	return (EXIT_FAILURE);
@@ -298,9 +298,8 @@ int ConfigParser::extract_server_block(int i) {
 		if (_serv_blocks[i][_conf_pos] == SEMICOLON) {
 			_tokens = split(_buf, SPACE);
 			set_mode();
-//			print_vector(_tokens, _tokens.size());
-			if (!_tokens.empty() && find_in_valid_members(_tokens[0]) == EXIT_FAILURE)
-				return (print_line_error(INVALID_MEMBER, _config_file, get_line_num(_tokens[0])));
+			if (!_tokens.empty() && find_in_valid_identifiers(_tokens[0]) == EXIT_FAILURE)
+				return (print_line_error(INVALID_IDENTIFIER, _config_file, get_line_num(_tokens[0])));
 			else if (set_server_parameter() == EXIT_FAILURE)
 				return (EXIT_FAILURE);
 			_buf.clear();
@@ -330,7 +329,7 @@ int	ConfigParser::set_server_parameter() {
 	int i;
 
 	i = get_func_index();
-	if (i == SPEC_MEMBER) {
+	if (i == SPEC_IDENTIFIER) {
 		if (_tokens[0] == "location")
 			add_location();
 		return (EXIT_SUCCESS);
@@ -342,11 +341,11 @@ int	ConfigParser::get_func_index() {
 	std::string	member;
 
 	member = _tokens[0];
-	for (int i = 0; i < _valid_members.size(); i++) {
-		if (member == _valid_members[i])
+	for (int i = 0; i < _valid_identifiers.size(); i++) {
+		if (member == _valid_identifiers[i])
 			return (i);
 	}
-	return (SPEC_MEMBER);
+	return (SPEC_IDENTIFIER);
 }
 
 void ConfigParser::add_location() {
