@@ -92,7 +92,6 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 		}
 		std::cout << std::endl;
 
-
 		o << "SCRIPTS:					";
 		for (int j = 0; j < s->_locations[i].scripts.size(); j++) {
 			if (j < s->_locations[i].scripts.size() - 1)

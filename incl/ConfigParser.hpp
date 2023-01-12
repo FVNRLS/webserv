@@ -34,6 +34,7 @@ private:
 	std::vector<char>						_spec_chars;
 	std::vector<std::string>				_valid_identifiers;
 	std::vector<std::string>				_spec_valid_identifiers;
+	std::vector<std::string>				_valid_methods;
 	std::vector<Config> 					*_serv;
 	std::vector<std::string>				_serv_blocks;
 	std::vector<std::string>				_tokens;

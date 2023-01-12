@@ -48,6 +48,11 @@ _i_serv(-1), _i_loc(-1) {
 	_spec_valid_identifiers.push_back("location");
 	_spec_valid_identifiers.push_back(STR_CLOSED_CURLY_BRACE);
 	_spec_valid_identifiers.push_back(STR_SEMICOLON);
+
+	_valid_methods.push_back("GET");
+	_valid_methods.push_back("POST");
+	_valid_methods.push_back("PUT");
+	_valid_methods.push_back("DELETE");
 }
 
 ConfigParser::ConfigParser(const ConfigParser &src) { *this = src; }
@@ -60,6 +65,7 @@ ConfigParser &ConfigParser::operator=(const ConfigParser &src) { //todo: complet
 }
 
 ConfigParser::~ConfigParser() {}
+
 
 //MEMBER FUNCTIONS
 int	ConfigParser::parse() {
@@ -301,10 +307,8 @@ int ConfigParser::extract_server_block(int i) {
 }
 
 void	ConfigParser::set_mode() {
-	if (_tokens[0] == "location") {
+	if (_tokens[0] == "location")
 		_serv_mode = false;
-		_i_loc++;
-	}
 	else if (_tokens[0] == "}") {
 		_serv_mode = true;
 		_tokens.erase(_tokens.begin()); //remove the '}' from the tokens list, so only the parameters are left
@@ -425,23 +429,45 @@ int ConfigParser::set_port() {
 }
 
 int ConfigParser::set_root() {
-	std::string	*target;
+	std::string *param;
 
 	if (_serv_mode)
-		target = &(*_serv)[_i_serv]._root;
+		param = &(*_serv)[_i_serv]._root;
 	else
-		target = &(*_serv)[_i_loc]._root;
-
-	if (!target->empty())
+		param = &(*_serv)[_i_serv]._locations[_i_loc].root;
+	if (!param->empty())
 		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
-	else if (_tokens.size() == 2) {
-		*target = _tokens[1];
-		return (EXIT_SUCCESS);
-	}
-	return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+	else if (_tokens.size() != 2)
+		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+	*param = _tokens[1];
+	return (EXIT_SUCCESS);
 }
 
 int ConfigParser::set_allowed_methods() {
+	size_t		num_methods;
+	size_t		num_valid_methods;
+	size_t 		j;
+
+	num_methods = _tokens.size() - 1;
+	num_valid_methods = _valid_methods.size();
+	if (num_methods < 1 || num_methods > num_valid_methods)
+		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+
+	for (int i = 1; i < num_methods; i++) {
+		j = 0;
+		while (j < num_valid_methods) {
+			if (_tokens[i] == _valid_methods[j]) {
+				if (_serv_mode)
+					(*_serv)[_i_serv]._methods.push_back(_tokens[i]);
+				else
+					(*_serv)[_i_serv]._locations[_i_loc].methods.push_back(_tokens[i]);
+				break;
+			}
+			j++;
+		}
+		if (j == num_valid_methods)
+			return (print_line_error(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
+	}
 	return (EXIT_SUCCESS);
 }
 
