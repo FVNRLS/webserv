@@ -29,6 +29,7 @@ private:
 	size_t 									_serv_def_start;
 	size_t 									_serv_def_end;
 	int 									_i_serv;
+	int 									_i_port;
 	int 									_i_loc;
 	std::vector<char>						_spec_chars;
 	std::vector<std::string>				_valid_identifiers;

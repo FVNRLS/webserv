@@ -48,7 +48,15 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 	o << "\033[33m****** SERVER CONFIGURATION *******\033[0m" << std::endl;
 	o << "NAME:						" << s->_name << std::endl;
 	o << "IP ADDRESS:					" << s->_ip << std::endl;
-	o << "PORT:						" << s->_port << std::endl;
+
+	o << "PORTS:						";
+	for (int j = 0; j < s->_port.size(); j++) {
+		if (j < s->_port.size() - 1)
+			o << s->_port[j] << ", ";
+		else
+			o << s->_port[j] << std::endl;
+	}
+
 	o << "ROOT:						" << s->_root << std::endl;
 
 	o << "METHODS:					";
@@ -58,7 +66,6 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 		else
 			o << s->_methods[j] << std::endl;
 	}
-
 	std::cout << std::endl;
 
 	o << "INDEX:					" << s->_index << std::endl;

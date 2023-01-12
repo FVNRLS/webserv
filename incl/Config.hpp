@@ -32,7 +32,7 @@ class Config {
 private:
 	std::string					_name;
 	std::string 				_ip;
-	long 						_port;
+	std::vector<long> 			_port;
 	std::string 				_root;
 	std::vector<std::string>	_methods;
 	std::string 				_index;

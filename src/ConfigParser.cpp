@@ -278,6 +278,7 @@ int ConfigParser::extract_server_block(int i) {
 	_serv_mode = true;
 	_buf.clear();
 	_i_loc = -1;
+	_i_port = -1;
 
 	while (_conf_pos < _serv_blocks[i].length()) {
 		if (_serv_blocks[i][_conf_pos] == SEMICOLON) {
@@ -407,20 +408,20 @@ int ConfigParser::set_ip_address() {
 int ConfigParser::set_port() {
 	char *endptr;
 
-	if ((*_serv)[_i_serv]._port == 0) {
-		if (_serv_mode) {
-			if (_tokens.size() == 2) {
-				(*_serv)[_i_serv]._port = strtoll(_tokens[1].c_str(), &endptr, 10);
-				if (endptr == _tokens[1] || *endptr != '\0'
-					|| (*_serv)[_i_serv]._port > MAX_PORT_NUM || (*_serv)[_i_serv]._port < 1)
-					return (print_line_error(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
-				return (EXIT_SUCCESS);
-			}
-			return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
-		} else
-			return (print_line_error(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
+	(*_serv)[_i_serv]._port.push_back(0);
+	_i_port++;
+	if (_serv_mode) {
+		if (_tokens.size() == 2) {
+			(*_serv)[_i_serv]._port[_i_port] = strtoll(_tokens[1].c_str(), &endptr, 10);
+			if (endptr == _tokens[1] || *endptr != '\0'
+				|| (*_serv)[_i_serv]._port[_i_port] > MAX_PORT_NUM || (*_serv)[_i_serv]._port[_i_port] < 1)
+				return (print_line_error(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
+			return (EXIT_SUCCESS);
+		}
+		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 	}
-	return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+	else
+		return (print_line_error(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
 }
 
 int ConfigParser::set_root() {
