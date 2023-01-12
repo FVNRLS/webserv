@@ -444,23 +444,27 @@ int ConfigParser::set_root() {
 }
 
 int ConfigParser::set_allowed_methods() {
-	size_t		num_methods;
-	size_t		num_valid_methods;
-	size_t 		j;
+	size_t 						num_methods;
+	size_t 						num_valid_methods;
+	size_t 						j;
+	std::vector<std::string> 	*param;
 
 	num_methods = _tokens.size() - 1;
 	num_valid_methods = _valid_methods.size();
-	if (num_methods < 1 || num_methods > num_valid_methods)
-		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+	if (_serv_mode)
+		param = &(*_serv)[_i_serv]._methods;
+	else
+		param = &(*_serv)[_i_serv]._locations[_i_loc].methods;
 
-	for (int i = 1; i < num_methods; i++) {
+	if (!param->empty())
+		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+	else if (num_methods < 1 || num_methods > num_valid_methods)
+		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+	for (int i = 1; i <= num_methods; i++) {
 		j = 0;
 		while (j < num_valid_methods) {
 			if (_tokens[i] == _valid_methods[j]) {
-				if (_serv_mode)
-					(*_serv)[_i_serv]._methods.push_back(_tokens[i]);
-				else
-					(*_serv)[_i_serv]._locations[_i_loc].methods.push_back(_tokens[i]);
+				param->push_back(_tokens[i]);
 				break;
 			}
 			j++;
