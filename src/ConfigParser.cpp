@@ -30,38 +30,24 @@ _i_serv(-1), _i_loc(-1) {
 	_spec_chars.push_back(HASH);
 	_spec_chars.push_back(NULL_TERM);
 
-	//VECTOR OF VALID CONFIGURATION FILE MEMBERS
-	_valid_identifiers.push_back("server_name");
-	_valid_identifiers.push_back("ip_address");
-	_valid_identifiers.push_back("port");
-	_valid_identifiers.push_back("root");
-	_valid_identifiers.push_back("index");
-	_valid_identifiers.push_back("max_client_body_size");
-	_valid_identifiers.push_back("error_pages");
-	_valid_identifiers.push_back("redirection");
-	_valid_identifiers.push_back("allowed_methods");
-	_valid_identifiers.push_back("allowed_scripts");
-	_valid_identifiers.push_back("directory_listing");
-	_valid_identifiers.push_back("autoindex");
+	//PAIRS OF VALID CONFIGURATION IDENTIFIERS AND FUNCTION POINTERS
+	_valid_identifiers.push_back("server_name"); 			_func_tab.push_back(&ConfigParser::set_server_name);
+	_valid_identifiers.push_back("ip_address");				_func_tab.push_back(&ConfigParser::set_ip_address);
+	_valid_identifiers.push_back("port");					_func_tab.push_back(&ConfigParser::set_port);
+	_valid_identifiers.push_back("root");					_func_tab.push_back(&ConfigParser::set_root);
+	_valid_identifiers.push_back("allowed_methods");		_func_tab.push_back(&ConfigParser::set_allowed_methods);
+	_valid_identifiers.push_back("index");					_func_tab.push_back(&ConfigParser::set_index);
+	_valid_identifiers.push_back("max_client_body_size");	_func_tab.push_back(&ConfigParser::set_max_client_body_size);
+	_valid_identifiers.push_back("error_pages");			_func_tab.push_back(&ConfigParser::set_error_pages);
+	_valid_identifiers.push_back("autoindex");				_func_tab.push_back(&ConfigParser::set_autoindex);
+	_valid_identifiers.push_back("redirection");			_func_tab.push_back(&ConfigParser::set_redirection);
+	_valid_identifiers.push_back("allowed_scripts");		_func_tab.push_back(&ConfigParser::set_allowed_scripts);
+	_valid_identifiers.push_back("directory_listing");		_func_tab.push_back(&ConfigParser::set_directory_listing);
 
 	_spec_valid_identifiers.push_back("server");
 	_spec_valid_identifiers.push_back("location");
 	_spec_valid_identifiers.push_back(STR_CLOSED_CURLY_BRACE);
 	_spec_valid_identifiers.push_back(STR_SEMICOLON);
-
-	//VECTOR OF FUNCTION POINTERS
-	_func_tab.push_back(&ConfigParser::set_server_name);
-	_func_tab.push_back(&ConfigParser::set_ip_address);
-	_func_tab.push_back(&ConfigParser::set_port);
-	_func_tab.push_back(&ConfigParser::set_root);
-	_func_tab.push_back(&ConfigParser::set_index);
-	_func_tab.push_back(&ConfigParser::set_max_client_body_size);
-	_func_tab.push_back(&ConfigParser::set_error_pages);
-	_func_tab.push_back(&ConfigParser::set_redirection);
-	_func_tab.push_back(&ConfigParser::set_allowed_methods);
-	_func_tab.push_back(&ConfigParser::set_allowed_scripts);
-	_func_tab.push_back(&ConfigParser::set_directory_listing);
-	_func_tab.push_back(&ConfigParser::set_autoindex);
 }
 
 ConfigParser::ConfigParser(const ConfigParser &src) { *this = src; }
@@ -356,6 +342,7 @@ int ConfigParser::add_location() {
 	if (set_loc_prefix(loc) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	loc.max_client_body_size = 0;
+	loc.directory_listing = false;
 	(*_serv)[_i_serv]._locations.push_back(loc);
 	_i_loc++;
 	return (EXIT_SUCCESS);

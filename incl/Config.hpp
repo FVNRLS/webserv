@@ -17,13 +17,13 @@
 struct	location {
 	std::string					prefix;
 	std::string					root;	//if root empty -> uses the server_root
+	std::string					index;
 	std::vector<std::string>	methods;
 	std::vector<std::string>	scripts;
-	std::string					index;
 	size_t 						max_client_body_size; // limit on body sent from client;
-	std::string 				auth_clients; //limit_client_body_size - authorization header;
 	std::string					redirect;
-
+	bool 						directory_listing;
+	std::string 				limit_client_body_size; //limit_client_body_size - authorization header;
 	std::string 				cgi_path; //todo: bonus stuff
 };
 
@@ -39,6 +39,7 @@ private:
 	long 						_max_client_body_size;
 	std::string 				_error_page;
 	bool 						_autoindex;
+	std::string					_redirect;
 	std::vector<location>		_locations;
 
 public:

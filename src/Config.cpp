@@ -97,8 +97,9 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 
 		o << "INDEX:					" << s->_locations[i].index << std::endl;
 		o << "MAX. CLIENT BODY SIZE:		" << s->_locations[i].max_client_body_size << std::endl;
-		o << "CLIENTS:					" << s->_locations[i].auth_clients << std::endl;
+		o << "CLIENTS:					" << s->_locations[i].limit_client_body_size << std::endl;
 		o << "REDIRECT:					" << s->_locations[i].redirect << std::endl;
+		o << "DIRECTORY LISTING:			" << s->_locations[i].directory_listing << std::endl;
 		o << "CGI PATH:					" << s->_locations[i].cgi_path << std::endl;
 	}
 	return (o);
