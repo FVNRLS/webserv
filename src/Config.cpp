@@ -69,11 +69,11 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 
 	//PRINTING OF ALL LOCATIONS
 	for (int i = 0; i < s->_locations.size(); i++) {
-		s_upper_name = s->_locations[i].path;
+		s_upper_name = s->_locations[i].prefix;
 		std::transform(s_upper_name.begin(), s_upper_name.end(), s_upper_name.begin(), ::toupper);
 
-		o << "\033[33m****** LOCATION " << "CONFIGURATION *******\033[0m" << std::endl;
-		o << "PATH:						" << s->_locations[i].path << std::endl;
+		o << "\033[33m****** LOCATION " << s->_locations[i].prefix << " CONFIGURATION *******\033[0m" << std::endl;
+		o << "PREFIX:						" << s->_locations[i].prefix << std::endl;
 		o << "ROOT:						" << s->_locations[i].root << std::endl;
 
 		o << "METHODS:					";

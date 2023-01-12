@@ -330,8 +330,10 @@ int	ConfigParser::set_server_parameter() {
 
 	i = get_func_index();
 	if (i == SPEC_IDENTIFIER) {
-		if (_tokens[0] == "location")
-			add_location();
+		if (_tokens[0] == "location") {
+			if (add_location() == EXIT_FAILURE)
+				return (EXIT_FAILURE);
+		}
 		return (EXIT_SUCCESS);
 	}
 	return ((this->*_func_tab[i])());
@@ -348,13 +350,24 @@ int	ConfigParser::get_func_index() {
 	return (SPEC_IDENTIFIER);
 }
 
-void ConfigParser::add_location() {
+int ConfigParser::add_location() {
 	location loc;
 
+	if (set_loc_prefix(loc) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 	loc.max_client_body_size = 0;
 	(*_serv)[_i_serv]._locations.push_back(loc);
 	_i_loc++;
+	return (EXIT_SUCCESS);
 }
+
+int ConfigParser::set_loc_prefix(location &loc) {
+	if (_tokens.size() != 2)
+		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+	loc.prefix = _tokens[1];
+	return (EXIT_SUCCESS);
+}
+
 
 int ConfigParser::set_server_name() {
 	if ((*_serv)[_i_serv]._name.empty()) {

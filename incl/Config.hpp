@@ -15,7 +15,7 @@
 #include "main.hpp"
 
 struct	location {
-	std::string					path;
+	std::string					prefix;
 	std::string					root;	//if root empty -> uses the server_root
 	std::vector<std::string>	methods;
 	std::vector<std::string>	scripts;
