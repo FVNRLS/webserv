@@ -8,15 +8,15 @@ include_directories(./incl)
 add_executable(webserver
         src/main.cpp
 
-        src/Server.cpp
-        incl/Server.hpp
+        src/Config.cpp
+        incl/Config.hpp
 
         src/Client.cpp
         incl/Client.hpp
 
         incl/main.hpp
-        src/Config.cpp
-        incl/Config.hpp
+        src/ConfigParser.cpp
+        incl/ConfigParser.hpp
 
         src/error_handler.cpp
         incl/error_handler.hpp
@@ -25,4 +25,4 @@ add_executable(webserver
         incl/tools.hpp
         src/tools/trim.cpp
         src/tools/split.cpp
-        )
+        incl/Server.hpp src/Server.cpp)

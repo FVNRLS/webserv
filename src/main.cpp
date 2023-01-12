@@ -10,17 +10,17 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "ConfigParser.hpp"
 #include "Config.hpp"
-#include "Server.hpp"
 
 int main(int argc, char **argv) {
-	Config				conf(argv[1]);
-	std::vector<Server> servers;
+	std::vector<Config> server_configs;
+	ConfigParser		parser(server_configs, argv[1]);
 
 	if (argc != 2)
 		return (print_error(ARG_ERR, argv[1]));
 
-	if (conf.parse(servers, argv[1]) == EXIT_FAILURE)
+	if (parser.parse() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	
 
