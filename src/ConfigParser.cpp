@@ -62,7 +62,6 @@ ConfigParser &ConfigParser::operator=(const ConfigParser &src) { //todo: complet
 ConfigParser::~ConfigParser() {}
 
 //MEMBER FUNCTIONS
-
 int	ConfigParser::parse() {
 
 	if (check_extension() == EXIT_FAILURE)
@@ -311,6 +310,8 @@ void	ConfigParser::set_mode() {
 	}
 }
 
+
+//***** CONFIG FILE SETTERS *****
 int	ConfigParser::set_server_parameter() {
 	int i;
 
@@ -348,13 +349,14 @@ int ConfigParser::add_location() {
 	return (EXIT_SUCCESS);
 }
 
+
+//SERVER SPECIFIC SETTERS
 int ConfigParser::set_loc_prefix(location &loc) {
 	if (_tokens.size() != 2)
 		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 	loc.prefix = _tokens[1];
 	return (EXIT_SUCCESS);
 }
-
 
 int ConfigParser::set_server_name() {
 	if ((*_serv)[_i_serv]._name.empty()) {
@@ -438,6 +440,10 @@ int ConfigParser::set_root() {
 	return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 }
 
+int ConfigParser::set_allowed_methods() {
+	return (EXIT_SUCCESS);
+}
+
 int ConfigParser::set_index() {
 	return (EXIT_SUCCESS);
 }
@@ -450,14 +456,15 @@ int ConfigParser::set_error_pages() {
 	return (EXIT_SUCCESS);
 }
 
+int ConfigParser::set_autoindex() {
+	return (EXIT_SUCCESS);
+}
+
 int ConfigParser::set_redirection() {
 	return (EXIT_SUCCESS);
 }
 
-int ConfigParser::set_allowed_methods() {
-	return (EXIT_SUCCESS);
-}
-
+//LOCATION SPECIFIC SETTERS
 int ConfigParser::set_allowed_scripts() {
 	return (EXIT_SUCCESS);
 }
@@ -466,6 +473,4 @@ int ConfigParser::set_directory_listing() {
 	return (EXIT_SUCCESS);
 }
 
-int ConfigParser::set_autoindex() {
-	return (EXIT_SUCCESS);
-}
+
