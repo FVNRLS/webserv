@@ -83,6 +83,8 @@ std::ostream	&operator<<(std::ostream &o, Server *s) {
 			else
 				o << s->_locations[i].methods[j] << std::endl;
 		}
+		std::cout << std::endl;
+
 
 		o << "SCRIPTS:					";
 		for (int j = 0; j < s->_locations[i].scripts.size(); j++) {
@@ -91,9 +93,10 @@ std::ostream	&operator<<(std::ostream &o, Server *s) {
 			else
 				o << s->_locations[i].scripts[j] << std::endl;
 		}
+		std::cout << std::endl;
 
 		o << "INDEX:					" << s->_locations[i].index << std::endl;
-		o << "MAX. CLIENT BODY SIZE:	" << s->_locations[i].max_client_body_size << std::endl;
+		o << "MAX. CLIENT BODY SIZE:		" << s->_locations[i].max_client_body_size << std::endl;
 		o << "CLIENTS:					" << s->_locations[i].auth_clients << std::endl;
 		o << "REDIRECT:					" << s->_locations[i].redirect << std::endl;
 		o << "CGI PATH:					" << s->_locations[i].cgi_path << std::endl;

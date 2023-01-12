@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "Config.hpp"
+#include "Server.hpp"
 
 //BASIC CLASS SETUP
 Config::Config() : _config_file(NULL), _serv_mode(false), _line_num(1), _pos(0), _conf_pos(0), _serv_cnt(0),
@@ -329,8 +330,11 @@ int	Config::set_server_parameter() {
 	int i;
 
 	i = get_func_index();
-	if (i == SPEC_MEMBER)
+	if (i == SPEC_MEMBER) {
+		if (_tokens[0] == "location")
+			add_location();
 		return (EXIT_SUCCESS);
+	}
 	return ((this->*_func_tab[i])());
 }
 
@@ -343,6 +347,14 @@ int	Config::get_func_index() {
 			return (i);
 	}
 	return (SPEC_MEMBER);
+}
+
+void Config::add_location() {
+	location loc;
+
+	loc.max_client_body_size = 0;
+	(*_serv)[_i_serv]._locations.push_back(loc);
+	_i_loc++;
 }
 
 int Config::set_server_name() {

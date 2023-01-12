@@ -58,6 +58,7 @@ private:
 
 	int								set_server_parameter();
 	int								get_func_index();
+	void 							add_location();
 	int 							set_server_name();
 	int 							set_ip_address();
 	int 							set_port();
