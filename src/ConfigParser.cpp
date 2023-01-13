@@ -120,7 +120,7 @@ size_t ConfigParser::get_line_num(std::string &str) {
 	if (static_cast<int>(_conf_pos) - static_cast<int>(_buf.length()) - 20 < 0)
 		pos = 0;
 	else
-		pos = _conf_pos - _buf.length() - 20;
+		pos = _conf_pos - _buf.length() - 50;
 	pos = _content.find(str, pos);
 
 	_line_num = 1;
