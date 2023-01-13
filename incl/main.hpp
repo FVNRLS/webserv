@@ -43,13 +43,16 @@
 #define TAB						'\t'
 
 //STRINGS
-#define	STR_CLOSED_CURLY_BRACE	"}"
-#define STR_SEMICOLON			";"
-#define STR_SPACE				" "
+const std::string STR_CLOSED_CURLY_BRACE	=	"}";
+const std::string STR_SEMICOLON 			=	";";
+const std::string EQUAL_SIGN 				=	"=";
+
+//NUMERIC CONSTANTS
 #define MAX_PORT_NUM			65535
 #define MIN_CLIENT_BODY_SIZE	10
 
 //DEFAULTS
 const std::string DEFAULT_INDEX = "index.html";
 const std::string DEFAULT_ERROR_PAGES_DIR = "config/default_error_pages";
-
+const std::string DEFAULT_REDIR_FIRST = "config";
+const std::string DEFAULT_REDIR_SECOND = "welcome page"; //unsure about the values

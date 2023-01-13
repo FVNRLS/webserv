@@ -19,12 +19,12 @@ struct	location {
 	std::string					root;	//if root empty -> uses the server_root
 	std::string					index;
 	std::vector<std::string>	methods;
-	std::vector<std::string>	scripts;
 	long long 					max_client_body_size; // limit on body sent from client;
-	std::string					redirect;
 	bool 						directory_listing;
 	std::string 				limit_client_body_size; //limit_client_body_size - authorization header;
 	std::string 				cgi_path; //todo: bonus stuff
+	std::vector<std::pair<std::string, std::string> >	redirect;
+	std::vector<std::pair<std::string, std::string> >	scripts;
 };
 
 class Config {
@@ -32,15 +32,14 @@ class Config {
 private:
 	std::string					_name;
 	std::string 				_ip;
-	std::vector<long> 			_port;
+	std::vector<long> 			_ports;
 	std::string 				_root;
 	std::vector<std::string>	_methods;
 	std::string 				_index;
 	long long 					_max_client_body_size;
 	std::string 				_error_pages_dir;
-	bool 						_autoindex;
-	std::string					_redirect;
 	std::vector<location>		_locations;
+	std::vector<std::pair<std::string, std::string> >	_redirect;
 
 public:
 	friend class ConfigParser;

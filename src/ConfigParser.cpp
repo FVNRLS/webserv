@@ -39,7 +39,6 @@ _i_serv(-1), _i_loc(-1) {
 	_valid_identifiers.push_back("index");					_func_tab.push_back(&ConfigParser::set_index);
 	_valid_identifiers.push_back("max_client_body_size");	_func_tab.push_back(&ConfigParser::set_max_client_body_size);
 	_valid_identifiers.push_back("error_pages");			_func_tab.push_back(&ConfigParser::set_error_pages_dir);
-	_valid_identifiers.push_back("autoindex");				_func_tab.push_back(&ConfigParser::set_autoindex);
 	_valid_identifiers.push_back("redirection");			_func_tab.push_back(&ConfigParser::set_redirection);
 	_valid_identifiers.push_back("allowed_scripts");		_func_tab.push_back(&ConfigParser::set_allowed_scripts);
 	_valid_identifiers.push_back("directory_listing");		_func_tab.push_back(&ConfigParser::set_directory_listing);
@@ -411,13 +410,13 @@ int ConfigParser::set_ip_address() {
 int ConfigParser::set_port() {
 	char *endptr;
 
-	(*_serv)[_i_serv]._port.push_back(0);
+	(*_serv)[_i_serv]._ports.push_back(0);
 	_i_port++;
 	if (_serv_mode) {
 		if (_tokens.size() == 2) {
-			(*_serv)[_i_serv]._port[_i_port] = strtoll(_tokens[1].c_str(), &endptr, 10);
+			(*_serv)[_i_serv]._ports[_i_port] = strtoll(_tokens[1].c_str(), &endptr, 10);
 			if (endptr == _tokens[1] || *endptr != '\0'
-				|| (*_serv)[_i_serv]._port[_i_port] > MAX_PORT_NUM || (*_serv)[_i_serv]._port[_i_port] < 1)
+				|| (*_serv)[_i_serv]._ports[_i_port] > MAX_PORT_NUM || (*_serv)[_i_serv]._ports[_i_port] < 1)
 				return (print_line_error(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
 			return (EXIT_SUCCESS);
 		}
@@ -537,11 +536,35 @@ int ConfigParser::set_error_pages_dir() {
 	return (EXIT_SUCCESS);
 }
 
-int ConfigParser::set_autoindex() {
-	return (EXIT_SUCCESS);
-}
-
 int ConfigParser::set_redirection() {
+	std::vector<std::pair<std::string, std::string> > *param;
+	size_t 		num_tokens;
+	std::pair<std::string, std::string>	pair;
+
+	num_tokens = _tokens.size();
+	if (_serv_mode)
+		param = &(*_serv)[_i_serv]._redirect;
+	else
+		param = &(*_serv)[_i_serv]._locations[_i_loc].redirect;
+	if (!param->empty() && !_serv_mode)
+		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+
+	if (num_tokens == 1) {
+		pair.first = DEFAULT_REDIR_FIRST;
+		pair.second = DEFAULT_REDIR_SECOND;
+	}
+	else if (num_tokens != 4)
+		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+	else {
+		pair.first = _tokens[1];
+		if (_tokens[2] != EQUAL_SIGN)
+			return (print_line_error(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
+		if (_tokens[3] == EQUAL_SIGN)
+				return (print_line_error(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
+		pair.second = _tokens[3];
+	}
+	if (!pair.first.empty() && !pair.second.empty())
+		param->push_back(pair);
 	return (EXIT_SUCCESS);
 }
 

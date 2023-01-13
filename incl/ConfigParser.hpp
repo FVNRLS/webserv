@@ -71,7 +71,6 @@ private:
 	int 	set_index();
 	int 	set_max_client_body_size();
 	int 	set_error_pages_dir();
-	int 	set_autoindex();
 	int 	set_redirection();
 	int 	set_allowed_scripts();
 	int 	set_directory_listing();
