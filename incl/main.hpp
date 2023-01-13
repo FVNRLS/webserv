@@ -47,8 +47,9 @@
 #define STR_SEMICOLON			";"
 #define STR_SPACE				" "
 #define MAX_PORT_NUM			65535
+#define MIN_CLIENT_BODY_SIZE	10
 
 //DEFAULTS
 const std::string DEFAULT_INDEX = "index.html";
-
+const std::string DEFAULT_ERROR_PAGES_DIR = "config/default_error_pages";
 

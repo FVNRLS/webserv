@@ -13,7 +13,7 @@
 #include "Config.hpp"
 
 //BASIC CLASS SETUP
-Config::Config() : _max_client_body_size(10), _autoindex(true), _port(0) {}
+Config::Config() : _max_client_body_size(UINT32_MAX), _autoindex(true), _port(0) {}
 
 Config::Config(const Config &src) {
 	*this = src;
@@ -29,7 +29,7 @@ Config &Config::operator=(const Config &src) { //todo: complete!
 	_methods = src._methods;
 	_index = src._index;
 	_max_client_body_size = src._max_client_body_size;
-	_error_page = src._error_page;
+	_error_pages_dir = src._error_pages_dir;
 	_autoindex = src._autoindex;
 	_locations = src._locations;
 	return (*this);
@@ -69,7 +69,7 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 
 	o << "INDEX:						" << s->_index << std::endl;
 	o << "MAX. CLIENT BODY SIZE:		" << s->_max_client_body_size << std::endl;
-	o << "ERROR PAGE:					" << s->_error_page << std::endl;
+	o << "ERROR PAGE:					" << s->_error_pages_dir << std::endl;
 	o << "AUTOINDEX:					" << s->_autoindex << std::endl;
 	std::cout << std::endl;
 

@@ -20,7 +20,7 @@ struct	location {
 	std::string					index;
 	std::vector<std::string>	methods;
 	std::vector<std::string>	scripts;
-	size_t 						max_client_body_size; // limit on body sent from client;
+	long long 					max_client_body_size; // limit on body sent from client;
 	std::string					redirect;
 	bool 						directory_listing;
 	std::string 				limit_client_body_size; //limit_client_body_size - authorization header;
@@ -36,8 +36,8 @@ private:
 	std::string 				_root;
 	std::vector<std::string>	_methods;
 	std::string 				_index;
-	long 						_max_client_body_size;
-	std::string 				_error_page;
+	long long 					_max_client_body_size;
+	std::string 				_error_pages_dir;
 	bool 						_autoindex;
 	std::string					_redirect;
 	std::vector<location>		_locations;

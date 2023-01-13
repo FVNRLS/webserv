@@ -67,7 +67,7 @@ int	print_line_error(int error, const std::string &config_file, size_t line) {
 		std::cerr << "Error: invalid identifier found in configuration file "
 				  << filename <<  " on line: " << line << std::endl;
 	else if (error == INVALID_SCOPE)
-		std::cerr << "Error: server parameter is defined in an invalid scope in configuration file "
+		std::cerr << "Error: parameter defined in an invalid scope in configuration file "
 				  << filename <<  " on line: " << line << std::endl;
 	else if (error == REDEFINITION_OF_SERVER_PARAMETER)
 		std::cerr << "Error: redefinition of server identifier in configuration file "

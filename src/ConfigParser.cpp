@@ -38,7 +38,7 @@ _i_serv(-1), _i_loc(-1) {
 	_valid_identifiers.push_back("allowed_methods");		_func_tab.push_back(&ConfigParser::set_allowed_methods);
 	_valid_identifiers.push_back("index");					_func_tab.push_back(&ConfigParser::set_index);
 	_valid_identifiers.push_back("max_client_body_size");	_func_tab.push_back(&ConfigParser::set_max_client_body_size);
-	_valid_identifiers.push_back("error_pages");			_func_tab.push_back(&ConfigParser::set_error_pages);
+	_valid_identifiers.push_back("error_pages");			_func_tab.push_back(&ConfigParser::set_error_pages_dir);
 	_valid_identifiers.push_back("autoindex");				_func_tab.push_back(&ConfigParser::set_autoindex);
 	_valid_identifiers.push_back("redirection");			_func_tab.push_back(&ConfigParser::set_redirection);
 	_valid_identifiers.push_back("allowed_scripts");		_func_tab.push_back(&ConfigParser::set_allowed_scripts);
@@ -347,13 +347,12 @@ int ConfigParser::add_location() {
 
 	if (set_loc_prefix(loc) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
-	loc.max_client_body_size = 0;
+	loc.max_client_body_size = UINT32_MAX;
 	loc.directory_listing = false;
 	(*_serv)[_i_serv]._locations.push_back(loc);
 	_i_loc++;
 	return (EXIT_SUCCESS);
 }
-
 
 //SERVER SPECIFIC SETTERS
 int ConfigParser::set_loc_prefix(location &loc) {
@@ -475,7 +474,7 @@ int ConfigParser::set_allowed_methods() {
 	return (EXIT_SUCCESS);
 }
 
-int ConfigParser::set_index() {
+int ConfigParser::set_index() { //todo: apply autoindex
 	std::string *param;
 	size_t 		num_tokens;
 
@@ -496,10 +495,45 @@ int ConfigParser::set_index() {
 }
 
 int ConfigParser::set_max_client_body_size() {
+	long long 	*param;
+	size_t 		num_tokens;
+	char 		*endptr;
+
+	num_tokens = _tokens.size();
+	if (_serv_mode)
+		param = &(*_serv)[_i_serv]._max_client_body_size;
+	else
+		param = &(*_serv)[_i_serv]._locations[_i_loc].max_client_body_size;
+	if (*param != UINT32_MAX)
+		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+	else if (num_tokens > 2)
+		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+	else if (num_tokens == 2) {
+		*param = std::strtoll(_tokens[1].c_str(), &endptr, 10);
+			if (*param < MIN_CLIENT_BODY_SIZE || *param > UINT32_MAX || endptr == _tokens[1] || *endptr != '\0')
+				return (print_line_error(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
+	}
+
 	return (EXIT_SUCCESS);
 }
 
-int ConfigParser::set_error_pages() {
+int ConfigParser::set_error_pages_dir() {
+	std::string *param;
+	size_t 		num_tokens;
+
+	num_tokens = _tokens.size();
+	if (_serv_mode)
+		param = &(*_serv)[_i_serv]._error_pages_dir;
+	else
+		return (print_line_error(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
+	if (!param->empty())
+		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+	else if (num_tokens > 2)
+		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+	else if (num_tokens == 1)
+		*param = DEFAULT_ERROR_PAGES_DIR;
+	else if (num_tokens == 2)
+		*param = _tokens[1];
 	return (EXIT_SUCCESS);
 }
 
