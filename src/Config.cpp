@@ -66,9 +66,8 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 		else
 			o << s->_methods[j] << std::endl;
 	}
-	std::cout << std::endl;
 
-	o << "INDEX:					" << s->_index << std::endl;
+	o << "INDEX:						" << s->_index << std::endl;
 	o << "MAX. CLIENT BODY SIZE:		" << s->_max_client_body_size << std::endl;
 	o << "ERROR PAGE:					" << s->_error_page << std::endl;
 	o << "AUTOINDEX:					" << s->_autoindex << std::endl;
@@ -90,7 +89,6 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 			else
 				o << s->_locations[i].methods[j] << std::endl;
 		}
-		std::cout << std::endl;
 
 		o << "SCRIPTS:					";
 		for (int j = 0; j < s->_locations[i].scripts.size(); j++) {
@@ -101,7 +99,7 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 		}
 		std::cout << std::endl;
 
-		o << "INDEX:					" << s->_locations[i].index << std::endl;
+		o << "INDEX:						" << s->_locations[i].index << std::endl;
 		o << "MAX. CLIENT BODY SIZE:		" << s->_locations[i].max_client_body_size << std::endl;
 		o << "CLIENTS:					" << s->_locations[i].limit_client_body_size << std::endl;
 		o << "REDIRECT:					" << s->_locations[i].redirect << std::endl;

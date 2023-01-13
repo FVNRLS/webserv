@@ -37,7 +37,7 @@
 #define NEWLINE					'\n'
 #define SPACE					' '
 #define SEMICOLON				';'
-#define DOT					'.'
+#define DOT						'.'
 #define HASH					'#'
 #define NULL_TERM				'\0'
 #define TAB						'\t'
@@ -47,3 +47,8 @@
 #define STR_SEMICOLON			";"
 #define STR_SPACE				" "
 #define MAX_PORT_NUM			65535
+
+//DEFAULTS
+const std::string DEFAULT_INDEX = "index.html";
+
+
