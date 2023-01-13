@@ -477,18 +477,20 @@ int ConfigParser::set_allowed_methods() {
 
 int ConfigParser::set_index() {
 	std::string *param;
+	size_t 		num_tokens;
 
+	num_tokens = _tokens.size();
 	if (_serv_mode)
 		param = &(*_serv)[_i_serv]._index;
 	else
 		param = &(*_serv)[_i_serv]._locations[_i_loc].index;
 	if (!param->empty())
 		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
-	else if (_tokens.size() > 2)
+	else if (num_tokens > 2)
 		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
-	else if (_tokens.size() == 1)
+	else if (num_tokens == 1)
 		*param = DEFAULT_INDEX;
-	else if (_tokens.size() == 2)
+	else if (num_tokens == 2)
 		*param = _tokens[1];
 	return (EXIT_SUCCESS);
 }
