@@ -69,7 +69,6 @@ ConfigParser::~ConfigParser() {}
 
 //MEMBER FUNCTIONS
 int	ConfigParser::parse() {
-
 	if (check_extension() == EXIT_FAILURE)
 		return (print_error(INVALID_EXTENSION, _config_file));
 	if (read_conf_file() == EXIT_FAILURE)
@@ -84,7 +83,8 @@ int	ConfigParser::parse() {
 	if (extract_servers() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 
-	std::cout << &(*_serv)[0] << std::endl;
+	for (int i = 0; i < (*_serv).size(); i++)
+		std::cout << &(*_serv)[i] << std::endl;
 	return (EXIT_SUCCESS);
 }
 
@@ -323,6 +323,7 @@ int	ConfigParser::set_server_parameter() {
 	i = get_func_index();
 	if (i == SPEC_IDENTIFIER) {
 		if (_tokens[0] == "location") {
+			_serv_mode = false;
 			if (add_location() == EXIT_FAILURE)
 				return (EXIT_FAILURE);
 		}

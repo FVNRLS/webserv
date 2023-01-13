@@ -119,7 +119,7 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 		if (!s->_locations[i].redirect.empty())
 			o << "REDIRECT:					" << s->_locations[i].redirect[0].first << " = " << s->_locations[i].redirect[0].second << std::endl;
 		o << "DIRECTORY LISTING:			" << s->_locations[i].directory_listing << std::endl;
-		o << "CGI PATH:					" << s->_locations[i].cgi_path << std::endl;
+		o << "CGI PATH:					" << s->_locations[i].cgi_path << std::endl << std::endl;
 	}
 	return (o);
 }
