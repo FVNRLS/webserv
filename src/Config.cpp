@@ -103,12 +103,16 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 				o << s->_locations[i].methods[j] << std::endl;
 		}
 
-		o << "SCRIPTS:					";
-		for (int j = 0; j < s->_locations[i].scripts.size(); j++) {
-			if (j < s->_locations[i].scripts.size() - 1)
-				o << s->_locations[i].scripts[j].first << ", " << s->_locations[i].scripts[j].second << std::endl;
+		if (!s->_locations[i].scripts.empty()) {
+			o << "SCRIPTS:					";
+			for (int j = 0; j < s->_locations[i].scripts.size(); j++) {
+				if (j == 0)
+					o << s->_locations[i].scripts[j].first << " = " << s->_locations[i].scripts[j].second << std::endl;
+				else
+					o <<  "							" << s->_locations[i].scripts[j].first <<
+					" = " << s->_locations[i].scripts[j].second << std::endl;
+			}
 		}
-		std::cout << std::endl;
 
 		o << "INDEX:						" << s->_locations[i].index << std::endl;
 		o << "MAX. CLIENT BODY SIZE:		" << s->_locations[i].max_client_body_size << std::endl;

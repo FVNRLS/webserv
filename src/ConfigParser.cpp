@@ -570,10 +570,53 @@ int ConfigParser::set_redirection() {
 
 //LOCATION SPECIFIC SETTERS
 int ConfigParser::set_allowed_scripts() {
+	std::vector<std::pair<std::string, std::string> >	*param;
+	size_t	num_tokens;
+	std::pair<std::string, std::string>	pair;
+
+	num_tokens = _tokens.size();
+	if (_serv_mode)
+		return (print_line_error(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
+	else
+		param = &(*_serv)[_i_serv]._locations[_i_loc].scripts;
+
+	if (num_tokens == 1) {
+		pair.first = DEFAULT_REDIR_FIRST;
+		pair.second = DEFAULT_REDIR_SECOND;
+	}
+	else if (num_tokens != 4)
+		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+	else {
+		pair.first = _tokens[1];
+		if (_tokens[2] != EQUAL_SIGN)
+			return (print_line_error(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
+		if (_tokens[3] == EQUAL_SIGN)
+			return (print_line_error(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
+		pair.second = _tokens[3];
+	}
+	if (!pair.first.empty() && !pair.second.empty())
+		param->push_back(pair);
 	return (EXIT_SUCCESS);
 }
 
 int ConfigParser::set_directory_listing() {
+	size_t 		num_tokens;
+
+	num_tokens = _tokens.size();
+	if (_serv_mode)
+		return (print_line_error(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
+	else if ((*_serv)[_i_serv]._locations[_i_loc].directory_listing == true)
+		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+	else if (num_tokens > 2)
+		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+	else if (num_tokens == 2) {
+		if (_tokens[1] == "false")
+			return (EXIT_SUCCESS);
+		else if (_tokens[1] == "true")
+			(*_serv)[_i_serv]._locations[_i_loc].directory_listing = true;
+		else
+			return (print_line_error(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
+	}
 	return (EXIT_SUCCESS);
 }
 
