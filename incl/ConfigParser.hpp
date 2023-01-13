@@ -74,8 +74,9 @@ private:
 	int 	set_redirection();
 	int 	set_allowed_scripts();
 	int 	set_directory_listing();
+	int 	set_cgi_path();
 
-public:
+		public:
 	//BASIC CLASS SETUP
 	ConfigParser();
 	ConfigParser(std::vector<Config> &servers, char *path);

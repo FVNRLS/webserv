@@ -22,7 +22,7 @@ struct	location {
 	long long 					max_client_body_size; // limit on body sent from client;
 	bool 						directory_listing;
 	std::string 				limit_client_body_size; //limit_client_body_size - authorization header;
-	std::string 				cgi_path; //todo: bonus stuff
+	std::string 				cgi_path;
 	std::vector<std::pair<std::string, std::string> >	redirect;
 	std::vector<std::pair<std::string, std::string> >	scripts;
 };

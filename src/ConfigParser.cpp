@@ -42,6 +42,7 @@ _i_serv(-1), _i_loc(-1) {
 	_valid_identifiers.push_back("redirection");			_func_tab.push_back(&ConfigParser::set_redirection);
 	_valid_identifiers.push_back("allowed_scripts");		_func_tab.push_back(&ConfigParser::set_allowed_scripts);
 	_valid_identifiers.push_back("directory_listing");		_func_tab.push_back(&ConfigParser::set_directory_listing);
+	_valid_identifiers.push_back("cgi_path");		_func_tab.push_back(&ConfigParser::set_cgi_path);
 
 	_spec_valid_identifiers.push_back("server");
 	_spec_valid_identifiers.push_back("location");
@@ -620,4 +621,16 @@ int ConfigParser::set_directory_listing() {
 	return (EXIT_SUCCESS);
 }
 
+int ConfigParser::set_cgi_path() {
+	size_t 		num_tokens;
 
+	num_tokens = _tokens.size();
+	if (_serv_mode)
+		return (print_line_error(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
+	else if (!(*_serv)[_i_serv]._locations[_i_loc].cgi_path.empty())
+		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+	else if (num_tokens > 2)
+		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+	(*_serv)[_i_serv]._locations[_i_loc].cgi_path = _tokens[1];
+	return (EXIT_SUCCESS);
+}

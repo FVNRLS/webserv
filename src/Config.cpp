@@ -116,7 +116,6 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 
 		o << "INDEX:						" << s->_locations[i].index << std::endl;
 		o << "MAX. CLIENT BODY SIZE:		" << s->_locations[i].max_client_body_size << std::endl;
-		o << "CLIENTS:					" << s->_locations[i].limit_client_body_size << std::endl;
 		if (!s->_locations[i].redirect.empty())
 			o << "REDIRECT:					" << s->_locations[i].redirect[0].first << " = " << s->_locations[i].redirect[0].second << std::endl;
 		o << "DIRECTORY LISTING:			" << s->_locations[i].directory_listing << std::endl;
