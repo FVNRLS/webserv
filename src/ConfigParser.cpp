@@ -68,6 +68,7 @@ ConfigParser::~ConfigParser() {}
 
 
 //MEMBER FUNCTIONS
+//TODO: multiple server parsing doesn't work, because of _conf_pos --> FIX!!!
 int	ConfigParser::parse() {
 	if (check_extension() == EXIT_FAILURE)
 		return (print_error(INVALID_EXTENSION, _config_file));
@@ -82,6 +83,10 @@ int	ConfigParser::parse() {
 
 	if (extract_servers() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
+
+//	print_vector(_serv_blocks, 1);
+	std::cout << _serv_blocks[0].size() << std::endl;
+	std::cout << _conf_pos << std::endl;
 
 	for (int i = 0; i < (*_serv).size(); i++)
 		std::cout << &(*_serv)[i] << std::endl;
@@ -264,6 +269,9 @@ int	ConfigParser::extract_servers() {
 	_conf_pos = 0;
 	replace_open_braces(_serv_blocks);
 	for (_i_serv = 0;  _i_serv < _serv_blocks.size(); _i_serv++) {
+		if (_i_serv == 1) {
+
+		}
 		if (extract_server_block(_i_serv) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 	}
@@ -281,12 +289,15 @@ void	ConfigParser::replace_open_braces(std::vector<std::string> &v) {
 }
 
 int ConfigParser::extract_server_block(int i) {
+	size_t len;
+
 	_serv_mode = true;
 	_buf.clear();
 	_i_loc = -1;
 	_i_port = -1;
+	len = _serv_blocks[i].length() + _conf_pos;
 
-	while (_conf_pos < _serv_blocks[i].length()) {
+	while (_conf_pos < len) {
 		if (_serv_blocks[i][_conf_pos] == SEMICOLON) {
 			_tokens = split(_buf, SPACE);
 			set_mode();
@@ -300,7 +311,7 @@ int ConfigParser::extract_server_block(int i) {
 		else if (_serv_blocks[i][_conf_pos] == NEWLINE)
 			_line_num++;
 		else
-			_buf += _serv_blocks[0][_conf_pos];
+			_buf += _serv_blocks[i][_conf_pos];
 		_conf_pos++;
 	}
 	return (EXIT_SUCCESS);
@@ -354,6 +365,7 @@ int ConfigParser::add_location() {
 	_i_loc++;
 	return (EXIT_SUCCESS);
 }
+
 
 //SERVER SPECIFIC SETTERS
 int ConfigParser::set_loc_prefix(location &loc) {

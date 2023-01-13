@@ -126,3 +126,50 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 
 Config::~Config() {}
 
+
+//GETTERS
+std::string Config::get_name() {
+	return (_name);
+}
+
+std::string	Config::get_ip() {
+	return (_ip);
+}
+
+std::vector<long>	Config::get_ports() {
+	return (_ports);
+}
+
+std::string	Config::get_root() {
+	return (_root);
+}
+
+std::vector<std::string>	Config::get_methods() {
+	return (_methods);
+}
+
+std::string	Config::get_index() {
+	return (_index);
+}
+
+long long	Config::get_max_client_body_size() {
+	return (_max_client_body_size);
+}
+
+std::string	Config::get_error_pages_dir() {
+	return (_error_pages_dir);
+}
+
+std::vector<location>	Config::get_locations() {
+	return (_locations);
+}
+
+std::vector<std::pair<std::string, std::string> >	Config::get_redirect() {
+	return (_redirect);
+}
+
+
+
+
+
+

@@ -50,6 +50,18 @@ public:
 	Config &operator=(const Config &src);
 	friend std::ostream	&operator<<(std::ostream &o, Config *a);
 	~Config();
+
+	//GETTERS
+	std::string					get_name();
+	std::string					get_ip();
+	std::vector<long>			get_ports();
+	std::string					get_root();
+	std::vector<std::string>	get_methods();
+	std::string 				get_index();
+	long long 					get_max_client_body_size();
+	std::string 				get_error_pages_dir();
+	std::vector<location>		get_locations();
+	std::vector<std::pair<std::string, std::string> >	get_redirect();
 };
 
 
