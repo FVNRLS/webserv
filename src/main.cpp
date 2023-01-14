@@ -15,10 +15,10 @@
 
 int main(int argc, char **argv) {
 	std::vector<Config> server_configs;
-	ConfigParser		parser(server_configs, argv[1]);
 
 	if (argc != 2)
 		return (print_error(ARG_ERR, argv[1]));
+	ConfigParser		parser(server_configs, argv[1]);
 
 	if (parser.parse() == EXIT_FAILURE)
 		return (EXIT_FAILURE);

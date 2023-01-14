@@ -17,7 +17,7 @@
 ConfigParser::ConfigParser() : _config_file(NULL), _serv_mode(false), _line_num(1), _pos(0), _conf_pos(0), _serv_cnt(0),
 							   _serv_def_start(0), _serv_def_end(0), _i_serv(-1), _i_loc(-1) {}
 
-ConfigParser::ConfigParser(std::vector<Config> &servers, char *path) : _serv(&servers), _config_file(path),
+ConfigParser::ConfigParser(std::vector<Config> &servers, char *path) : _config_file(path), _serv(&servers),
 _serv_mode(false), _line_num(1), _pos(0), _conf_pos(0), _serv_cnt(0), _serv_def_start(0), _serv_def_end(0),
 _i_serv(-1), _i_loc(-1) {
 
@@ -108,7 +108,7 @@ int	ConfigParser::read_conf_file() {
 	std::ifstream	file;
 	std::string		line;
 
-	file.open(_config_file);
+	file.open(_config_file.c_str());
 	if (!file.is_open() || file.fail())
 		return (print_error(BAD_PERMISSIONS, _config_file));
 	while (std::getline(file, line)) {

@@ -20,6 +20,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <cassert>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -28,6 +29,10 @@
 
 #include "error_handler.hpp"
 #include "tools.hpp"
+
+#ifndef UINT32_MAX
+# define	UINT32_MAX __UINT32_MAX__
+#endif
 
 //CHARACTERS
 #define NOT_FOUND				(-1)
@@ -41,6 +46,7 @@
 #define HASH					'#'
 #define NULL_TERM				'\0'
 #define TAB						'\t'
+
 
 //STRINGS
 const std::string STR_CLOSED_CURLY_BRACE	=	"}";
