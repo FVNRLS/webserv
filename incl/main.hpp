@@ -20,7 +20,6 @@
 #include <vector>
 #include <list>
 #include <map>
-#include <cassert>
 
 #include <sys/types.h>
 #include <sys/socket.h>
