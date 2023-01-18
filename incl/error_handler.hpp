@@ -36,6 +36,9 @@ enum errors {
 
 	SERVER_NAME_NOT_UNIQUE,
 	NO_IP_ADDRESS,
+	NO_PORTS,
+	NO_ROOT,
+	NO_INDEX
 };
 
 

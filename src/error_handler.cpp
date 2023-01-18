@@ -93,7 +93,13 @@ int	print_param_error(int error, const std::string &config_file, std::string &pa
 
 	if (error == SERVER_NAME_NOT_UNIQUE)
 		std::cerr << "Error: server name " << param << " not unique in confiiguration file " << filename << std::endl;
-	if (error == NO_IP_ADDRESS)
+	else if (error == NO_IP_ADDRESS)
 		std::cerr << "Error: missing IP address for server " << param << " in " << filename << std::endl;
+	else if (error == NO_PORTS)
+		std::cerr << "Error: no port(s) specified for server " << param << " in " << filename << std::endl;
+	else if (error == NO_ROOT)
+		std::cerr << "Error: no root path specified for server " << param << " in " << filename << std::endl;
+	else if (error == NO_INDEX)
+		std::cerr << "Error: no index page specified for location " << param << " in " << filename << std::endl;
 	return (EXIT_FAILURE);
 }

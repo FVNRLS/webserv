@@ -652,6 +652,9 @@ int ConfigParser::check_required_param_def() {
 		if (check_serv_config() == EXIT_FAILURE || check_loc_config() == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 	}
+	create_ip_port_combinations();
+	if (check_ip_port_combinations() == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
@@ -660,18 +663,10 @@ int ConfigParser::check_serv_config() {
 		return (EXIT_FAILURE);
 	if (check_ip_address() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
-
-
-	return (EXIT_SUCCESS);
-}
-
-int ConfigParser::check_loc_config() {
-	size_t	num_locs;
-
-	num_locs = (*_serv)[_i_serv]._locations.size();
-	for (int j = 0; j < num_locs; j++) {
-	}
-
+	if (check_ports() == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+	if (check_root() == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
@@ -696,5 +691,44 @@ int ConfigParser::check_ip_address() {
 	ip = &(*_serv)[_i_serv]._ip;
 	if (ip->empty())
 		return (print_param_error(NO_IP_ADDRESS, _config_file, (*_serv)[_i_serv]._name));
+	return (EXIT_SUCCESS);
+}
+
+int ConfigParser::check_ports() {
+	std::vector <long>	*ports;
+
+	ports = &(*_serv)[_i_serv]._ports;
+	if (ports->empty())
+		return (print_param_error(NO_PORTS, _config_file, (*_serv)[_i_serv]._name));
+	return (EXIT_SUCCESS);
+}
+
+int ConfigParser::check_root() {
+	std::string	*root;
+
+	root = &(*_serv)[_i_serv]._root;
+	if (root->empty())
+		return (print_param_error(NO_ROOT, _config_file, (*_serv)[_i_serv]._name));
+	return (EXIT_SUCCESS);
+}
+
+int ConfigParser::check_loc_config() {
+	size_t		num_locs;
+	std::string	index;
+
+	num_locs = (*_serv)[_i_serv]._locations.size();
+	for (int j = 0; j < num_locs; j++) {
+		index = (*_serv)[_i_serv]._locations[j].index;
+		if (index.empty())
+			return (print_param_error(NO_INDEX, _config_file, (*_serv)[_i_serv]._locations[j].prefix));
+	}
+	return (EXIT_SUCCESS);
+}
+
+void	ConfigParser::create_ip_port_combinations() {
+
+}
+
+int	ConfigParser::check_ip_port_combinations() {
 	return (EXIT_SUCCESS);
 }

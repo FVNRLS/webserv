@@ -81,7 +81,12 @@ private:
 	int 	check_loc_config();
 	int 	check_server_name();
 	int 	check_ip_address();
+	int 	check_ports();
+	int 	check_root();
 
+
+		void	create_ip_port_combinations();
+	int		check_ip_port_combinations();
 
 
 		public:

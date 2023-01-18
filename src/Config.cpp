@@ -69,7 +69,8 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 		}
 	}
 
-	o << std::left << std::setw(28) << "INDEX:" << s->_index << std::endl;
+	if (!s->_index.empty())
+		o << std::left << std::setw(28) << "INDEX:" << s->_index << std::endl;
 	o << std::left << std::setw(28) << "MAX. CLIENT BODY SIZE:" << s->_max_client_body_size << std::endl;
 	o << std::left << std::setw(28) << "ERROR PAGE:" << s->_error_pages_dir << std::endl;
 
@@ -95,12 +96,14 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 		o << std::left << std::setw(28) << "PREFIX:" << s->_locations[i].prefix << std::endl;
 		o << std::left << std::setw(28) << "ROOT:" << s->_locations[i].root << std::endl;
 
-		o << std::left << std::setw(28) << "METHODS:";
-		for (int j = 0; j < s->_locations[i].methods.size(); j++) {
-			if (j < s->_locations[i].methods.size() - 1)
-			 	o << s->_locations[i].methods[j] << ", ";
-			else
-				o << s->_locations[i].methods[j] << std::endl;
+		if (!s->_locations[i].methods.empty()) {
+			o << std::left << std::setw(28) << "METHODS:";
+			for (int j = 0; j < s->_locations[i].methods.size(); j++) {
+				if (j < s->_locations[i].methods.size() - 1)
+					o << s->_locations[i].methods[j] << ", ";
+				else
+					o << s->_locations[i].methods[j] << std::endl;
+			}
 		}
 
 		if (!s->_locations[i].scripts.empty()) {
