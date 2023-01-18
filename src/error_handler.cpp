@@ -31,6 +31,8 @@ int	print_error(int error, const std::string &config_file) {
 		std::cerr << "Error: no server specified in configuration file " << filename << std::endl;
 	else if (error == BAD_PERMISSIONS)
 		std::cerr << "Error: invalid permissions of " << filename << std::endl;
+	else if (error == NO_FILE)
+		std::cerr << "Error: the configuration file " << filename << " doesn't exist" << std::endl;
 
 	return (EXIT_FAILURE);
 }

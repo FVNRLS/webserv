@@ -68,7 +68,6 @@ ConfigParser::~ConfigParser() {}
 
 
 //MEMBER FUNCTIONS
-//TODO: multiple server parsing doesn't work, because of _conf_pos --> FIX!!!
 int	ConfigParser::parse() {
 	if (check_extension() == EXIT_FAILURE)
 		return (print_error(INVALID_EXTENSION, _config_file));
@@ -105,6 +104,8 @@ int	ConfigParser::read_conf_file() {
 	std::ifstream	file;
 	std::string		line;
 
+	if (access("example.txt", F_OK) < 0)
+		return (print_error(NO_FILE, _config_file));
 	file.open(_config_file.c_str());
 	if (!file.is_open() || file.fail())
 		return (print_error(BAD_PERMISSIONS, _config_file));
@@ -378,7 +379,6 @@ int ConfigParser::set_server_name() {
 	size_t	num_tokens;
 
 	num_tokens = _tokens.size();
-
 	if ((*_serv)[_i_serv]._name.empty()) {
 		if (_serv_mode) {
 			if (num_tokens < 2)
@@ -490,7 +490,7 @@ int ConfigParser::set_allowed_methods() {
 	return (EXIT_SUCCESS);
 }
 
-int ConfigParser::set_index() { //todo: apply autoindex
+int ConfigParser::set_index() {
 	std::string *param;
 	size_t 		num_tokens;
 
@@ -585,6 +585,7 @@ int ConfigParser::set_redirection() {
 	return (EXIT_SUCCESS);
 }
 
+
 //LOCATION SPECIFIC SETTERS
 int ConfigParser::set_allowed_scripts() {
 	std::vector<std::pair<std::string, std::string> >	*param;
@@ -650,6 +651,7 @@ int ConfigParser::set_cgi_path() {
 	(*_serv)[_i_serv]._locations[_i_loc].cgi_path = _tokens[1];
 	return (EXIT_SUCCESS);
 }
+
 
 //POST PARSING CHECKERS
 int ConfigParser::check_required_param_def() {
@@ -740,7 +742,7 @@ int ConfigParser::check_loc_index() {
 	return (EXIT_SUCCESS);
 }
 
-void ConfigParser::check_loc_root() {
+void 	ConfigParser::check_loc_root() {
 	std::string	*root;
 
 	root = &(*_serv)[_i_serv]._locations[_i_loc].root;
@@ -748,7 +750,7 @@ void ConfigParser::check_loc_root() {
 		*root = (*_serv)[_i_serv]._locations[_i_loc].prefix;
 }
 
-void ConfigParser::check_cgi_path() {
+void 	ConfigParser::check_cgi_path() {
 	std::string	*cgi;
 
 	cgi = &(*_serv)[_i_serv]._locations[_i_loc].cgi_path;
