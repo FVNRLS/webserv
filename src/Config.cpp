@@ -46,10 +46,10 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 
 	o << std::endl << "\033[31m****** SERVER " << s_upper_name << " *******\033[0m" << std::endl << std::endl;
 	o << "\033[33m****** SERVER CONFIGURATION *******\033[0m" << std::endl;
-	o << "NAME:						" << s->_name << std::endl;
-	o << "IP ADDRESS:					" << s->_ip << std::endl;
+	o << std::left << std::setw(28) << "NAME:" << s->_name << std::endl;
+	o << std::left << std::setw(28) << "IP ADDRESS:" << s->_ip << std::endl;
 
-	o << "PORTS:						";
+	o << std::left << std::setw(28) << "PORTS:";
 	for (int j = 0; j < s->_ports.size(); j++) {
 		if (j < s->_ports.size() - 1)
 			o << s->_ports[j] << ", ";
@@ -60,7 +60,7 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 	o << "ROOT:						" << s->_root << std::endl;
 
 	if (!s->_methods.empty()) {
-		o << "METHODS:					";
+		o << std::left << std::setw(28) << "METHODS:";
 		for (int j = 0; j < s->_methods.size(); j++) {
 			if (j < s->_methods.size() - 1)
 				o << s->_methods[j] << ", ";
@@ -69,12 +69,12 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 		}
 	}
 
-	o << "INDEX:						" << s->_index << std::endl;
-	o << "MAX. CLIENT BODY SIZE:		" << s->_max_client_body_size << std::endl;
-	o << "ERROR PAGE:					" << s->_error_pages_dir << std::endl;
+	o << std::left << std::setw(28) << "INDEX:" << s->_index << std::endl;
+	o << std::left << std::setw(28) << "MAX. CLIENT BODY SIZE:" << s->_max_client_body_size << std::endl;
+	o << std::left << std::setw(28) << "ERROR PAGE:" << s->_error_pages_dir << std::endl;
 
 	if (!s->_redirect.empty()) {
-		o << "REDIRECTS:					";
+		o << std::left << std::setw(28) << "REDIRECTS:";
 		for (int j = 0; j < s->_redirect.size(); j++) {
 			if (j == 0)
 				o << s->_redirect[j].first << " = " << s->_redirect[j].second << std::endl;
@@ -92,10 +92,10 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 		std::transform(s_upper_name.begin(), s_upper_name.end(), s_upper_name.begin(), ::toupper);
 
 		o << "\033[33m****** LOCATION " << s->_locations[i].prefix << " CONFIGURATION *******\033[0m" << std::endl;
-		o << "PREFIX:						" << s->_locations[i].prefix << std::endl;
-		o << "ROOT:						" << s->_locations[i].root << std::endl;
+		o << std::left << std::setw(28) << "PREFIX:" << s->_locations[i].prefix << std::endl;
+		o << std::left << std::setw(28) << "ROOT:" << s->_locations[i].root << std::endl;
 
-		o << "METHODS:					";
+		o << std::left << std::setw(28) << "METHODS:";
 		for (int j = 0; j < s->_locations[i].methods.size(); j++) {
 			if (j < s->_locations[i].methods.size() - 1)
 			 	o << s->_locations[i].methods[j] << ", ";
@@ -104,7 +104,7 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 		}
 
 		if (!s->_locations[i].scripts.empty()) {
-			o << "SCRIPTS:					";
+			o << std::left << std::setw(28) << "SCRIPTS:";
 			for (int j = 0; j < s->_locations[i].scripts.size(); j++) {
 				if (j == 0)
 					o << s->_locations[i].scripts[j].first << " = " << s->_locations[i].scripts[j].second << std::endl;
@@ -114,12 +114,13 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 			}
 		}
 
-		o << "INDEX:						" << s->_locations[i].index << std::endl;
-		o << "MAX. CLIENT BODY SIZE:		" << s->_locations[i].max_client_body_size << std::endl;
+		o << std::left << std::setw(28) << "INDEX:" << s->_locations[i].index << std::endl;
+		o << std::left << std::setw(28) << "MAX. CLIENT BODY SIZE:" << s->_locations[i].max_client_body_size << std::endl;
 		if (!s->_locations[i].redirect.empty())
-			o << "REDIRECT:					" << s->_locations[i].redirect[0].first << " = " << s->_locations[i].redirect[0].second << std::endl;
-		o << "DIRECTORY LISTING:			" << s->_locations[i].directory_listing << std::endl;
-		o << "CGI PATH:					" << s->_locations[i].cgi_path << std::endl << std::endl;
+			o << std::left << std::setw(28) << "REDIRECT:" << s->_locations[i].redirect[0].first
+				<< " = " << s->_locations[i].redirect[0].second << std::endl;
+		o << std::left << std::setw(28) << "DIRECTORY LISTING:" << s->_locations[i].directory_listing << std::endl;
+		o << std::left << std::setw(28) << "CGI PATH:" << s->_locations[i].cgi_path << std::endl << std::endl;
 	}
 	return (o);
 }
