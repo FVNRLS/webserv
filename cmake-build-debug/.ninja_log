@@ -90,3 +90,6 @@
 3	678	1674037787000000000	CMakeFiles/webserver.dir/src/Config.cpp.o	b11db586e21c9121
 3	848	1674037787000000000	CMakeFiles/webserver.dir/src/ConfigParser.cpp.o	68bc7a944fac86c1
 848	907	1674037788000000000	webserver	a4988fde8aef2316
+2	471	1674038795000000000	CMakeFiles/webserver.dir/src/main.cpp.o	e4069d92c7575fb2
+2	873	1674038795000000000	CMakeFiles/webserver.dir/src/ConfigParser.cpp.o	68bc7a944fac86c1
+873	951	1674038795000000000	webserver	a4988fde8aef2316

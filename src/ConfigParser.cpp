@@ -290,7 +290,6 @@ int ConfigParser::extract_server_block() {
 	_serv_mode = true;
 	_buf.clear();
 	_i_loc = -1;
-	_i_port = -1;
 	len = _serv_blocks[_i_serv].length();
 	j = 0;
 	while (j < len) {
@@ -418,15 +417,14 @@ int ConfigParser::set_ip_address() {
 
 int ConfigParser::set_port() {
 	char *endptr;
+	long port;
 
-	(*_serv)[_i_serv]._ports.push_back(0);
-	_i_port++;
 	if (_serv_mode) {
 		if (_tokens.size() == 2) {
-			(*_serv)[_i_serv]._ports[_i_port] = strtoll(_tokens[1].c_str(), &endptr, 10);
-			if (endptr == _tokens[1] || *endptr != '\0'
-				|| (*_serv)[_i_serv]._ports[_i_port] > MAX_PORT_NUM || (*_serv)[_i_serv]._ports[_i_port] < 1)
+			port = strtoll(_tokens[1].c_str(), &endptr, 10);
+			if (endptr == _tokens[1] || *endptr != '\0' || port > MAX_PORT_NUM || port < 1)
 				return (print_line_error(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
+			(*_serv)[_i_serv]._ports.push_back(port);
 			return (EXIT_SUCCESS);
 		}
 		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
