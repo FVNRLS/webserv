@@ -19,7 +19,7 @@ Config::Config(const Config &src) {
 	*this = src;
 }
 
-Config &Config::operator=(const Config &src) { //todo: complete!
+Config &Config::operator=(const Config &src) {
 	if (this == &src)
 		return (*this);
 	_name = src._name;

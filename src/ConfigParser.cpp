@@ -57,10 +57,29 @@ _i_serv(-1), _i_loc(-1) {
 
 ConfigParser::ConfigParser(const ConfigParser &src) { *this = src; }
 
-ConfigParser &ConfigParser::operator=(const ConfigParser &src) { //todo: complete in the end!
+ConfigParser &ConfigParser::operator=(const ConfigParser &src) {
 	if (this == &src)
 		return (*this);
 	_config_file = src._config_file;
+	_content = src._content;
+	_buf = src._buf;
+	_serv_mode = src._serv_mode;
+	_line_num = src._line_num;
+	_pos = src._pos;
+	_conf_pos = src._conf_pos;
+	_serv_cnt = src._serv_cnt;
+	_serv_def_start = src._serv_def_start;
+	_serv_def_end = src._serv_def_end;
+	_i_serv = src._i_serv;
+	_i_loc = src._i_loc;
+	_spec_chars = src._spec_chars;
+	_valid_identifiers = src._valid_identifiers;
+	_spec_valid_identifiers = src._spec_valid_identifiers;
+	_valid_methods = src._valid_methods;
+	*_serv = *src._serv; //todo: is it right?
+	_serv_blocks = src._serv_blocks;
+	_tokens = src._tokens;
+	_func_tab = src._func_tab;
 	return (*this);
 }
 
