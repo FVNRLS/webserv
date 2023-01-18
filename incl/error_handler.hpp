@@ -38,7 +38,8 @@ enum errors {
 	NO_IP_ADDRESS,
 	NO_PORTS,
 	NO_ROOT,
-	NO_INDEX
+	NO_INDEX,
+	DUPLICATE_IP_PORT_COMB
 };
 
 

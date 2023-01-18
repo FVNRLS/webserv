@@ -87,7 +87,6 @@ int	ConfigParser::parse() {
 	for (int i = 0; i < (*_serv).size(); i++)
 		std::cout << &(*_serv)[i] << std::endl;
 
-
 	return (EXIT_SUCCESS);
 }
 
@@ -768,5 +767,14 @@ void	ConfigParser::create_ip_port_combinations() {
 }
 
 int	ConfigParser::check_ip_port_combinations() {
+	std::vector <std::string>			combs;
+	std::vector<std::string>::iterator 	it;
+
+	for (int i = 0; i < _serv_cnt; i++)
+		combs.insert(combs.end(), (*_serv)[i]._ip_port_comb.begin(), (*_serv)[i]._ip_port_comb.end());
+	std::sort(combs.begin(), combs.end());
+	it = std::adjacent_find(combs.begin(), combs.end());
+	if (it != combs.end())
+		return (print_param_error(DUPLICATE_IP_PORT_COMB, _config_file, *it));
 	return (EXIT_SUCCESS);
 }

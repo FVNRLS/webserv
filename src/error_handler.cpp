@@ -101,5 +101,7 @@ int	print_param_error(int error, const std::string &config_file, std::string &pa
 		std::cerr << "Error: no root path specified for server " << param << " in " << filename << std::endl;
 	else if (error == NO_INDEX)
 		std::cerr << "Error: no index page specified for location " << param << " in " << filename << std::endl;
+	else if (error == DUPLICATE_IP_PORT_COMB)
+		std::cerr << "Error: duplicate ip/port definition of " << param << " in " << filename << std::endl;
 	return (EXIT_FAILURE);
 }
