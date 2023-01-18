@@ -55,7 +55,7 @@ private:
 	int		extract_servers();
 	void	replace_open_braces(std::vector<std::string> &v);
 	void 	create_servers();
-	int 	extract_server_block(int i);
+	int 	extract_server_block();
 	void	set_mode();
 
 	//CONFIG FILE SETTERS
