@@ -29,33 +29,37 @@
 #include "error_handler.hpp"
 #include "tools.hpp"
 
+//COVERING UINT32_MAX MACRO FOR ARCH LINUX
 #ifndef UINT32_MAX
 # define	UINT32_MAX __UINT32_MAX__
 #endif
 
 //CHARACTERS
-#define NOT_FOUND				(-1)
-#define SPEC_IDENTIFIER			(-2)
-#define	OPEN_CURLY_BRACE		'{'
-#define	CLOSED_CURLY_BRACE		'}'
-#define NEWLINE					'\n'
-#define SPACE					' '
-#define SEMICOLON				';'
-#define DOT						'.'
-#define HASH					'#'
-#define NULL_TERM				'\0'
-#define TAB						'\t'
+enum chars {
+	NOT_FOUND 			= (-1),
+	SPEC_IDENTIFIER 	= (-2),
+	OPEN_CURLY_BRACE 	= '{',
+	CLOSED_CURLY_BRACE	= '}',
+ 	NEWLINE				= '\n',
+ 	SPACE				= ' ',
+ 	SEMICOLON			= ';',
+ 	DOT					= '.',
+ 	HASH				= '#',
+ 	NULL_TERM			= '\0',
+ 	TAB					= '\t'
+};
 
+//NUMERIC CONSTANTS
+enum num_constants {
+	MAX_PORT_NUM			= 65535,
+	MIN_CLIENT_BODY_SIZE	= 10,
+	NEGATIVE_OFFSET			= 50
+};
 
 //STRINGS
 const std::string STR_CLOSED_CURLY_BRACE	=	"}";
 const std::string STR_SEMICOLON 			=	";";
 const std::string EQUAL_SIGN 				=	"=";
-
-//NUMERIC CONSTANTS
-#define MAX_PORT_NUM			65535
-#define MIN_CLIENT_BODY_SIZE	10
-#define NEGATIVE_OFFSET			50
 
 //DEFAULTS
 const std::string DEFAULT_INDEX = "index.html";
