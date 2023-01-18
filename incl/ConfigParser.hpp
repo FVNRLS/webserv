@@ -86,12 +86,11 @@ private:
 	int 	check_loc_index();
 	void 	check_loc_root();
 	void 	check_cgi_path();
-
-		void	create_ip_port_combinations();
+	void	create_ip_port_combinations();
 	int		check_ip_port_combinations();
 
 
-		public:
+public:
 	//BASIC CLASS SETUP
 	ConfigParser();
 	ConfigParser(std::vector<Config> &servers, char *path);
