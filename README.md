@@ -8,6 +8,6 @@ This project is about writing your own HTTP server. You will be able to test it 
 
 # How does it work?
 ## Setup
-- compile with ``make``, c ompile with Cmake, compile with GODS HELP....
+- compile with ``make``, compile with Cmake, compile with GODS HELP....
 - run with ``webserv`` without any options
 - pick a browser of your choice and visit the server's website by entering the address specified in the ``*.conf`` file (standard is localhost)
