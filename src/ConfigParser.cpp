@@ -104,7 +104,7 @@ int	ConfigParser::read_conf_file() {
 	std::ifstream	file;
 	std::string		line;
 
-	if (access("example.txt", F_OK) < 0)
+	if (access(_config_file.c_str(), F_OK) < 0)
 		return (print_error(NO_FILE, _config_file));
 	file.open(_config_file.c_str());
 	if (!file.is_open() || file.fail())
