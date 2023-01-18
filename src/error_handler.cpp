@@ -50,6 +50,9 @@ int	print_line_error(int error, const std::string &config_file, size_t line) {
 	if (error == INVALID_SERVER_DEFINITION)
 		std::cerr << "Error: invalid server definition in configuration file "
 			<< filename <<  " on line: " << line << std::endl;
+	else if (error == NESTED_LOCATION_DEFINITION)
+		std::cerr << "Error: definition of nested locations in configuration file "
+				  << filename <<  " on line: " << line << std::endl;
 	else if (error == INVALID_CHARACTERS_FOUND)
 		std::cerr << "Error: invalid characters found in configuration file "
 				  << filename <<  " on line: " << line << std::endl;

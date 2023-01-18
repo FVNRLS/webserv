@@ -300,7 +300,8 @@ int ConfigParser::extract_server_block() {
 				continue;
 			}
 			_tokens = split(_buf, SPACE);
-			set_mode();
+			if (set_mode() == EXIT_FAILURE)
+				return (EXIT_FAILURE);
 			if (!_tokens.empty() && find_in_valid_identifiers(_tokens[0]) == EXIT_FAILURE)
 				return (print_line_error(INVALID_IDENTIFIER, _config_file, get_line_num(_tokens[0])));
 			else if (set_server_parameter() == EXIT_FAILURE)
@@ -316,14 +317,18 @@ int ConfigParser::extract_server_block() {
 	return (EXIT_SUCCESS);
 }
 
-void	ConfigParser::set_mode() {
-	if (_tokens[0] == "location")
+int	ConfigParser::set_mode() {
+	if (_tokens[0] == "location") {
+		if (!_serv_mode)
+			return (print_line_error(NESTED_LOCATION_DEFINITION, _config_file, get_line_num(_tokens[0])));
 		_serv_mode = false;
+	}
 	else if (_tokens[0] == "}") {
 		_serv_mode = true;
 		if (!_tokens.empty())
 			_tokens.erase(_tokens.begin()); //remove the '}' from the tokens list, so only the parameters are left
 	}
+	return (EXIT_SUCCESS);
 }
 
 
@@ -334,7 +339,6 @@ int	ConfigParser::set_server_parameter() {
 	i = get_func_index();
 	if (i == SPEC_IDENTIFIER) {
 		if (_tokens[0] == "location") {
-			_serv_mode = false;
 			if (add_location() == EXIT_FAILURE)
 				return (EXIT_FAILURE);
 		}
