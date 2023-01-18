@@ -84,10 +84,6 @@ int	ConfigParser::parse() {
 	if (extract_servers() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 
-//	print_vector(_serv_blocks, 1);
-	std::cout << _serv_blocks[0].size() << std::endl;
-	std::cout << _conf_pos << std::endl;
-
 	for (int i = 0; i < (*_serv).size(); i++)
 		std::cout << &(*_serv)[i] << std::endl;
 	return (EXIT_SUCCESS);
@@ -269,9 +265,6 @@ int	ConfigParser::extract_servers() {
 	_conf_pos = 0;
 	replace_open_braces(_serv_blocks);
 	for (_i_serv = 0;  _i_serv < _serv_blocks.size(); _i_serv++) {
-		if (_i_serv == 1) {
-
-		}
 		if (extract_server_block(_i_serv) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 	}
@@ -290,15 +283,16 @@ void	ConfigParser::replace_open_braces(std::vector<std::string> &v) {
 
 int ConfigParser::extract_server_block(int i) {
 	size_t len;
+	size_t j;
 
 	_serv_mode = true;
 	_buf.clear();
 	_i_loc = -1;
 	_i_port = -1;
-	len = _serv_blocks[i].length() + _conf_pos;
-
-	while (_conf_pos < len) {
-		if (_serv_blocks[i][_conf_pos] == SEMICOLON) {
+	len = _serv_blocks[i].length();
+	j = 0;
+	while (j < len) {
+		if (_serv_blocks[i][j] == SEMICOLON) {
 			_tokens = split(_buf, SPACE);
 			set_mode();
 			if (!_tokens.empty() && find_in_valid_identifiers(_tokens[0]) == EXIT_FAILURE)
@@ -308,10 +302,11 @@ int ConfigParser::extract_server_block(int i) {
 			_buf.clear();
 			_tokens.clear();
 		}
-		else if (_serv_blocks[i][_conf_pos] == NEWLINE)
+		else if (_serv_blocks[i][j] == NEWLINE)
 			_line_num++;
 		else
-			_buf += _serv_blocks[i][_conf_pos];
+			_buf += _serv_blocks[i][j];
+		j++;
 		_conf_pos++;
 	}
 	return (EXIT_SUCCESS);
