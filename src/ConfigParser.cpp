@@ -315,7 +315,8 @@ void	ConfigParser::set_mode() {
 		_serv_mode = false;
 	else if (_tokens[0] == "}") {
 		_serv_mode = true;
-		_tokens.erase(_tokens.begin()); //remove the '}' from the tokens list, so only the parameters are left
+		if (!_tokens.empty())
+			_tokens.erase(_tokens.begin()); //remove the '}' from the tokens list, so only the parameters are left
 	}
 }
 
