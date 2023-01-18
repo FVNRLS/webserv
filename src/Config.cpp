@@ -57,7 +57,15 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 			o << s->_ports[j] << std::endl;
 	}
 
-	o << "ROOT:						" << s->_root << std::endl;
+	o << std::left << std::setw(28) << "IP-PORTS COMBINATIONS:";
+	for (int j = 0; j < s->_ports.size(); j++) {
+		if (j == 0)
+			o << s->_ip_port_comb[j] << std::endl;
+		else
+			o  << "							" << s->_ip_port_comb[j] << std::endl;
+	}
+
+	o << std::left << std::setw(28) << "ROOT:" << s->_root << std::endl;
 
 	if (!s->_methods.empty()) {
 		o << std::left << std::setw(28) << "METHODS:";

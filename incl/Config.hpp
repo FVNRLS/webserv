@@ -33,6 +33,7 @@ private:
 	std::string					_name;
 	std::string 				_ip;
 	std::vector<long> 			_ports;
+	std::vector<std::string>	_ip_port_comb;
 	std::string 				_root;
 	std::vector<std::string>	_methods;
 	std::string 				_index;

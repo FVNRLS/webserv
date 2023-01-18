@@ -752,7 +752,19 @@ void ConfigParser::check_cgi_path() {
 }
 
 void	ConfigParser::create_ip_port_combinations() {
+	std::stringstream 	ss;
+	std::string 		comb;
 
+	for (int i = 0; i < _serv_cnt; i++) {
+		for (int j = 0; j < (*_serv)[i]._ports.size(); j++) {
+			ss << (*_serv)[i]._ports[j];
+			comb = (*_serv)[i]._ip + "::" + ss.str();
+			(*_serv)[i]._ip_port_comb.push_back(comb);
+			comb.clear();
+			ss.clear();
+			ss.str("");
+		}
+	}
 }
 
 int	ConfigParser::check_ip_port_combinations() {
