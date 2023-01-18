@@ -42,7 +42,7 @@ _i_serv(-1), _i_loc(-1) {
 	_valid_identifiers.push_back("redirection");			_func_tab.push_back(&ConfigParser::set_redirection);
 	_valid_identifiers.push_back("allowed_scripts");		_func_tab.push_back(&ConfigParser::set_allowed_scripts);
 	_valid_identifiers.push_back("directory_listing");		_func_tab.push_back(&ConfigParser::set_directory_listing);
-	_valid_identifiers.push_back("cgi_path");		_func_tab.push_back(&ConfigParser::set_cgi_path);
+	_valid_identifiers.push_back("cgi_path");				_func_tab.push_back(&ConfigParser::set_cgi_path);
 
 	_spec_valid_identifiers.push_back("server");
 	_spec_valid_identifiers.push_back("location");
@@ -370,13 +370,18 @@ int ConfigParser::set_loc_prefix(location &loc) {
 }
 
 int ConfigParser::set_server_name() {
+	size_t	num_tokens;
+
+	num_tokens = _tokens.size();
+
 	if ((*_serv)[_i_serv]._name.empty()) {
 		if (_serv_mode) {
-			if (_tokens.size() == 2) {
-				(*_serv)[_i_serv]._name = _tokens[1];
+			if (num_tokens < 2)
 				return (EXIT_SUCCESS);
-			}
-			return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+			else if (num_tokens > 2)
+				return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+			(*_serv)[_i_serv]._name = _tokens[1];
+			return (EXIT_SUCCESS);
 		}
 		else
 			return (print_line_error(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
@@ -643,6 +648,42 @@ int ConfigParser::set_cgi_path() {
 
 //POST PARSING CHECKERS
 int ConfigParser::check_required_param_def() {
+	for (_i_serv = 0; _i_serv < _serv_cnt; _i_serv++) {
+		if (check_serv_config() == EXIT_FAILURE || check_loc_config() == EXIT_FAILURE)
+			return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}
 
+int ConfigParser::check_serv_config() {
+	if (check_server_name() == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+
+
+	return (EXIT_SUCCESS);
+}
+
+int ConfigParser::check_loc_config() {
+	size_t	num_locs;
+
+	num_locs = (*_serv)[_i_serv]._locations.size();
+	for (int j = 0; j < num_locs; j++) {
+	}
+
+	return (EXIT_SUCCESS);
+}
+
+int ConfigParser::check_server_name() {
+	std::stringstream 	ss;
+	std::string			*name;
+
+	name = &(*_serv)[_i_serv]._name;
+	ss << "Default_Server_" << _i_serv;
+	if (name->empty())
+		*name = ss.str();
+	for (int i = 0; i < _serv->size(); i++) {
+		if (*name == (*_serv)[i]._name && i != _i_serv)
+			return (print_param_error(SERVER_NAME_NOT_UNIQUE, _config_file, *name));
+	}
 	return (EXIT_SUCCESS);
 }

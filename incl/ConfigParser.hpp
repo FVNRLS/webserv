@@ -77,6 +77,10 @@ private:
 
 	//CHECKERS
 	int 	check_required_param_def();
+	int 	check_serv_config();
+	int 	check_loc_config();
+	int 	check_server_name();
+
 
 
 public:

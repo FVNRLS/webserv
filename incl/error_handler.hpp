@@ -33,8 +33,11 @@ enum errors {
 	INVALID_PARAMETER,
 	INVALID_NUM_OF_PARAMETERS,
 	REDEFINITION_OF_SERVER_PARAMETER,
+
+	SERVER_NAME_NOT_UNIQUE
 };
 
 
 int	print_error(int error, const std::string& config_file);
 int	print_line_error(int error, const std::string &config_file, size_t line);
+int	print_param_error(int error, const std::string &config_file, std::string &param);

@@ -81,3 +81,17 @@ int	print_line_error(int error, const std::string &config_file, size_t line) {
 	return (EXIT_FAILURE);
 }
 
+int	print_param_error(int error, const std::string &config_file, std::string &param) {
+	std::string	filename;
+	size_t 		slash_pos;
+
+	slash_pos = config_file.find_last_of('/');
+	if (slash_pos == std::string::npos)
+		filename = config_file;
+	else
+		filename = config_file.substr(slash_pos + 1);
+
+	if (error == SERVER_NAME_NOT_UNIQUE)
+		std::cerr << "Error: server name " << param << " not unique in confiiguration file " << filename << std::endl;
+	return (EXIT_FAILURE);
+}
