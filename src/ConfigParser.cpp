@@ -293,6 +293,11 @@ int ConfigParser::extract_server_block() {
 	j = 0;
 	while (j < len) {
 		if (_serv_blocks[_i_serv][j] == SEMICOLON) {
+			if (_buf.empty()) {
+				j++;
+				_conf_pos++;
+				continue;
+			}
 			_tokens = split(_buf, SPACE);
 			set_mode();
 			if (!_tokens.empty() && find_in_valid_identifiers(_tokens[0]) == EXIT_FAILURE)
