@@ -78,12 +78,14 @@ private:
 	//CHECKERS
 	int 	check_required_param_def();
 	int 	check_serv_config();
-	int 	check_loc_config();
 	int 	check_server_name();
 	int 	check_ip_address();
 	int 	check_ports();
 	int 	check_root();
-
+	int 	check_loc_config();
+	int 	check_loc_index();
+	void 	check_loc_root();
+	void 	check_cgi_path();
 
 		void	create_ip_port_combinations();
 	int		check_ip_port_combinations();

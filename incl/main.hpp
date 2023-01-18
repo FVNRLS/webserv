@@ -66,3 +66,4 @@ const std::string DEFAULT_INDEX = "index.html";
 const std::string DEFAULT_ERROR_PAGES_DIR = "config/default_error_pages";
 const std::string DEFAULT_REDIR_FIRST = "config";
 const std::string DEFAULT_REDIR_SECOND = "welcome page"; //unsure about the values
+const std::string DEFAULT_CGI_PATH = "config/cgi/cgi.py"; //unsure about the values

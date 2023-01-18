@@ -72,7 +72,8 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 	if (!s->_index.empty())
 		o << std::left << std::setw(28) << "INDEX:" << s->_index << std::endl;
 	o << std::left << std::setw(28) << "MAX. CLIENT BODY SIZE:" << s->_max_client_body_size << std::endl;
-	o << std::left << std::setw(28) << "ERROR PAGE:" << s->_error_pages_dir << std::endl;
+	if (!s->_error_pages_dir.empty())
+		o << std::left << std::setw(28) << "ERROR PAGE:" << s->_error_pages_dir << std::endl;
 
 	if (!s->_redirect.empty()) {
 		o << std::left << std::setw(28) << "REDIRECTS:";

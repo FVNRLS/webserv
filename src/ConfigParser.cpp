@@ -714,15 +714,41 @@ int ConfigParser::check_root() {
 
 int ConfigParser::check_loc_config() {
 	size_t		num_locs;
-	std::string	index;
 
 	num_locs = (*_serv)[_i_serv]._locations.size();
-	for (int j = 0; j < num_locs; j++) {
-		index = (*_serv)[_i_serv]._locations[j].index;
-		if (index.empty())
-			return (print_param_error(NO_INDEX, _config_file, (*_serv)[_i_serv]._locations[j].prefix));
+	for (_i_loc = 0; _i_loc < num_locs; _i_loc++) {
+		if (check_loc_index() == EXIT_FAILURE)
+			return (EXIT_FAILURE);
+		check_loc_root();
+		check_cgi_path();
+
 	}
 	return (EXIT_SUCCESS);
+}
+
+int ConfigParser::check_loc_index() {
+	std::string	*index;
+
+	index = &(*_serv)[_i_serv]._locations[_i_loc].index;
+	if (index->empty())
+		return (print_param_error(NO_INDEX, _config_file, (*_serv)[_i_serv]._locations[_i_loc].prefix));
+	return (EXIT_SUCCESS);
+}
+
+void ConfigParser::check_loc_root() {
+	std::string	*root;
+
+	root = &(*_serv)[_i_serv]._locations[_i_loc].root;
+	if (root->empty())
+		*root = (*_serv)[_i_serv]._locations[_i_loc].prefix;
+}
+
+void ConfigParser::check_cgi_path() {
+	std::string	*cgi;
+
+	cgi = &(*_serv)[_i_serv]._locations[_i_loc].cgi_path;
+	if (cgi->empty())
+		*cgi = DEFAULT_CGI_PATH;
 }
 
 void	ConfigParser::create_ip_port_combinations() {
