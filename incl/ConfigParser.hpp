@@ -80,10 +80,11 @@ private:
 	int 	check_serv_config();
 	int 	check_loc_config();
 	int 	check_server_name();
+	int 	check_ip_address();
 
 
 
-public:
+		public:
 	//BASIC CLASS SETUP
 	ConfigParser();
 	ConfigParser(std::vector<Config> &servers, char *path);

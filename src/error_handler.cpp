@@ -93,5 +93,7 @@ int	print_param_error(int error, const std::string &config_file, std::string &pa
 
 	if (error == SERVER_NAME_NOT_UNIQUE)
 		std::cerr << "Error: server name " << param << " not unique in confiiguration file " << filename << std::endl;
+	if (error == NO_IP_ADDRESS)
+		std::cerr << "Error: missing IP address for server " << param << " in " << filename << std::endl;
 	return (EXIT_FAILURE);
 }

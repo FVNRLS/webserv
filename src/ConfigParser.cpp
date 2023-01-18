@@ -658,6 +658,8 @@ int ConfigParser::check_required_param_def() {
 int ConfigParser::check_serv_config() {
 	if (check_server_name() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
+	if (check_ip_address() == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 
 
 	return (EXIT_SUCCESS);
@@ -685,5 +687,14 @@ int ConfigParser::check_server_name() {
 		if (*name == (*_serv)[i]._name && i != _i_serv)
 			return (print_param_error(SERVER_NAME_NOT_UNIQUE, _config_file, *name));
 	}
+	return (EXIT_SUCCESS);
+}
+
+int ConfigParser::check_ip_address() {
+	std::string	*ip;
+
+	ip = &(*_serv)[_i_serv]._ip;
+	if (ip->empty())
+		return (print_param_error(NO_IP_ADDRESS, _config_file, (*_serv)[_i_serv]._name));
 	return (EXIT_SUCCESS);
 }

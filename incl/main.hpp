@@ -53,7 +53,7 @@ enum chars {
 enum num_constants {
 	MAX_PORT_NUM			= 65535,
 	MIN_CLIENT_BODY_SIZE	= 10,
-	NEGATIVE_OFFSET			= 50
+	NEGATIVE_OFFSET			= 75
 };
 
 //STRINGS
