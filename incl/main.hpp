@@ -55,6 +55,7 @@ const std::string EQUAL_SIGN 				=	"=";
 //NUMERIC CONSTANTS
 #define MAX_PORT_NUM			65535
 #define MIN_CLIENT_BODY_SIZE	10
+#define NEGATIVE_OFFSET			50
 
 //DEFAULTS
 const std::string DEFAULT_INDEX = "index.html";

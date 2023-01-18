@@ -118,10 +118,10 @@ int	ConfigParser::read_conf_file() {
 size_t ConfigParser::get_line_num(std::string &str) {
 	size_t 	pos;
 
-	if (static_cast<int>(_conf_pos) - static_cast<int>(_buf.length()) - 20 < 0)
+	if (static_cast<int>(_conf_pos) - static_cast<int>(_buf.length()) - NEGATIVE_OFFSET < 0)
 		pos = 0;
 	else
-		pos = _conf_pos - _buf.length() - 50;
+		pos = _conf_pos - _buf.length() - NEGATIVE_OFFSET;
 	pos = _content.find(str, pos);
 
 	_line_num = 1;
@@ -302,9 +302,7 @@ int ConfigParser::extract_server_block(int i) {
 			_buf.clear();
 			_tokens.clear();
 		}
-		else if (_serv_blocks[i][j] == NEWLINE)
-			_line_num++;
-		else
+		else if (_serv_blocks[i][j] != NEWLINE)
 			_buf += _serv_blocks[i][j];
 		j++;
 		_conf_pos++;
