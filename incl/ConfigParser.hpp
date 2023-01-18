@@ -76,7 +76,11 @@ private:
 	int 	set_directory_listing();
 	int 	set_cgi_path();
 
-		public:
+	//CHECKERS
+	int 	check_required_param_def();
+
+
+public:
 	//BASIC CLASS SETUP
 	ConfigParser();
 	ConfigParser(std::vector<Config> &servers, char *path);

@@ -78,14 +78,16 @@ int	ConfigParser::parse() {
 		return (EXIT_FAILURE);
 	if (_serv_cnt == 0)
 		return (print_error(NO_SERVER, _config_file));
-
 	create_servers();
-
 	if (extract_servers() == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+	if (check_required_param_def() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 
 	for (int i = 0; i < (*_serv).size(); i++)
 		std::cout << &(*_serv)[i] << std::endl;
+
+
 	return (EXIT_SUCCESS);
 }
 
@@ -638,5 +640,11 @@ int ConfigParser::set_cgi_path() {
 	else if (num_tokens > 2)
 		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 	(*_serv)[_i_serv]._locations[_i_loc].cgi_path = _tokens[1];
+	return (EXIT_SUCCESS);
+}
+
+//POST PARSING CHECKERS
+int ConfigParser::check_required_param_def() {
+
 	return (EXIT_SUCCESS);
 }
