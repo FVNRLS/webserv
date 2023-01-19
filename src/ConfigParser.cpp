@@ -319,6 +319,10 @@ int ConfigParser::extract_server_block() {
 				continue;
 			}
 			_tokens = split(_buf, SPACE);
+			if (_tokens.empty()) {
+				_buf.clear();
+				continue;
+			}
 			if (set_mode() == EXIT_FAILURE)
 				return (EXIT_FAILURE);
 			if (!_tokens.empty() && find_in_valid_identifiers(_tokens[0]) == EXIT_FAILURE)
