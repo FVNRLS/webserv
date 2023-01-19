@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   errors.hpp                                         :+:      :+:    :+:   */
+/*   parsing_errors.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rmazurit <rmazurit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -14,7 +14,10 @@
 
 #include "main.hpp"
 
-enum errors {
+class Config;
+
+//PARSING ERRORS
+enum parsing_errors {
 	ARG_ERR,
 	INVALID_EXTENSION,
 	NO_SERVER,
@@ -45,7 +48,15 @@ enum errors {
 	DUPLICATE_IP_PORT_COMB
 };
 
+int	parsing_error_basic(int error, const std::string& config_file);
+int	parsing_error_line(int error, const std::string &config_file, size_t line);
+int	parsing_error_param(int error, const std::string &config_file, std::string &param);
 
-int	print_error(int error, const std::string& config_file);
-int	print_line_error(int error, const std::string &config_file, size_t line);
-int	print_param_error(int error, const std::string &config_file, std::string &param);
+
+//SERVER ERRORS
+enum server_errors {
+	SOCKET_OPEN_ERROR,
+	BIND_ERROR,
+};
+
+int server_error(int error, const Config &conf);

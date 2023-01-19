@@ -17,15 +17,26 @@
 class Server {
 
 private:
+//	std::vector<Config>	*_conf;
+	Config				*_config; //todo: just for test of 1 config --> delete afterwards!
+	struct sockaddr_in	_serv_addr;
+	int 				_socket;
 
-public:
+
+	void	set_serv_addr();
+	int		create_socket();
+	int 	bind_socket();
+
+
+
+		public:
 	Server();
+	Server(std::vector<Config> &server_configs);
 	Server(const Server &src);
 	Server &operator=(const Server &src);
 	~Server();
 
 	int start();
-
 };
 
 

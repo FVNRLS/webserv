@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   errors.cpp                                         :+:      :+:    :+:   */
+/*   parsing_errors.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rmazurit <rmazurit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -11,8 +11,9 @@
 /* ************************************************************************** */
 
 #include "error_handler.hpp"
+#include "Config.hpp"
 
-int	print_error(int error, const std::string &config_file) {
+int	parsing_error_basic(int error, const std::string &config_file) {
 
 	std::string	filename;
 	size_t 		slash_pos;
@@ -37,7 +38,7 @@ int	print_error(int error, const std::string &config_file) {
 	return (EXIT_FAILURE);
 }
 
-int	print_line_error(int error, const std::string &config_file, size_t line) {
+int	parsing_error_line(int error, const std::string &config_file, size_t line) {
 	std::string	filename;
 	size_t 		slash_pos;
 
@@ -89,7 +90,7 @@ int	print_line_error(int error, const std::string &config_file, size_t line) {
 	return (EXIT_FAILURE);
 }
 
-int	print_param_error(int error, const std::string &config_file, std::string &param) {
+int	parsing_error_param(int error, const std::string &config_file, std::string &param) {
 	std::string	filename;
 	size_t 		slash_pos;
 
@@ -111,5 +112,16 @@ int	print_param_error(int error, const std::string &config_file, std::string &pa
 		std::cerr << "Error: no index page specified for location " << param << " in " << filename << std::endl;
 	else if (error == DUPLICATE_IP_PORT_COMB)
 		std::cerr << "Error: duplicate ip/port definition of " << param << " in " << filename << std::endl;
+	return (EXIT_FAILURE);
+}
+
+int server_error(int error, const Config &conf) {
+	if (error == SOCKET_OPEN_ERROR)
+		std::cerr << "Error: unable to open socket" << std::endl;
+	if (error == BIND_ERROR)
+		std::cerr << "Error: unable to bind socket on port " << conf.get_ports()[0] << std::endl;
+
+
+
 	return (EXIT_FAILURE);
 }
