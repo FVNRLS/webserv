@@ -88,6 +88,8 @@ ConfigParser::~ConfigParser() {}
 
 //MEMBER FUNCTIONS
 int	ConfigParser::parse() {
+	if (access(_config_file.c_str(), F_OK) < 0)
+		return (print_error(NO_FILE, _config_file));
 	if (check_extension() == EXIT_FAILURE)
 		return (print_error(INVALID_EXTENSION, _config_file));
 	if (read_conf_file() == EXIT_FAILURE)
@@ -123,8 +125,6 @@ int	ConfigParser::read_conf_file() {
 	std::ifstream	file;
 	std::string		line;
 
-	if (access(_config_file.c_str(), F_OK) < 0)
-		return (print_error(NO_FILE, _config_file));
 	file.open(_config_file.c_str());
 	if (!file.is_open() || file.fail())
 		return (print_error(BAD_PERMISSIONS, _config_file));
