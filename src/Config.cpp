@@ -143,50 +143,46 @@ Config::~Config() {}
 
 
 //GETTERS
-std::string Config::get_name() {
+std::string Config::get_name() const {
 	return (_name);
 }
 
-std::string	Config::get_ip() {
+std::string	Config::get_ip() const {
 	return (_ip);
 }
 
-std::vector<long>	Config::get_ports() {
+std::vector<long>	Config::get_ports() const {
 	return (_ports);
 }
 
-std::string	Config::get_root() {
+std::string	Config::get_root() const {
 	return (_root);
 }
 
-std::vector<std::string>	Config::get_methods() {
+std::vector<std::string>	Config::get_methods() const {
 	return (_methods);
 }
 
-std::string	Config::get_index() {
+std::string	Config::get_index() const {
 	return (_index);
 }
 
-long long	Config::get_max_client_body_size() {
+long long	Config::get_max_client_body_size() const {
 	return (_max_client_body_size);
 }
 
-std::string	Config::get_error_pages_dir() {
+std::string	Config::get_error_pages_dir() const {
 	return (_error_pages_dir);
 }
 
-std::vector<location>	Config::get_locations() {
+std::vector<location>	Config::get_locations() const {
 	return (_locations);
 }
 
-std::vector<std::pair<std::string, std::string> >	Config::get_redirect() {
+std::vector<std::pair<std::string, std::string> >	Config::get_redirect() const {
 	return (_redirect);
 }
 
-std::vector<std::string>	Config::get_ip_port_comb() {
+std::vector<std::string>	Config::get_ip_port_comb() const {
 	return (_ip_port_comb);
 }
-
-
-
-

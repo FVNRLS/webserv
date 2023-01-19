@@ -30,6 +30,7 @@ struct	location {
 class Config {
 
 private:
+	friend class 				ConfigParser;
 	std::string					_name;
 	std::string 				_ip;
 	std::vector<long> 			_ports;
@@ -43,8 +44,6 @@ private:
 	std::vector<std::pair<std::string, std::string> >	_redirect;
 
 public:
-	friend class ConfigParser;
-
 	//BASIC CLASS SETUP
 	Config();
 	Config(const Config &src);
@@ -52,18 +51,18 @@ public:
 	~Config();
 
 	//GETTERS
-	std::string					get_name();
-	std::string					get_ip();
-	std::vector<long>			get_ports();
-	std::string					get_root();
-	std::vector<std::string>	get_methods();
-	std::string 				get_index();
-	long long 					get_max_client_body_size();
-	std::string 				get_error_pages_dir();
-	std::vector<location>		get_locations();
-	std::vector<std::string>	get_ip_port_comb();
-	std::vector<std::pair<std::string, std::string> >	get_redirect();
-	};
+	std::string					get_name() const;
+	std::string					get_ip() const;
+	std::vector<long>			get_ports() const;
+	std::string					get_root() const;
+	std::vector<std::string>	get_methods() const;
+	std::string 				get_index() const;
+	long long 					get_max_client_body_size() const;
+	std::string 				get_error_pages_dir() const;
+	std::vector<location>		get_locations() const;
+	std::vector<std::string>	get_ip_port_comb() const;
+	std::vector<std::pair<std::string, std::string> >	get_redirect() const;
+};
 
 std::ostream	&operator<<(std::ostream &o, Config *s);
 
