@@ -133,5 +133,6 @@ int Server::accept_requests() {
 		memset(buffer, 0, sizeof(buffer));
 		close(client_socket);
 	}
+
 	return (EXIT_SUCCESS);
 }
