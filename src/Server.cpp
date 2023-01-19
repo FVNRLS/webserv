@@ -41,7 +41,6 @@ int Server::start() {
 	if (bind_socket() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 
-
 	close(_socket);
 	return (EXIT_SUCCESS);
 }
@@ -64,19 +63,22 @@ int Server::create_socket() {
  * 2. set the address family to AF_INET, which stands for Internet Protocol version 4.
  * 3. set the port number for the server to the first element of the ports array from the _config object,
  * and it uses the htons function to convert the port number to the correct byte order for network transmission.
- * 4. set INADDR_ANY - server will listen for connections on all available network interfaces.
+ * 4. set ip address - server will listen for connections on the available network interface
  * */
 void Server::set_serv_addr() {
+	u_int32_t	ip_addr;
+
+	ip_addr = inet_addr(_config->get_ip().c_str());
 	memset(&_serv_addr, 0, sizeof(_serv_addr));
 	_serv_addr.sin_family = AF_INET;
 	_serv_addr.sin_port = htons(_config->get_ports()[0]); // server port
-	_serv_addr.sin_addr.s_addr = INADDR_ANY; // server address
+	_serv_addr.sin_addr.s_addr = ip_addr; // server ip_address
 }
 
 int Server::bind_socket() {
 	if (bind(_socket, (struct sockaddr *)&_serv_addr, sizeof(_serv_addr)) < 0)
-		return (server_error(SOCKET_OPEN_ERROR, *_config));
+		return (server_error(BIND_ERROR, *_config));
 	else
-		std::cout << "bind success on port " << ntohs(_serv_addr.sin_port) << std::endl; //todo: del
+		std::cout << "bind success on port " << ntohs(_serv_addr.sin_port) << std::endl; //todo: DEL
 	return (EXIT_SUCCESS);
 }

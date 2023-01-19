@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
 
 	if (parser.parse() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
-	print_configurations(server_configs);
+//	print_configurations(server_configs);
 
 	//SERVER CORE
 	Server	server(server_configs);

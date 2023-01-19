@@ -29,7 +29,7 @@ private:
 
 
 
-		public:
+public:
 	Server();
 	Server(std::vector<Config> &server_configs);
 	Server(const Server &src);
