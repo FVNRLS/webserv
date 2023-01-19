@@ -34,11 +34,15 @@ Server::~Server() {}
 
 
 //MEMBER FUNCTIONS
-int Server::start() {
+int Server::run() {
 	set_serv_addr();
 	if (create_socket() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	if (bind_socket() == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+	if (listen_to_connections() == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+	if (accept_requests() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 
 	close(_socket);
@@ -88,5 +92,46 @@ int Server::bind_socket() {
 	else
 		std::cout << "bind success on " << inet_ntoa(_serv_addr.sin_addr) << ":" << ntohs(_serv_addr.sin_port)
 			<< std::endl; //todo: DEL
+	return (EXIT_SUCCESS);
+}
+
+int Server::connect_to_server() {
+	if (connect(_socket, (struct sockaddr *)&_serv_addr, sizeof(_serv_addr)) < 0)
+		return (server_error(CONNECT_ERROR, *_config));
+	char buffer[1024] = "Hello, server!";
+	send(_socket, buffer, sizeof(buffer), 0);
+	return (EXIT_SUCCESS);
+}
+/*
+ * Once the server is listening for connections, it can use the accept() function to accept a connection from a client.
+ * */
+int	Server::listen_to_connections() {
+	if (listen(_socket, MAX_CONNECTIONS) < 0)
+		return (server_error(LISTEN_ERROR, *_config));
+	return (EXIT_SUCCESS);
+}
+
+int Server::accept_requests() {
+	while (true) {
+		// Accept an incoming connection
+		struct sockaddr_in cli_addr;
+		socklen_t clilen = sizeof(cli_addr);
+		int client_socket = accept(_socket, (struct sockaddr *) &cli_addr, &clilen);
+		if (client_socket < 0)
+			return (server_error(ACCEPT_ERROR, *_config));
+
+		// Read a message from the client
+		char buffer[1024];
+		if (recv(client_socket, buffer, sizeof(buffer), 0) == 0)
+			std::cout << "Message received from client: " << buffer << std::endl;
+
+		// Echo the message back to the client
+		char msg[1024] = "Hello Client!";
+		send(client_socket, msg, sizeof(buffer), 0);
+
+		// Clear buffer and close the socket
+		memset(buffer, 0, sizeof(buffer));
+		close(client_socket);
+	}
 	return (EXIT_SUCCESS);
 }

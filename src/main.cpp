@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 
 	//SERVER CORE
 	Server	server(server_configs);
-	if (server.start() == EXIT_FAILURE)
+	if (server.run() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 
 

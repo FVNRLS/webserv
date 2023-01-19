@@ -243,7 +243,7 @@ int ConfigParser::find_open_brace() {
 	size_t	j;
 	size_t	len;
 
-	j = _conf_pos - _buf.length() + 8; //offset from the start of the word 'server'
+	j = _conf_pos - _buf.length() + 8; //offset from the run of the word 'server'
 	len = _content.length();
 	while (j < len) {
 		if (_content[j] != SPACE && _content[j] != NEWLINE && _content[j] != OPEN_CURLY_BRACE)

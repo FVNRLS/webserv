@@ -117,11 +117,15 @@ int	parsing_error_param(int error, const std::string &config_file, std::string &
 
 int server_error(int error, const Config &conf) {
 	if (error == SOCKET_OPEN_ERROR)
-		std::cerr << "Error: unable to open socket" << std::endl;
-	if (error == BIND_ERROR)
-		std::cerr << "Error: unable to bind socket on port " << conf.get_ports()[0] << std::endl;
-
-
+		std::cerr << "Error: failed to open socket" << std::endl;
+	else if (error == BIND_ERROR)
+		std::cerr << "Error: failed to bind socket on port " << conf.get_ports()[0] << std::endl;
+	else if (error == CONNECT_ERROR)
+		std::cerr << "Error: failed to connect to the server on port " << conf.get_ports()[0] << std::endl;
+	else if (error == LISTEN_ERROR)
+		std::cerr << "Error: failed to listen to the socket on port " << conf.get_ports()[0] << std::endl;
+	else if (error == ACCEPT_ERROR)
+		std::cerr << "Error: failed to accept connection on port " << conf.get_ports()[0] << std::endl;
 
 	return (EXIT_FAILURE);
 }

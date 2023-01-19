@@ -57,6 +57,9 @@ int	parsing_error_param(int error, const std::string &config_file, std::string &
 enum server_errors {
 	SOCKET_OPEN_ERROR,
 	BIND_ERROR,
+	CONNECT_ERROR,
+	LISTEN_ERROR,
+	ACCEPT_ERROR,
 };
 
 int server_error(int error, const Config &conf);
