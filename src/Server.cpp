@@ -10,3 +10,20 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "Server.hpp"
+
+//BASIC CLASS SETUP
+Server::Server() {}
+
+Server::Server(const Server &src) {
+	*this = src;
+}
+
+Server &Server::operator=(const Server &src) { //todo: check after finishing the class
+	if (this == &src)
+		return (*this);
+	return (*this);
+}
+
+Server::~Server() {}
+

@@ -12,6 +12,7 @@
 
 #include "ConfigParser.hpp"
 #include "Config.hpp"
+#include "Server.hpp"
 
 int main(int argc, char **argv) {
 	if (argc != 2)
@@ -19,11 +20,18 @@ int main(int argc, char **argv) {
 
 	std::vector<Config>	server_configs;
 	ConfigParser		parser(server_configs, argv[1]);
+	Server				server;
 
 	if (parser.parse() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
+
 	for (int i = 0; i < server_configs.size(); i++)
 		std::cout << &server_configs[i] << std::endl;
+
+	if (server.start() == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+
+
 	
 
 	return (EXIT_SUCCESS);

@@ -12,6 +12,20 @@
 
 #pragma once
 
+#include "main.hpp"
 
+class Server {
+
+private:
+
+public:
+	Server();
+	Server(const Server &src);
+	Server &operator=(const Server &src);
+	~Server();
+
+	int start();
+
+};
 
 
