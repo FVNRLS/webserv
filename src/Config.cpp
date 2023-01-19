@@ -41,55 +41,55 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 	std::string	loc_upper_name;
 
 	//PRINTING OF SERVER CONFIGURATIONS
-	s_upper_name = s->_name;
+	s_upper_name = s->get_name();
 	std::transform(s_upper_name.begin(), s_upper_name.end(), s_upper_name.begin(), ::toupper);
 
 	o << std::endl << "\033[31m****** SERVER " << s_upper_name << " *******\033[0m" << std::endl << std::endl;
 	o << "\033[33m****** SERVER CONFIGURATION *******\033[0m" << std::endl;
-	o << std::left << std::setw(28) << "NAME:" << s->_name << std::endl;
-	o << std::left << std::setw(28) << "IP ADDRESS:" << s->_ip << std::endl;
+	o << std::left << std::setw(28) << "NAME:" << s->get_name() << std::endl;
+	o << std::left << std::setw(28) << "IP ADDRESS:" << s->get_ip() << std::endl;
 
 	o << std::left << std::setw(28) << "PORTS:";
-	for (int j = 0; j < s->_ports.size(); j++) {
-		if (j < s->_ports.size() - 1)
-			o << s->_ports[j] << ", ";
+	for (int j = 0; j < s->get_ports().size(); j++) {
+		if (j < s->get_ports().size() - 1)
+			o << s->get_ports()[j] << ", ";
 		else
-			o << s->_ports[j] << std::endl;
+			o << s->get_ports()[j] << std::endl;
 	}
 
 	o << std::left << std::setw(28) << "IP-PORTS COMBINATIONS:";
-	for (int j = 0; j < s->_ports.size(); j++) {
+	for (int j = 0; j < s->get_ports().size(); j++) {
 		if (j == 0)
-			o << s->_ip_port_comb[j] << std::endl;
+			o << s->get_ip_port_comb()[j] << std::endl;
 		else
-			o  << "							" << s->_ip_port_comb[j] << std::endl;
+			o  << "							" << s->get_ip_port_comb()[j] << std::endl;
 	}
 
-	o << std::left << std::setw(28) << "ROOT:" << s->_root << std::endl;
+	o << std::left << std::setw(28) << "ROOT:" << s->get_root() << std::endl;
 
-	if (!s->_methods.empty()) {
+	if (!s->get_methods().empty()) {
 		o << std::left << std::setw(28) << "METHODS:";
-		for (int j = 0; j < s->_methods.size(); j++) {
-			if (j < s->_methods.size() - 1)
-				o << s->_methods[j] << ", ";
+		for (int j = 0; j < s->get_methods().size(); j++) {
+			if (j < s->get_methods().size() - 1)
+				o << s->get_methods()[j] << ", ";
 			else
-				o << s->_methods[j] << std::endl;
+				o << s->get_methods()[j] << std::endl;
 		}
 	}
 
-	if (!s->_index.empty())
-		o << std::left << std::setw(28) << "INDEX:" << s->_index << std::endl;
-	o << std::left << std::setw(28) << "MAX. CLIENT BODY SIZE:" << s->_max_client_body_size << std::endl;
-	if (!s->_error_pages_dir.empty())
-		o << std::left << std::setw(28) << "ERROR PAGE:" << s->_error_pages_dir << std::endl;
+	if (!s->get_index().empty())
+		o << std::left << std::setw(28) << "INDEX:" << s->get_index() << std::endl;
+	o << std::left << std::setw(28) << "MAX. CLIENT BODY SIZE:" << s->get_max_client_body_size() << std::endl;
+	if (!s->get_error_pages_dir().empty())
+		o << std::left << std::setw(28) << "ERROR PAGE:" << s->get_error_pages_dir() << std::endl;
 
-	if (!s->_redirect.empty()) {
+	if (!s->get_redirect().empty()) {
 		o << std::left << std::setw(28) << "REDIRECTS:";
-		for (int j = 0; j < s->_redirect.size(); j++) {
+		for (int j = 0; j < s->get_redirect().size(); j++) {
 			if (j == 0)
-				o << s->_redirect[j].first << " = " << s->_redirect[j].second << std::endl;
+				o << s->get_redirect()[j].first << " = " << s->get_redirect()[j].second << std::endl;
 			else
-				o << "							" << s->_redirect[j].first << " = " << s->_redirect[j].second
+				o << "							" << s->get_redirect()[j].first << " = " << s->get_redirect()[j].second
 				  << std::endl;
 		}
 	}
@@ -97,42 +97,44 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 	std::cout << std::endl;
 
 	//PRINTING OF ALL LOCATIONS
-	for (int i = 0; i < s->_locations.size(); i++) {
-		s_upper_name = s->_locations[i].prefix;
+	for (int i = 0; i < s->get_locations().size(); i++) {
+		s_upper_name = s->get_locations()[i].prefix;
 		std::transform(s_upper_name.begin(), s_upper_name.end(), s_upper_name.begin(), ::toupper);
 
-		o << "\033[33m****** LOCATION " << s->_locations[i].prefix << " CONFIGURATION *******\033[0m" << std::endl;
-		o << std::left << std::setw(28) << "PREFIX:" << s->_locations[i].prefix << std::endl;
-		o << std::left << std::setw(28) << "ROOT:" << s->_locations[i].root << std::endl;
+		o << "\033[33m****** LOCATION " << s->get_locations()[i].prefix << " CONFIGURATION *******\033[0m" << std::endl;
+		o << std::left << std::setw(28) << "PREFIX:" << s->get_locations()[i].prefix << std::endl;
+		o << std::left << std::setw(28) << "ROOT:" << s->get_locations()[i].root << std::endl;
 
-		if (!s->_locations[i].methods.empty()) {
+		if (!s->get_locations()[i].methods.empty()) {
 			o << std::left << std::setw(28) << "METHODS:";
-			for (int j = 0; j < s->_locations[i].methods.size(); j++) {
-				if (j < s->_locations[i].methods.size() - 1)
-					o << s->_locations[i].methods[j] << ", ";
+			for (int j = 0; j < s->get_locations()[i].methods.size(); j++) {
+				if (j < s->get_locations()[i].methods.size() - 1)
+					o << s->get_locations()[i].methods[j] << ", ";
 				else
-					o << s->_locations[i].methods[j] << std::endl;
+					o << s->get_locations()[i].methods[j] << std::endl;
 			}
 		}
 
-		if (!s->_locations[i].scripts.empty()) {
+		if (!s->get_locations()[i].scripts.empty()) {
 			o << std::left << std::setw(28) << "SCRIPTS:";
-			for (int j = 0; j < s->_locations[i].scripts.size(); j++) {
+			for (int j = 0; j < s->get_locations()[i].scripts.size(); j++) {
 				if (j == 0)
-					o << s->_locations[i].scripts[j].first << " = " << s->_locations[i].scripts[j].second << std::endl;
+					o << s->get_locations()[i].scripts[j].first << " = "
+						<< s->get_locations()[i].scripts[j].second << std::endl;
 				else
-					o <<  "							" << s->_locations[i].scripts[j].first <<
-					" = " << s->_locations[i].scripts[j].second << std::endl;
+					o <<  "							" << s->get_locations()[i].scripts[j].first <<
+					" = " << s->get_locations()[i].scripts[j].second << std::endl;
 			}
 		}
 
-		o << std::left << std::setw(28) << "INDEX:" << s->_locations[i].index << std::endl;
-		o << std::left << std::setw(28) << "MAX. CLIENT BODY SIZE:" << s->_locations[i].max_client_body_size << std::endl;
-		if (!s->_locations[i].redirect.empty())
-			o << std::left << std::setw(28) << "REDIRECT:" << s->_locations[i].redirect[0].first
-				<< " = " << s->_locations[i].redirect[0].second << std::endl;
-		o << std::left << std::setw(28) << "DIRECTORY LISTING:" << s->_locations[i].directory_listing << std::endl;
-		o << std::left << std::setw(28) << "CGI PATH:" << s->_locations[i].cgi_path << std::endl << std::endl;
+		o << std::left << std::setw(28) << "INDEX:" << s->get_locations()[i].index << std::endl;
+		o << std::left << std::setw(28) << "MAX. CLIENT BODY SIZE:"
+			<< s->get_locations()[i].max_client_body_size << std::endl;
+		if (!s->get_locations()[i].redirect.empty())
+			o << std::left << std::setw(28) << "REDIRECT:" << s->get_locations()[i].redirect[0].first
+				<< " = " << s->get_locations()[i].redirect[0].second << std::endl;
+		o << std::left << std::setw(28) << "DIRECTORY LISTING:" << s->get_locations()[i].directory_listing << std::endl;
+		o << std::left << std::setw(28) << "CGI PATH:" << s->get_locations()[i].cgi_path << std::endl << std::endl;
 	}
 	return (o);
 }
@@ -181,7 +183,9 @@ std::vector<std::pair<std::string, std::string> >	Config::get_redirect() {
 	return (_redirect);
 }
 
-
+std::vector<std::string>	Config::get_ip_port_comb() {
+	return (_ip_port_comb);
+}
 
 
 

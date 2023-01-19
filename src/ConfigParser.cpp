@@ -103,10 +103,6 @@ int	ConfigParser::parse() {
 		return (EXIT_FAILURE);
 	if (check_required_param_def() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
-
-	for (int i = 0; i < (*_serv).size(); i++)
-		std::cout << &(*_serv)[i] << std::endl;
-
 	return (EXIT_SUCCESS);
 }
 

@@ -22,6 +22,8 @@ int main(int argc, char **argv) {
 
 	if (parser.parse() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
+	for (int i = 0; i < server_configs.size(); i++)
+		std::cout << &server_configs[i] << std::endl;
 	
 
 	return (EXIT_SUCCESS);
