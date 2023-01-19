@@ -27,3 +27,6 @@ Server &Server::operator=(const Server &src) { //todo: check after finishing the
 
 Server::~Server() {}
 
+int Server::start() {
+	return (EXIT_SUCCESS);
+}
