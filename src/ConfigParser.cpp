@@ -11,7 +11,8 @@
 /* ************************************************************************** */
 
 #include "ConfigParser.hpp"
-#include "Config.hpp"
+std::string	trim(std::string &s);
+std::vector<std::string> split(std::string &s, char sep);
 
 //BASIC CLASS SETUP
 ConfigParser::ConfigParser() : _config_file(NULL), _serv_mode(false), _line_num(1), _pos(0), _conf_pos(0), _serv_cnt(0),

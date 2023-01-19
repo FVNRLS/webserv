@@ -12,11 +12,7 @@
 
 #pragma once
 
-#include "main.hpp"
-
-std::string	trim(std::string &s);
-std::vector<std::string> split(std::string &s, char sep);
-
+#include "tools.hpp"
 
 //TEMPLATES
 template <typename T>
@@ -31,4 +27,9 @@ void	print_vector(T vector, size_t size) {
 			std::cout << vector[i];
 	}
 	std::cout << std::endl;
+}
+
+void	print_configurations(std::vector<Config> &server_configs) {
+	for (int i = 0; i < server_configs.size(); i++)
+		std::cout << &server_configs[i] << std::endl;
 }

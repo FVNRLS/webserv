@@ -12,6 +12,8 @@
 
 #include "main.hpp"
 
+std::string trim(std::string &s);
+
 std::vector<std::string>	split(std::string &s, char sep) {
 	std::vector<std::string>	tokens;
 	std::string 				tok;

@@ -28,7 +28,6 @@
 #include <netdb.h>
 
 #include "error_handler.hpp"
-#include "tools.hpp"
 
 //COVERING UINT32_MAX MACRO FOR ARCH LINUX
 #ifndef UINT32_MAX

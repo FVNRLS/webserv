@@ -12,6 +12,7 @@
 
 #include "ConfigParser.hpp"
 #include "Server.hpp"
+#include "tools.hpp"
 
 int main(int argc, char **argv) {
 	if (argc != 2)
@@ -23,8 +24,7 @@ int main(int argc, char **argv) {
 
 	if (parser.parse() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
-	for (int i = 0; i < server_configs.size(); i++)
-		std::cout << &server_configs[i] << std::endl;
+	print_configurations(server_configs);
 
 	//SERVER CORE
 	Server	server(server_configs);
