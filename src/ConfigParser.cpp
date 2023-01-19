@@ -396,8 +396,15 @@ int ConfigParser::add_location() {
 
 //SERVER SPECIFIC SETTERS
 int ConfigParser::set_loc_prefix(location &loc) {
+	std::vector<location>	*locs;
+
+	locs = &(*_serv)[_i_serv]._locations;
 	if (_tokens.size() != 2)
 		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
+	for (int i = 0; i < locs->size(); i++) {
+		if ((*locs)[i].prefix == _tokens[1])
+			return (print_line_error(REDEFINITION_OF_SERVER_PARAM, _config_file, get_line_num(_tokens[0])));
+	}
 	loc.prefix = _tokens[1];
 	return (EXIT_SUCCESS);
 }
@@ -418,7 +425,7 @@ int ConfigParser::set_server_name() {
 		else
 			return (print_line_error(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
 	}
-	return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+	return (print_line_error(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 }
 
 int ConfigParser::set_ip_address() {
@@ -449,7 +456,7 @@ int ConfigParser::set_ip_address() {
 		else
 			return (print_line_error(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
 	}
-	return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+	return (print_line_error(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 }
 
 int ConfigParser::set_port() {
@@ -478,7 +485,7 @@ int ConfigParser::set_root() {
 	else
 		param = &(*_serv)[_i_serv]._locations[_i_loc].root;
 	if (!param->empty())
-		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+		return (print_line_error(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 	else if (_tokens.size() != 2)
 		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 	*param = _tokens[1];
@@ -499,13 +506,15 @@ int ConfigParser::set_allowed_methods() {
 		param = &(*_serv)[_i_serv]._locations[_i_loc].methods;
 
 	if (!param->empty())
-		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+		return (print_line_error(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 	else if (num_methods < 1 || num_methods > num_valid_methods)
 		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 	for (int i = 1; i <= num_methods; i++) {
 		j = 0;
 		while (j < num_valid_methods) {
 			if (_tokens[i] == _valid_methods[j]) {
+				if (std::find(param->begin(), param->end(), _tokens[i]) != param->end())
+					return (print_line_error(REDEFINITION_OF_SERVER_PARAM, _config_file, get_line_num(_tokens[0])));
 				param->push_back(_tokens[i]);
 				break;
 			}
@@ -527,7 +536,7 @@ int ConfigParser::set_index() {
 	else
 		param = &(*_serv)[_i_serv]._locations[_i_loc].index;
 	if (!param->empty())
-		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+		return (print_line_error(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 	else if (num_tokens > 2)
 		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 	else if (num_tokens == 1)
@@ -548,7 +557,7 @@ int ConfigParser::set_max_client_body_size() {
 	else
 		param = &(*_serv)[_i_serv]._locations[_i_loc].max_client_body_size;
 	if (*param != UINT32_MAX)
-		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+		return (print_line_error(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 	else if (num_tokens > 2)
 		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 	else if (num_tokens == 2) {
@@ -570,7 +579,7 @@ int ConfigParser::set_error_pages_dir() {
 	else
 		return (print_line_error(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
 	if (!param->empty())
-		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+		return (print_line_error(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 	else if (num_tokens > 2)
 		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 	else if (num_tokens == 1)
@@ -591,7 +600,7 @@ int ConfigParser::set_redirection() {
 	else
 		param = &(*_serv)[_i_serv]._locations[_i_loc].redirect;
 	if (!param->empty() && !_serv_mode)
-		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+		return (print_line_error(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 
 	if (num_tokens == 1) {
 		pair.first = DEFAULT_REDIR_FIRST;
@@ -651,7 +660,7 @@ int ConfigParser::set_directory_listing() {
 	if (_serv_mode)
 		return (print_line_error(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
 	else if ((*_serv)[_i_serv]._locations[_i_loc].directory_listing == true)
-		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+		return (print_line_error(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 	else if (num_tokens > 2)
 		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 	else if (num_tokens == 2) {
@@ -672,7 +681,7 @@ int ConfigParser::set_cgi_path() {
 	if (_serv_mode)
 		return (print_line_error(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
 	else if (!(*_serv)[_i_serv]._locations[_i_loc].cgi_path.empty())
-		return (print_line_error(REDEFINITION_OF_SERVER_PARAMETER, _config_file, get_line_num(_tokens[0])));
+		return (print_line_error(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 	else if (num_tokens > 2)
 		return (print_line_error(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 	(*_serv)[_i_serv]._locations[_i_loc].cgi_path = _tokens[1];
@@ -755,7 +764,6 @@ int ConfigParser::check_loc_config() {
 			return (EXIT_FAILURE);
 		check_loc_root();
 		check_cgi_path();
-
 	}
 	return (EXIT_SUCCESS);
 }

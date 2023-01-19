@@ -74,8 +74,11 @@ int	print_line_error(int error, const std::string &config_file, size_t line) {
 	else if (error == INVALID_SCOPE)
 		std::cerr << "Error: parameter defined in an invalid scope in configuration file "
 				  << filename <<  " on line: " << line << std::endl;
-	else if (error == REDEFINITION_OF_SERVER_PARAMETER)
+	else if (error == REDEFINITION_OF_SERVER_IDENT)
 		std::cerr << "Error: redefinition of server identifier in configuration file "
+				  << filename <<  " on line: " << line << std::endl;
+	else if (error == REDEFINITION_OF_SERVER_PARAM)
+		std::cerr << "Error: redefinition of server parameter in configuration file "
 				  << filename <<  " on line: " << line << std::endl;
 	else if (error == INVALID_NUM_OF_PARAMETERS)
 		std::cerr << "Error: invalid number of parameters in the definition of a server identifier in configuration file "
