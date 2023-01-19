@@ -75,10 +75,18 @@ void Server::set_serv_addr() {
 	_serv_addr.sin_addr.s_addr = ip_addr; // server ip_address
 }
 
+/*
+ * 1. _socket: The socket descriptor that was returned by the socket() function.
+ * 2. (struct sockaddr *)&_serv_addr: A pointer to a sockaddr_in structure that contains the address and port information.
+ * 3. sizeof(_serv_addr): The size of the sockaddr_in structure.
+ * specifies the address and port that the socket should use. Once a socket is bound,
+ * it can be used to send or receive data.
+ * */
 int Server::bind_socket() {
 	if (bind(_socket, (struct sockaddr *)&_serv_addr, sizeof(_serv_addr)) < 0)
 		return (server_error(BIND_ERROR, *_config));
 	else
-		std::cout << "bind success on port " << ntohs(_serv_addr.sin_port) << std::endl; //todo: DEL
+		std::cout << "bind success on " << inet_ntoa(_serv_addr.sin_addr) << ":" << ntohs(_serv_addr.sin_port)
+			<< std::endl; //todo: DEL
 	return (EXIT_SUCCESS);
 }
