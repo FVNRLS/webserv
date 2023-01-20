@@ -33,3 +33,6 @@ void	print_configurations(std::vector<Config> &server_configs) {
 	for (size_t i = 0; i < server_configs.size(); i++)
 		std::cout << &server_configs[i] << std::endl;
 }
+
+std::string 				trim(std::string &s);
+std::vector<std::string>	split(std::string &s, char sep);

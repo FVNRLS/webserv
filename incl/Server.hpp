@@ -22,13 +22,12 @@ private:
 	struct sockaddr_in	_serv_addr;
 	int 				_socket;
 
-
-	void	set_serv_addr();
-	int		create_socket();
-	int 	bind_socket();
-	int		listen_to_connections();
-	int 	accept_requests();
-	int 	generate_response();
+	void			set_serv_addr();
+	int				create_socket();
+	int 			bind_socket();
+	int				listen_to_connections();
+	int 			accept_requests();
+	std::string 	generate_response(const std::string &request);
 
 
 

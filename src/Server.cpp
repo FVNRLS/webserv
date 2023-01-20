@@ -12,6 +12,8 @@
 
 #include "Server.hpp"
 #include "Config.hpp"
+std::string 				trim(std::string &s);
+std::vector<std::string>	split(std::string &s, char sep);
 
 //BASIC CLASS SETUP
 Server::Server() {} //todo: what to do?
@@ -109,8 +111,10 @@ int Server::accept_requests() {
 		struct sockaddr_in 	cli_addr;
 		socklen_t 			client_len;
 		int 				client_socket;
-		char 				cl_buf[1024];
-		std::string hello_header = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+		char 				client_buf[1024];
+		std::string 		request;
+		std::string 		content_length;
+		std::string 		response;
 
 
 		// Accept an incoming connection
@@ -120,11 +124,19 @@ int Server::accept_requests() {
 			return (server_error(ACCEPT_ERROR, *_config));
 
 		// Read a message from the client
-		recv(client_socket, cl_buf, sizeof(cl_buf), 0);
-		std::cout << cl_buf << std::endl;
+		recv(client_socket, client_buf, sizeof(client_buf), 0);
+		request = client_buf;
+		std::cout << request << std::endl;
 
 		// Echo the message back to the client
-		send(client_socket, hello_header.c_str(), hello_header.length(), 0);
+
+		response = generate_response(request);
+		if (response.empty()) {
+			close(client_socket);
+			return (EXIT_FAILURE);
+		}
+
+		send(client_socket, response.c_str(), response.length(), 0);
 
 		// Clear buffer and close the socket
 		close(client_socket);
@@ -133,6 +145,31 @@ int Server::accept_requests() {
 	return (EXIT_SUCCESS);
 }
 
-int Server::generate_response() {
-	return (EXIT_SUCCESS);
+//TODO: implement request parser
+
+std::string Server::generate_response(const std::string &request) {
+	std::string 	response;
+	const char 		*file_path;
+	std::ifstream 	file;
+	std::string 	body;
+
+	file_path = _config->get_index().c_str();
+	std::cout << file_path << std::endl;
+
+	if (access(file_path, F_OK) < 0) {
+		parsing_error_basic(NO_FILE, file_path);
+		return ("");
+	}
+	file.open(file_path);
+	if (!file.is_open() || file.fail()) {
+		parsing_error_basic(BAD_PERMISSIONS, file_path);
+		return ("");
+	}
+	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	response = RESPONSE_HEADER + std::to_string(body.length()) + "\n\n" + body;
+	file.close();
+
+
+
+	return (response);
 }
