@@ -29,6 +29,8 @@ ${NAME}: ${OBJ}
 
 all: ${NAME}
 
+bonus: all
+
 clean:
 	@rm -rf obj
 
@@ -37,4 +39,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re bonus
