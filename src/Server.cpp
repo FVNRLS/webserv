@@ -113,25 +113,25 @@ int	Server::listen_to_connections() {
 
 int Server::accept_requests() {
 	while (true) {
-		std::string	msg;
-		msg = "Message received from client:	";
+		struct sockaddr_in 	cli_addr;
+		socklen_t 			client_len;
+		int 				client_socket;
+		char 				cl_buf[1024];
+
 
 		// Accept an incoming connection
-		struct sockaddr_in cli_addr;
-		socklen_t clilen = sizeof(cli_addr);
-		int client_socket = accept(_socket, (struct sockaddr *) &cli_addr, &clilen);
+		client_len = sizeof(cli_addr);
+		client_socket = accept(_socket, (struct sockaddr *) &cli_addr, &client_len);
 		if (client_socket < 0)
 			return (server_error(ACCEPT_ERROR, *_config));
 
 		// Read a message from the client
-		char buffer[1024];
-//		memset(buffer, '\0', sizeof(buffer));
-		recv(client_socket, buffer, sizeof(buffer), 0);
-		std::cout << buffer << std::endl;
+		recv(client_socket, cl_buf, sizeof(cl_buf), 0);
+		std::cout << cl_buf << std::endl;
 
-		msg += buffer;
 		// Echo the message back to the client
-		send(client_socket, msg.c_str(), sizeof(buffer), 0);
+		char serv_buf[1024] = "Hello from Server!";
+		send(client_socket, serv_buf, sizeof(serv_buf), 0);
 
 		// Clear buffer and close the socket
 		close(client_socket);
