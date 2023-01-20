@@ -13,7 +13,7 @@
 #include "Config.hpp"
 
 //BASIC CLASS SETUP
-Config::Config() : _max_client_body_size(UINT32_MAX), _ports(0) {}
+Config::Config() : _ports(0), _max_client_body_size(UINT32_MAX) {}
 
 Config::Config(const Config &src) {
 	*this = src;
@@ -50,7 +50,7 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 	o << std::left << std::setw(28) << "IP ADDRESS:" << s->get_ip() << std::endl;
 
 	o << std::left << std::setw(28) << "PORTS:";
-	for (int j = 0; j < s->get_ports().size(); j++) {
+	for (size_t j = 0; j < s->get_ports().size(); j++) {
 		if (j < s->get_ports().size() - 1)
 			o << s->get_ports()[j] << ", ";
 		else
@@ -58,7 +58,7 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 	}
 
 	o << std::left << std::setw(28) << "IP-PORTS COMBINATIONS:";
-	for (int j = 0; j < s->get_ports().size(); j++) {
+	for (size_t j = 0; j < s->get_ports().size(); j++) {
 		if (j == 0)
 			o << s->get_ip_port_comb()[j] << std::endl;
 		else
@@ -69,7 +69,7 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 
 	if (!s->get_methods().empty()) {
 		o << std::left << std::setw(28) << "METHODS:";
-		for (int j = 0; j < s->get_methods().size(); j++) {
+		for (size_t j = 0; j < s->get_methods().size(); j++) {
 			if (j < s->get_methods().size() - 1)
 				o << s->get_methods()[j] << ", ";
 			else
@@ -85,7 +85,7 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 
 	if (!s->get_redirect().empty()) {
 		o << std::left << std::setw(28) << "REDIRECTS:";
-		for (int j = 0; j < s->get_redirect().size(); j++) {
+		for (size_t j = 0; j < s->get_redirect().size(); j++) {
 			if (j == 0)
 				o << s->get_redirect()[j].first << " = " << s->get_redirect()[j].second << std::endl;
 			else
@@ -97,7 +97,7 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 	std::cout << std::endl;
 
 	//PRINTING OF ALL LOCATIONS
-	for (int i = 0; i < s->get_locations().size(); i++) {
+	for (size_t i = 0; i < s->get_locations().size(); i++) {
 		s_upper_name = s->get_locations()[i].prefix;
 		std::transform(s_upper_name.begin(), s_upper_name.end(), s_upper_name.begin(), ::toupper);
 
@@ -107,7 +107,7 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 
 		if (!s->get_locations()[i].methods.empty()) {
 			o << std::left << std::setw(28) << "METHODS:";
-			for (int j = 0; j < s->get_locations()[i].methods.size(); j++) {
+			for (size_t j = 0; j < s->get_locations()[i].methods.size(); j++) {
 				if (j < s->get_locations()[i].methods.size() - 1)
 					o << s->get_locations()[i].methods[j] << ", ";
 				else
@@ -117,7 +117,7 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 
 		if (!s->get_locations()[i].scripts.empty()) {
 			o << std::left << std::setw(28) << "SCRIPTS:";
-			for (int j = 0; j < s->get_locations()[i].scripts.size(); j++) {
+			for (size_t j = 0; j < s->get_locations()[i].scripts.size(); j++) {
 				if (j == 0)
 					o << s->get_locations()[i].scripts[j].first << " = "
 						<< s->get_locations()[i].scripts[j].second << std::endl;

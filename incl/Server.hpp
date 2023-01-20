@@ -28,6 +28,7 @@ private:
 	int 	bind_socket();
 	int		listen_to_connections();
 	int 	accept_requests();
+	int 	generate_response();
 
 
 

@@ -110,7 +110,7 @@ int Server::accept_requests() {
 		socklen_t 			client_len;
 		int 				client_socket;
 		char 				cl_buf[1024];
-		char *hello_header = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+		std::string hello_header = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 
 
 		// Accept an incoming connection
@@ -124,11 +124,15 @@ int Server::accept_requests() {
 		std::cout << cl_buf << std::endl;
 
 		// Echo the message back to the client
-		send(client_socket, hello_header, strlen(hello_header), 0);
+		send(client_socket, hello_header.c_str(), hello_header.length(), 0);
 
 		// Clear buffer and close the socket
 		close(client_socket);
 	}
 
+	return (EXIT_SUCCESS);
+}
+
+int Server::generate_response() {
 	return (EXIT_SUCCESS);
 }

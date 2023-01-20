@@ -15,12 +15,9 @@ std::string	trim(std::string &s);
 std::vector<std::string> split(std::string &s, char sep);
 
 //BASIC CLASS SETUP
-ConfigParser::ConfigParser() : _config_file(NULL), _serv_mode(false), _line_num(1), _pos(0), _conf_pos(0), _serv_cnt(0),
-							   _serv_def_start(0), _serv_def_end(0), _i_serv(-1), _i_loc(-1) {}
-
-ConfigParser::ConfigParser(std::vector<Config> &servers, char *path) : _config_file(path), _serv(&servers),
-_serv_mode(false), _line_num(1), _pos(0), _conf_pos(0), _serv_cnt(0), _serv_def_start(0), _serv_def_end(0),
-_i_serv(-1), _i_loc(-1) {
+ConfigParser::ConfigParser(std::vector<Config> &servers, char *path) : _config_file(path), _serv_mode(false),
+_line_num(1), _pos(0), _conf_pos(0), _serv_cnt(0), _serv_def_start(0), _serv_def_end(0),
+_i_serv(-1), _i_loc(-1), _serv(&servers) {
 
 	//VECTOR OF VALID SPECIAL CHARACTERS
 	_spec_chars.push_back(OPEN_CURLY_BRACE);
@@ -144,7 +141,7 @@ size_t ConfigParser::get_line_num(std::string &str) {
 
 	_line_num = 1;
 	if (pos != std::string::npos) {
-		for (int i = 0; i < pos; i++) {
+		for (size_t i = 0; i < pos; i++) {
 			if (_content[i] == NEWLINE)
 				_line_num++;
 		}
@@ -180,7 +177,7 @@ int	ConfigParser::split_in_server_blocks() {
 }
 
 void	ConfigParser::create_servers() {
-	for (int i = 0; i < _serv_cnt; i++) {
+	for (size_t i = 0; i < _serv_cnt; i++) {
 		Config	serv;
 		_serv->push_back(serv);
 	}
@@ -194,7 +191,7 @@ void	ConfigParser::ignore_comments(size_t len) {
 }
 
 int ConfigParser::find_in_spec_chars(char c) const {
-	for (int i = 0; i < _spec_chars.size(); i++) {
+	for (size_t i = 0; i < _spec_chars.size(); i++) {
 		if (c == _spec_chars[i])
 			return (EXIT_SUCCESS);
 	}
@@ -205,12 +202,12 @@ int ConfigParser::find_in_valid_identifiers(std::string &s) const {
 	size_t	len;
 
 	len = _valid_identifiers.size();
-	for (int i = 0; i < len; i++) {
+	for (size_t i = 0; i < len; i++) {
 		if (_valid_identifiers[i] == s)
 			return (EXIT_SUCCESS);
 	}
 	len = _spec_valid_identifiers.size();
-	for (int i = 0; i < len; i++) {
+	for (size_t i = 0; i < len; i++) {
 		if (_spec_valid_identifiers[i] == s)
 			return (EXIT_SUCCESS);
 	}
@@ -292,7 +289,7 @@ int	ConfigParser::extract_servers() {
 void	ConfigParser::replace_open_braces(std::vector<std::string> &v) {
 	size_t	pos;
 
-	for (int i = 0; i < v.size(); i++) {
+	for (size_t i = 0; i < v.size(); i++) {
 		while ((pos = v[i].find(OPEN_CURLY_BRACE)) != _serv_blocks[0].npos) {
 			v[i].replace(pos, 1, STR_SEMICOLON);
 		}
@@ -371,7 +368,7 @@ int	ConfigParser::get_func_index() {
 	std::string	member;
 
 	member = _tokens[0];
-	for (int i = 0; i < _valid_identifiers.size(); i++) {
+	for (size_t i = 0; i < _valid_identifiers.size(); i++) {
 		if (member == _valid_identifiers[i])
 			return (i);
 	}
@@ -398,7 +395,7 @@ int ConfigParser::set_loc_prefix(location &loc) {
 	locs = &(*_serv)[_i_serv]._locations;
 	if (_tokens.size() != 2)
 		return (parsing_error_line(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
-	for (int i = 0; i < locs->size(); i++) {
+	for (size_t i = 0; i < locs->size(); i++) {
 		if ((*locs)[i].prefix == _tokens[1])
 			return (parsing_error_line(REDEFINITION_OF_SERVER_PARAM, _config_file, get_line_num(_tokens[0])));
 	}
@@ -506,7 +503,7 @@ int ConfigParser::set_allowed_methods() {
 		return (parsing_error_line(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 	else if (num_methods < 1 || num_methods > num_valid_methods)
 		return (parsing_error_line(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
-	for (int i = 1; i <= num_methods; i++) {
+	for (size_t i = 1; i <= num_methods; i++) {
 		j = 0;
 		while (j < num_valid_methods) {
 			if (_tokens[i] == _valid_methods[j]) {
@@ -718,7 +715,7 @@ int ConfigParser::check_server_name() {
 	ss << "Default_Server_" << _i_serv;
 	if (name->empty())
 		*name = ss.str();
-	for (int i = 0; i < _serv->size(); i++) {
+	for (size_t i = 0; i < _serv->size(); i++) {
 		if (*name == (*_serv)[i]._name && i != _i_serv)
 			return (parsing_error_param(SERVER_NAME_NOT_UNIQUE, _config_file, *name));
 	}
@@ -794,8 +791,8 @@ void	ConfigParser::create_ip_port_combinations() {
 	std::stringstream 	ss;
 	std::string 		comb;
 
-	for (int i = 0; i < _serv_cnt; i++) {
-		for (int j = 0; j < (*_serv)[i]._ports.size(); j++) {
+	for (size_t i = 0; i < _serv_cnt; i++) {
+		for (size_t j = 0; j < (*_serv)[i]._ports.size(); j++) {
 			ss << (*_serv)[i]._ports[j];
 			comb = (*_serv)[i]._ip + "::" + ss.str();
 			(*_serv)[i]._ip_port_comb.push_back(comb);
@@ -810,7 +807,7 @@ int	ConfigParser::check_ip_port_combinations() {
 	std::vector <std::string>			combs;
 	std::vector<std::string>::iterator 	it;
 
-	for (int i = 0; i < _serv_cnt; i++)
+	for (size_t i = 0; i < _serv_cnt; i++)
 		combs.insert(combs.end(), (*_serv)[i]._ip_port_comb.begin(), (*_serv)[i]._ip_port_comb.end());
 	std::sort(combs.begin(), combs.end());
 	it = std::adjacent_find(combs.begin(), combs.end());

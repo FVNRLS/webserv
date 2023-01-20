@@ -28,8 +28,8 @@ private:
 	size_t 									_serv_cnt;
 	size_t 									_serv_def_start;
 	size_t 									_serv_def_end;
-	int 									_i_serv;
-	int 									_i_loc;
+	size_t 									_i_serv;
+	size_t 									_i_loc;
 	std::vector<char>						_spec_chars;
 	std::vector<std::string>				_valid_identifiers;
 	std::vector<std::string>				_spec_valid_identifiers;

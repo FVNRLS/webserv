@@ -20,7 +20,7 @@ template <typename T>
 void	print_vector(T vector, size_t size) {
 	if (size == 0)
 		return;
-	for (int i = 0; i < size; i++) {
+	for (size_t i = 0; i < size; i++) {
 		if (i < size - 1)
 			std::cout << vector[i] << ' ';
 		else
@@ -30,6 +30,6 @@ void	print_vector(T vector, size_t size) {
 }
 
 void	print_configurations(std::vector<Config> &server_configs) {
-	for (int i = 0; i < server_configs.size(); i++)
+	for (size_t i = 0; i < server_configs.size(); i++)
 		std::cout << &server_configs[i] << std::endl;
 }
