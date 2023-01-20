@@ -20,18 +20,20 @@ OBJ = ${SRC:.cpp=.o}
 DEP = ${SRC:.cpp=.d}
 
 .cpp.o:
-	${CC} ${FLAGS} -I ${INCL} -c $< -o ${<:.cpp=.o}
+	@${CC} ${FLAGS} -I ${INCL} -c $< -o ${<:.cpp=.o}
 
 ${NAME}: ${OBJ}
-	${CC} ${OBJ} -o ${NAME}
+	@${CC} ${OBJ} -o ${NAME}
+	@rm -rf obj && mkdir obj
+	@mv ${OBJ} obj/
 
 all: ${NAME}
 
 clean:
-	${RM} ${OBJ} ${DEP}
+	@rm -rf obj
 
 fclean: clean
-	${RM} ${NAME}
+	@${RM} ${NAME}
 
 re: fclean all
 
