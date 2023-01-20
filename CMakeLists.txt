@@ -12,9 +12,6 @@ add_executable(webserver
         src/Config.cpp
         incl/Config.hpp
 
-        src/Client.cpp
-        incl/Client.hpp
-
         src/ConfigParser.cpp
         incl/ConfigParser.hpp
 

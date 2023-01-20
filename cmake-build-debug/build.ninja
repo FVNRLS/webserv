@@ -60,13 +60,6 @@ build CMakeFiles/webserver.dir/src/Config.cpp.o: CXX_COMPILER__webserver_Debug /
   OBJECT_DIR = CMakeFiles/webserver.dir
   OBJECT_FILE_DIR = CMakeFiles/webserver.dir/src
 
-build CMakeFiles/webserver.dir/src/Client.cpp.o: CXX_COMPILER__webserver_Debug /Users/rmazurit/Documents/42_Projects/webserv/src/Client.cpp || cmake_object_order_depends_target_webserver
-  DEP_FILE = CMakeFiles/webserver.dir/src/Client.cpp.o.d
-  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk -mmacosx-version-min=10.15
-  INCLUDES = -I/Users/rmazurit/Documents/42_Projects/webserv/./incl
-  OBJECT_DIR = CMakeFiles/webserver.dir
-  OBJECT_FILE_DIR = CMakeFiles/webserver.dir/src
-
 build CMakeFiles/webserver.dir/src/ConfigParser.cpp.o: CXX_COMPILER__webserver_Debug /Users/rmazurit/Documents/42_Projects/webserv/src/ConfigParser.cpp || cmake_object_order_depends_target_webserver
   DEP_FILE = CMakeFiles/webserver.dir/src/ConfigParser.cpp.o.d
   FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk -mmacosx-version-min=10.15
@@ -110,7 +103,7 @@ build CMakeFiles/webserver.dir/src/tools/split.cpp.o: CXX_COMPILER__webserver_De
 #############################################
 # Link the executable webserver
 
-build webserver: CXX_EXECUTABLE_LINKER__webserver_Debug CMakeFiles/webserver.dir/src/main.cpp.o CMakeFiles/webserver.dir/src/Config.cpp.o CMakeFiles/webserver.dir/src/Client.cpp.o CMakeFiles/webserver.dir/src/ConfigParser.cpp.o CMakeFiles/webserver.dir/src/error_handler.cpp.o CMakeFiles/webserver.dir/src/Server.cpp.o CMakeFiles/webserver.dir/src/tools/trim.cpp.o CMakeFiles/webserver.dir/src/tools/split.cpp.o
+build webserver: CXX_EXECUTABLE_LINKER__webserver_Debug CMakeFiles/webserver.dir/src/main.cpp.o CMakeFiles/webserver.dir/src/Config.cpp.o CMakeFiles/webserver.dir/src/ConfigParser.cpp.o CMakeFiles/webserver.dir/src/error_handler.cpp.o CMakeFiles/webserver.dir/src/Server.cpp.o CMakeFiles/webserver.dir/src/tools/trim.cpp.o CMakeFiles/webserver.dir/src/tools/split.cpp.o
   FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk -mmacosx-version-min=10.15
   OBJECT_DIR = CMakeFiles/webserver.dir
   POST_BUILD = :

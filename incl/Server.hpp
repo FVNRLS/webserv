@@ -26,7 +26,6 @@ private:
 	void	set_serv_addr();
 	int		create_socket();
 	int 	bind_socket();
-	int 	connect_to_server();
 	int		listen_to_connections();
 	int 	accept_requests();
 

@@ -95,13 +95,6 @@ int Server::bind_socket() {
 	return (EXIT_SUCCESS);
 }
 
-int Server::connect_to_server() {
-	if (connect(_socket, (struct sockaddr *)&_serv_addr, sizeof(_serv_addr)) < 0)
-		return (server_error(CONNECT_ERROR, *_config));
-	char buffer[1024] = "Hello, server!";
-	send(_socket, buffer, sizeof(buffer), 0);
-	return (EXIT_SUCCESS);
-}
 /*
  * Once the server is listening for connections, it can use the accept() function to accept a connection from a client.
  * */
@@ -117,6 +110,7 @@ int Server::accept_requests() {
 		socklen_t 			client_len;
 		int 				client_socket;
 		char 				cl_buf[1024];
+		char *hello_header = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 
 
 		// Accept an incoming connection
@@ -130,8 +124,7 @@ int Server::accept_requests() {
 		std::cout << cl_buf << std::endl;
 
 		// Echo the message back to the client
-		char serv_buf[1024] = "Hello from Server!";
-		send(client_socket, serv_buf, sizeof(serv_buf), 0);
+		send(client_socket, hello_header, strlen(hello_header), 0);
 
 		// Clear buffer and close the socket
 		close(client_socket);
