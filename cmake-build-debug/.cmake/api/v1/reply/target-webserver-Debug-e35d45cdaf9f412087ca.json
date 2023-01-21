@@ -42,14 +42,17 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk -mmacosx-version-min=10.15"
+					"fragment" : "-g"
+				},
+				{
+					"fragment" : "-std=gnu++98"
 				}
 			],
 			"includes" : 
 			[
 				{
 					"backtrace" : 2,
-					"path" : "/Users/rmazurit/Documents/42_Projects/webserv/./incl"
+					"path" : "/home/amenra/Documents/projects/webserv/./incl"
 				}
 			],
 			"language" : "CXX",

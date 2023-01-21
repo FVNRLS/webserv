@@ -212,11 +212,12 @@ int Server::process_incoming_request(const int &socket_fd, size_t socket_nbr) {
 }
 
 std::string Server::generate_response(const std::string &request) {
-	std::string 	response;
-	const char 		*file_path;
-	std::ifstream 	file;
-	std::string 	body;
-	std::string 	requested_path;
+	std::string 		response;
+	const char 			*file_path;
+	std::ifstream 		file;
+	std::string 		body;
+	std::string 		requested_path;
+	std::stringstream 	body_len;
 
 	requested_path = parse_request(request); //todo: cont!
 
@@ -233,10 +234,9 @@ std::string Server::generate_response(const std::string &request) {
 		return ("");
 	}
 	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-	response = RESPONSE_HEADER + std::to_string(body.length()) + "\n\n" + body;
+	body_len << body.length();
+	response = RESPONSE_HEADER + body_len.str() + "\n\n" + body;
 	file.close();
-
-
 
 	return (response);
 }

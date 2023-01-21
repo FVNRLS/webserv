@@ -17,9 +17,11 @@
 #include <sstream>
 #include <algorithm>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <list>
 #include <map>
+#include <iomanip>
 
 #include <unistd.h>
 #include <fcntl.h>

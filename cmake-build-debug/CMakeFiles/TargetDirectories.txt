@@ -1,3 +1,3 @@
-/Users/rmazurit/Documents/42_Projects/webserv/cmake-build-debug/CMakeFiles/webserver.dir
-/Users/rmazurit/Documents/42_Projects/webserv/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/rmazurit/Documents/42_Projects/webserv/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/amenra/Documents/projects/webserv/cmake-build-debug/CMakeFiles/webserver.dir
+/home/amenra/Documents/projects/webserv/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/amenra/Documents/projects/webserv/cmake-build-debug/CMakeFiles/rebuild_cache.dir

@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "webserver::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-webserver-Debug-87d77279d9bfee14ee2d.json",
+					"jsonFile" : "target-webserver-Debug-e35d45cdaf9f412087ca.json",
 					"name" : "webserver",
 					"projectIndex" : 0
 				}
@@ -49,12 +49,12 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/Users/rmazurit/Documents/42_Projects/webserv/cmake-build-debug",
-		"source" : "/Users/rmazurit/Documents/42_Projects/webserv"
+		"build" : "/home/amenra/Documents/projects/webserv/cmake-build-debug",
+		"source" : "/home/amenra/Documents/projects/webserv"
 	},
 	"version" : 
 	{
 		"major" : 2,
-		"minor" : 4
+		"minor" : 3
 	}
 }
