@@ -52,6 +52,9 @@ int main(int argc, char **argv) {
 	for (size_t i = 0; i < server_configs.size(); i++)
 		servers[i] = Server(server_configs[i]);
 
+	//TODO: create POLL-Class for request - handling and access sockets through getters! Run servers in while loop and not in forks!
+	//TODO: Shrink serv functionality only until listen()
+
 //	if (servers[0].run() == EXIT_FAILURE)
 //		return (EXIT_FAILURE);
 

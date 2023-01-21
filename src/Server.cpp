@@ -80,19 +80,12 @@ void Server::set_serv_addr() {
 
 /*
  * This function initializes a set of sockets and makes them non-blocking.
-It creates a new variable new_socket of type pollfd and sets the events field to POLLIN.
-It resizes the _sockets vector to hold _num_sockets + 1 elements, where _num_sockets is the number of sockets the server is going to handle.
-It enters a loop that runs _num_sockets times, and in each iteration:
-It creates a new socket with the socket() function, and assigns the file descriptor to the fd field of the new_socket variable.
-If the socket() function returns an error, the function returns server_error(SOCKET_OPEN_ERROR, *_config, i).
-It uses the fcntl() function to set the newly created socket to non-blocking mode.
-If the fcntl() function returns an error, the function returns server_error(SOCKET_OPEN_ERROR, *_config, i).
-It assigns the new_socket variable to the corresponding element of the _sockets vector.
-It sets the file descriptor of the last element of _sockets vector to be the standard input file descriptor (STDIN_FILENO)
-It uses the fcntl() function to set the last element of the _sockets vector to non-blocking mode.
-If the fcntl() function returns an error, the function returns server_error(SOCKET_OPEN_ERROR, *_config, i).
-The function returns EXIT_SUCCESS to indicate that the initialization was successful.
- *
+ * 1. creates a new variable new_socket of type pollfd and sets the events field to POLLIN.
+ * 2. creates a new socket with the socket() function, and assigns the file descriptor to the fd field of the new_socket variable.
+ * 3. assigns the new_socket variable to the corresponding element of the _sockets vector.
+ * 4. It sets the file descriptor of the last element of _sockets vector to be the standard input file descriptor (STDIN_FILENO)
+ * 5. It uses the fcntl() function to set the last element of the _sockets vector (standard input) to non-blocking mode.
+
  * */
 int Server::init_unblock_sockets() {
 	size_t 	i;
