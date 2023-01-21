@@ -68,9 +68,8 @@ void Server::set_serv_addr() {
 	size_t 		num_addr;
 
 	num_addr = _config->get_ports().size();
-	_serv_addr.reserve(num_addr);
+	_serv_addr.resize(num_addr);
 	ip_addr = inet_addr(_config->get_ip().c_str());
-
 	for (size_t i = 0; i < num_addr; i++) {
 		memset(&_serv_addr[i], 0, sizeof(_serv_addr[i]));
 		_serv_addr[i].sin_family = AF_INET;
@@ -80,25 +79,37 @@ void Server::set_serv_addr() {
 }
 
 /*
- * creates a socket using the Internet Protocol (IP) version 4 address family (AF_INET) and the TCP
- * socket type (SOCK_STREAM). The third argument, 0, is used to specify the protocol and is typically set to 0 to let
- * the system automatically choose the appropriate protocol.
+ * This function initializes a set of sockets and makes them non-blocking.
+It creates a new variable new_socket of type pollfd and sets the events field to POLLIN.
+It resizes the _sockets vector to hold _num_sockets + 1 elements, where _num_sockets is the number of sockets the server is going to handle.
+It enters a loop that runs _num_sockets times, and in each iteration:
+It creates a new socket with the socket() function, and assigns the file descriptor to the fd field of the new_socket variable.
+If the socket() function returns an error, the function returns server_error(SOCKET_OPEN_ERROR, *_config, i).
+It uses the fcntl() function to set the newly created socket to non-blocking mode.
+If the fcntl() function returns an error, the function returns server_error(SOCKET_OPEN_ERROR, *_config, i).
+It assigns the new_socket variable to the corresponding element of the _sockets vector.
+It sets the file descriptor of the last element of _sockets vector to be the standard input file descriptor (STDIN_FILENO)
+It uses the fcntl() function to set the last element of the _sockets vector to non-blocking mode.
+If the fcntl() function returns an error, the function returns server_error(SOCKET_OPEN_ERROR, *_config, i).
+The function returns EXIT_SUCCESS to indicate that the initialization was successful.
+ *
  * */
 int Server::init_unblock_sockets() {
 	size_t 	i;
-	pollfd	new_socket;
+	pollfd	new_socket = {};
 
-	_sockets.reserve(_num_sockets + 1);
+	_sockets.resize(_num_sockets + 1);
+	new_socket.events = POLLIN;
 	for (i = 0; i != _num_sockets; i++) {
 		new_socket.fd = socket(AF_INET, SOCK_STREAM, 0);
 		if (new_socket.fd < 0)
 			return  (server_error(SOCKET_OPEN_ERROR, *_config, i));
 		if (fcntl(new_socket.fd, F_SETFL, fcntl(new_socket.fd, F_GETFL) | O_NONBLOCK) < 0)
 			return  (server_error(SOCKET_OPEN_ERROR, *_config, i));
-		_sockets.push_back(new_socket);
+		_sockets[i] = new_socket;
 	}
-	_sockets.push_back(new_socket);
-	_sockets[i].fd = STDIN_FILENO;
+	new_socket.fd = STDIN_FILENO;
+	_sockets[i] = new_socket;
 	if (fcntl(_sockets[i].fd, F_SETFL, fcntl(_sockets[i].fd, F_GETFL) | O_NONBLOCK) < 0)
 		return  (server_error(SOCKET_OPEN_ERROR, *_config, i));
 	return (EXIT_SUCCESS);

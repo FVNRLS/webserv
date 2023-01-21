@@ -121,7 +121,8 @@ int server_error(int error, const Config &conf, size_t i) {
 			std::cerr << "Error: failed to open socket" << std::endl;
 			break;
 		case BIND_ERROR:
-			std::cerr << "Error: failed to bind socket on port " << conf.get_ports()[i] << std::endl;
+			std::cerr << "Error: failed to bind socket on " << conf.get_ip()
+				<< ":" << conf.get_ports()[i] << std::endl;
 			break;
 		case CONNECT_ERROR:
 			std::cerr << "Error: failed to connect to the server on port " << conf.get_ports()[i] << std::endl;
