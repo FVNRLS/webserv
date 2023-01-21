@@ -32,11 +32,20 @@ int main(int argc, char **argv) {
 	for (size_t i = 0; i < server_configs.size(); i++)
 		servers[i] = Server(server_configs[i]);
 
-	if (servers[0].run() == EXIT_FAILURE)
-		return (EXIT_FAILURE);
+	pid_t	pid;
+	for (size_t i = 0; i < server_configs.size(); i++) {
+		pid = fork();
+		if (pid < 0) {
+			perror("Fork failed!\n");
+			return (EXIT_FAILURE);
+		}
+		if (pid == 0) {
+			if (servers[i].run() == EXIT_FAILURE)
+				exit (EXIT_FAILURE); //todo: it will be fork!
+			exit(EXIT_SUCCESS);
+		}
+	}
 
-
-	
-
+	while (wait(NULL) < 0);
 	return (EXIT_SUCCESS);
 }

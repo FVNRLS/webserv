@@ -163,8 +163,8 @@ int Server::resolve_requests() {
 			}
 		}
 		if (_sockets[i].revents & POLLIN) { //todo: write terminal input handler!
-			if (process_cli() == EXIT_FAILURE)
-				return (EXIT_FAILURE);
+			if (process_cli() == CLOSE_SERVER_CMD)
+				exit_server();
 		}
 	}
 	return (EXIT_SUCCESS);
@@ -242,6 +242,24 @@ std::string	Server::parse_request(const std::string &request) {
 }
 
 int Server::process_cli() {
-	std::cout << "TERMINAL INPUT!!!!!" << std::endl;
+	std::ifstream	std_in;
+	std::string 	input;
+
+	std_in.open("/dev/stdin");
+	input.append((std::istreambuf_iterator<char>(std_in)), std::istreambuf_iterator<char>());
+
+	std::cout << input << std::endl;
+	if (input.empty())
+		return (EXIT_SUCCESS);
+	else if (input == "exit\n")
+		return (CLOSE_SERVER_CMD);
+	std_in.close();
 	return (EXIT_SUCCESS);
+}
+
+//todo: complete with client sockets ???
+void	Server::exit_server() {
+	for (size_t i = 0; i < _num_sockets; i++)
+		close(_sockets[i].fd);
+	exit(EXIT_SUCCESS);
 }

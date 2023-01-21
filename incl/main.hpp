@@ -41,6 +41,7 @@
 enum chars {
 	NOT_FOUND 			= (-1),
 	SPEC_IDENTIFIER 	= (-2),
+	CLOSE_SERVER_CMD	= (-3),
 	OPEN_CURLY_BRACE 	= '{',
 	CLOSED_CURLY_BRACE	= '}',
  	NEWLINE				= '\n',

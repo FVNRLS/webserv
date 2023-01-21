@@ -22,18 +22,22 @@ private:
 	std::vector<pollfd>			_sockets;
 	size_t 						_num_sockets;
 
+	//CORE FUNCTIONS
 	void						set_serv_addr();
 	int							init_unblock_sockets();
 	int 						bind_socket();
 	int							listen_to_connections();
 	int 						resolve_requests();
 	int 						process_incoming_request(const int &socket_fd, size_t socket_nbr);
-	int 						process_cli();
 	std::string 				generate_response(const std::string &request);
 	std::string					parse_request(const std::string &request);
 
+	//TERMINAL INTERACTION
+	int 						process_cli();
+	void						exit_server();
 
-public:
+
+		public:
 	Server(Config &server_config);
 	Server(const Server &src);
 	Server &operator=(const Server &src);
