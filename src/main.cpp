@@ -30,7 +30,7 @@ int	run_servers(const std::vector<Config> &server_configs, std::vector<Server> &
 		}
 	}
 	siginfo_t infop;
-	while (waitid(P_ALL, 0, &infop, WEXITED | WSTOPPED | WCONTINUED) == 0);
+	while (waitid(-1, 0, &infop, WEXITED | WSTOPPED | WCONTINUED) == 0);
 	return (EXIT_SUCCESS);
 }
 

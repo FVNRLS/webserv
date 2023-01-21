@@ -23,6 +23,7 @@
 #include <map>
 #include <iomanip>
 
+#include <signal.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <poll.h>
