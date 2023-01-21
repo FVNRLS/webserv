@@ -59,7 +59,8 @@ enum server_errors {
 	BIND_ERROR,
 	CONNECT_ERROR,
 	LISTEN_ERROR,
+	POLL_ERROR,
 	ACCEPT_ERROR,
 };
 
-int server_error(int error, const Config &conf);
+int server_error(int error, const Config &conf, size_t i);

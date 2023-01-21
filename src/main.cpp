@@ -29,9 +29,8 @@ int main(int argc, char **argv) {
 
 	//SERVER CORE
 	servers.reserve(server_configs.size());
-	for (size_t i = 0; i < servers.size(); i++) {
+	for (size_t i = 0; i < server_configs.size(); i++)
 		servers[i] = Server(server_configs[i]);
-	}
 
 	if (servers[0].run() == EXIT_FAILURE)
 		return (EXIT_FAILURE);

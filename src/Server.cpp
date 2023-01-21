@@ -28,6 +28,10 @@ Server::Server(const Server &src) {
 Server &Server::operator=(const Server &src) { //todo: check after finishing the class
 	if (this == &src)
 		return (*this);
+	_config = src._config;
+	_num_sockets = src._num_sockets;
+	_serv_addr = src._serv_addr;
+	_sockets = src._sockets;
 	return (*this);
 }
 
@@ -37,13 +41,13 @@ Server::~Server() {}
 //MEMBER FUNCTIONS
 int Server::run() {
 	set_serv_addr();
-	if (init_sockets() == EXIT_FAILURE)
+	if (init_unblock_sockets() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	if (bind_socket() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	if (listen_to_connections() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
-	if (accept_requests() == EXIT_FAILURE)
+	if (resolve_requests() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 
 	for (std::vector<pollfd>::iterator it = _sockets.begin(); it != _sockets.end(); it++)
@@ -61,10 +65,13 @@ int Server::run() {
  * */
 void Server::set_serv_addr() {
 	u_int32_t	ip_addr;
+	size_t 		num_addr;
 
+	num_addr = _config->get_ports().size();
+	_serv_addr.reserve(num_addr);
 	ip_addr = inet_addr(_config->get_ip().c_str());
 
-	for (size_t i = 0; i < _config->get_ports().size(); i++) {
+	for (size_t i = 0; i < num_addr; i++) {
 		memset(&_serv_addr[i], 0, sizeof(_serv_addr[i]));
 		_serv_addr[i].sin_family = AF_INET;
 		_serv_addr[i].sin_port = htons(_config->get_ports()[i]); // server port
@@ -77,16 +84,23 @@ void Server::set_serv_addr() {
  * socket type (SOCK_STREAM). The third argument, 0, is used to specify the protocol and is typically set to 0 to let
  * the system automatically choose the appropriate protocol.
  * */
-int Server::init_sockets() {
-	size_t i;
+int Server::init_unblock_sockets() {
+	size_t 	i;
+	pollfd	new_socket;
 
 	_sockets.reserve(_num_sockets + 1);
 	for (i = 0; i != _num_sockets; i++) {
-		_sockets[i].fd = socket(AF_INET, SOCK_STREAM, 0);
-		if (_sockets[i].fd < 0)
-			return  (server_error(SOCKET_OPEN_ERROR, *_config));
+		new_socket.fd = socket(AF_INET, SOCK_STREAM, 0);
+		if (new_socket.fd < 0)
+			return  (server_error(SOCKET_OPEN_ERROR, *_config, i));
+		if (fcntl(new_socket.fd, F_SETFL, fcntl(new_socket.fd, F_GETFL) | O_NONBLOCK) < 0)
+			return  (server_error(SOCKET_OPEN_ERROR, *_config, i));
+		_sockets.push_back(new_socket);
 	}
+	_sockets.push_back(new_socket);
 	_sockets[i].fd = STDIN_FILENO;
+	if (fcntl(_sockets[i].fd, F_SETFL, fcntl(_sockets[i].fd, F_GETFL) | O_NONBLOCK) < 0)
+		return  (server_error(SOCKET_OPEN_ERROR, *_config, i));
 	return (EXIT_SUCCESS);
 }
 
@@ -99,11 +113,10 @@ int Server::init_sockets() {
  * */
 int Server::bind_socket() {
 	for (size_t i = 0; i < _num_sockets; i++) {
-		if (bind(_sockets[i].fd, (struct sockaddr *)&_serv_addr, sizeof(_serv_addr)) < 0)
-			return (server_error(BIND_ERROR, *_config));
-		else
-			std::cout << "bind success on " << inet_ntoa(_serv_addr.sin_addr) << ":" << ntohs(_serv_addr.sin_port)
-				<< std::endl; //todo: DEL
+		if (bind(_sockets[i].fd, (struct sockaddr *)&_serv_addr[i], sizeof(_serv_addr[i])) < 0)
+			return (server_error(BIND_ERROR, *_config, i));
+		std::cout << "bind success on " << inet_ntoa(_serv_addr[i].sin_addr) << ":" << ntohs(_serv_addr[i].sin_port)
+		<< std::endl; //todo: DEL
 	}
 	return (EXIT_SUCCESS);
 }
@@ -112,16 +125,52 @@ int Server::bind_socket() {
  * Once the server is listening for connections, it can use the accept() function to accept a connection from a client.
  * */
 int	Server::listen_to_connections() {
-	if (listen(_socket, MAX_CONNECTIONS) < 0)
-		return (server_error(LISTEN_ERROR, *_config));
+	for (size_t i = 0; i < _num_sockets; i++) {
+		if (listen(_sockets[i].fd, MAX_CONNECTIONS) < 0)
+			return (server_error(LISTEN_ERROR, *_config, i));
+	}
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * 1. The function runs in an infinite loop.
+ * 2. Within the loop, it calls the poll() function on the _sockets vector, with a timeout of -1
+ * 		(meaning it will wait indefinitely) to wait for incoming connections.
+ * 3. It checks the return value of poll() for errors.
+ * 		If an error occurs, it checks if the error is EINTR -> indicates that the system call was interrupted by a signal.
+ * 		If the error is EINTR, the function continues to the next iteration of the loop.
+ * 		If the error is not EINTR, the function calls server_error() and returns an error code.
+ * 4. It iterates over the _sockets vector, checking for the POLLIN event on each file descriptor.
+ * 		If the POLLIN event is set, it calls the process_incoming_request() function on the file descriptor.
+ * 5. After handling all the _sockets in the vector, it checks if there is any input from the command-line interface (CLI).
+ * 		If there is input, it calls the process_cli() function. If the process_cli() function returns an error,
+ * 		the function returns an error code.
+ * 6. The function exits the infinite loop and returns EXIT_SUCCESS to indicate that it completed successfully.
+ * */
 int Server::resolve_requests() {
+	size_t 	i;
+
+	while (true) {
+		if (poll(&_sockets[0], _sockets.size(), -1) < 0) {
+			if (errno == EINTR)
+				continue;
+			return (server_error(POLL_ERROR, _config[0], 0));
+		}
+		for (i = 0; i < _num_sockets; i++) {
+			if (_sockets[i].revents & POLLIN) {
+				if (process_incoming_request(_sockets[i].fd, i) == EXIT_FAILURE)
+					return (EXIT_FAILURE);
+			}
+		}
+		if (_sockets[i].revents & POLLIN) { //todo: write terminal input handler!
+			if (process_cli() == EXIT_FAILURE)
+				return (EXIT_FAILURE);
+		}
+	}
 	return (EXIT_SUCCESS);
 }
 
-int Server::accept_requests() {
+int Server::process_incoming_request(const int &socket_fd, size_t socket_nbr) {
 		struct sockaddr_in 	cli_addr;
 		socklen_t 			client_len;
 		int 				client_socket;
@@ -131,15 +180,11 @@ int Server::accept_requests() {
 		std::string 		response;
 
 
-	while (true) {
-
-
-
 		// Accept an incoming connection
 		client_len = sizeof(cli_addr);
-		client_socket = accept(_sockets[0].fd, (struct sockaddr *) &cli_addr, &client_len);
+		client_socket = accept(socket_fd, (struct sockaddr *) &cli_addr, &client_len);
 		if (client_socket < 0)
-			return (server_error(ACCEPT_ERROR, *_config));
+			return (server_error(ACCEPT_ERROR, *_config, socket_nbr));
 
 		// Read a message from the client
 		recv(client_socket, client_buf, sizeof(client_buf), 0);
@@ -159,12 +204,8 @@ int Server::accept_requests() {
 		// Clear buffer and close the socket
 		close(client_socket);
 
-	}
-
 	return (EXIT_SUCCESS);
 }
-
-//TODO: implement request parser
 
 std::string Server::generate_response(const std::string &request) {
 	std::string 	response;
@@ -198,4 +239,9 @@ std::string Server::generate_response(const std::string &request) {
 
 std::string	Server::parse_request(const std::string &request) {
 	return (request);
+}
+
+int Server::process_cli() {
+	std::cout << "TERMINAL INPUT!!!!!" << std::endl;
+	return (EXIT_SUCCESS);
 }

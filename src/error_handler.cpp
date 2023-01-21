@@ -115,17 +115,28 @@ int	parsing_error_param(int error, const std::string &config_file, std::string &
 	return (EXIT_FAILURE);
 }
 
-int server_error(int error, const Config &conf) {
-	if (error == SOCKET_OPEN_ERROR)
-		std::cerr << "Error: failed to open socket" << std::endl;
-	else if (error == BIND_ERROR)
-		std::cerr << "Error: failed to bind socket on port " << conf.get_ports()[0] << std::endl;
-	else if (error == CONNECT_ERROR)
-		std::cerr << "Error: failed to connect to the server on port " << conf.get_ports()[0] << std::endl;
-	else if (error == LISTEN_ERROR)
-		std::cerr << "Error: failed to listen to the socket on port " << conf.get_ports()[0] << std::endl;
-	else if (error == ACCEPT_ERROR)
-		std::cerr << "Error: failed to accept connection on port " << conf.get_ports()[0] << std::endl;
-
+int server_error(int error, const Config &conf, size_t i) {
+	switch(error) {
+		case SOCKET_OPEN_ERROR:
+			std::cerr << "Error: failed to open socket" << std::endl;
+			break;
+		case BIND_ERROR:
+			std::cerr << "Error: failed to bind socket on port " << conf.get_ports()[i] << std::endl;
+			break;
+		case CONNECT_ERROR:
+			std::cerr << "Error: failed to connect to the server on port " << conf.get_ports()[i] << std::endl;
+			break;
+		case LISTEN_ERROR:
+			std::cerr << "Error: failed to listen to the socket on port " << conf.get_ports()[i] << std::endl;
+			break;
+		case POLL_ERROR:
+			std::cerr << "Error: failed polling sockets on IP address " << conf.get_ip() << std::endl;
+			break;
+		case ACCEPT_ERROR:
+			std::cerr << "Error: failed to accept connection on port " << conf.get_ports()[i] << std::endl;
+			break;
+		default:
+			std::cerr << "Error: unknown error" << std::endl;
+	}
 	return (EXIT_FAILURE);
 }
