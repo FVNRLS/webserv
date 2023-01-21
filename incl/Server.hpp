@@ -17,23 +17,23 @@
 class Server {
 
 private:
-//	std::vector<Config>	*_conf;
-	Config				*_config; //todo: just for test of 1 config --> delete afterwards!
-	struct sockaddr_in	_serv_addr;
-	int 				_socket;
+	Config						*_config;
+	std::vector<sockaddr_in>	_serv_addr;
+	std::vector<pollfd>			_sockets;
+	size_t 						_num_sockets;
 
 	void			set_serv_addr();
-	int				create_socket();
+	int				init_sockets();
 	int 			bind_socket();
 	int				listen_to_connections();
 	int 			accept_requests();
 	std::string 	generate_response(const std::string &request);
+	std::string		parse_request(const std::string &request);
 
 
 
 public:
-	Server();
-	Server(std::vector<Config> &server_configs);
+	Server(Config &server_config);
 	Server(const Server &src);
 	Server &operator=(const Server &src);
 	~Server();

@@ -21,14 +21,19 @@ int main(int argc, char **argv) {
 	//PARSING
 	std::vector<Config>	server_configs;
 	ConfigParser		parser(server_configs, argv[1]);
+	std::vector<Server> servers;
 
 	if (parser.parse() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 //	print_configurations(server_configs);
 
 	//SERVER CORE
-	Server	server(server_configs);
-	if (server.run() == EXIT_FAILURE)
+	servers.reserve(server_configs.size());
+	for (size_t i = 0; i < servers.size(); i++) {
+		servers[i] = Server(server_configs[i]);
+	}
+
+	if (servers[0].run() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 
 

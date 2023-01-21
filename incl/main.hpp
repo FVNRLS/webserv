@@ -22,6 +22,7 @@
 #include <map>
 
 #include <unistd.h>
+#include <poll.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
