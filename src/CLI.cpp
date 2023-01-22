@@ -40,16 +40,17 @@ int CLI::start() {
 int CLI::process_input() {
 	if (read_input() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
+	for (std::string::iterator it = _input.begin(); it != _input.end(); it++)
+		*it = std::toupper(*it);
 	std::cout << _input << std::endl;
 
 	if (_input.empty())
 		return (CLI_EMPTY);
-	if (_input == "exit\n")
+	if (_input == "EXIT\n")
 		return (EXIT);
-	if (_input == "ls\n")
+	if (_input == "LS\n")
 		return (LS);
-	else
-		return (HELP);
+	return (HELP);
 }
 
 int CLI::read_input() {
