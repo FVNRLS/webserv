@@ -28,8 +28,8 @@ add_executable(webserver
         incl/Server.hpp
 
         #TOOLS
-        incl/tools.hpp
         src/tools/trim.cpp
         src/tools/split.cpp
+        incl/tools.hpp
 
         )

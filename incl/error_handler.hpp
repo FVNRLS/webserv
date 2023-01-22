@@ -65,3 +65,4 @@ enum server_errors {
 };
 
 int socket_error(int error, const Config *conf, size_t i);
+int server_error(int error, const Config *conf, size_t i);

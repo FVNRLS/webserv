@@ -31,6 +31,8 @@ public:
 	~CLI();
 
 	int 	start();
-	int 	process_input();
+	int 	check_input();
 	int 	read_input();
+
+	pollfd 	get_pollfd();
 };

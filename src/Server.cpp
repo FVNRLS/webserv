@@ -40,30 +40,6 @@ Server::~Server() {}
 
 
 //MEMBER FUNCTIONS
-void 	Server::run() {
-	if (_cli.start() == EXIT_FAILURE)
-		exit_server();
-
-	while (true) {
-		if (poll(&_poll_fds[0], _sockets->size(), -1) < 0) {
-			if (errno == EINTR)
-				continue;
-			socket_error(POLL_ERROR, NULL, 0);
-			exit_server();
-		}
-		for (size_t i = 0; i < _num_fds; i++) {
-			if (_poll_fds[i].revents & POLLIN) {
-				if (process_incoming_request(_sockets[i].fd, i) == EXIT_FAILURE)
-					return (EXIT_FAILURE);
-			}
-		}
-		if (_sockets[i].revents & POLLIN) { //todo: write terminal input handler!
-			if (process_cli() == CLOSE_SERVER_CMD)
-				exit_server();
-		}
-	}
-}
-
 
 /*
  * 1. The function runs in an infinite loop.
@@ -80,8 +56,30 @@ void 	Server::run() {
  * 		the function returns an error code.
  * 6. The function exits the infinite loop and returns EXIT_SUCCESS to indicate that it completed successfully.
  * */
-int Server::resolve_requests() {
-	return (EXIT_SUCCESS);
+int Server::run() {
+	size_t i;
+
+	if (_cli.start() == EXIT_FAILURE)
+		exit_server();
+	_poll_fds.push_back(_cli.get_pollfd());
+
+	while (true) {
+		if (poll(&_poll_fds[0], _num_fds, -1) < 0) {
+			if (errno == EINTR)
+				continue;
+			return (terminate_with_error(socket_error(POLL_ERROR, NULL, 0)));
+		}
+		for (i = 0; i < _sockets->size(); i++) {
+			if (_poll_fds[i].revents & POLLIN) {
+				if (process_incoming_request(_poll_fds[i].fd, i) == EXIT_FAILURE)
+					return (terminate_with_error(EXIT_FAILURE));
+			}
+		}
+		if (_poll_fds[i].revents & POLLIN) {
+			if (process_cli_input() == EXIT_FAILURE)
+				return EXIT_FAILURE;
+		}
+	}
 }
 
 int Server::process_incoming_request(const int &socket_fd, size_t socket_nbr) {
@@ -98,8 +96,7 @@ int Server::process_incoming_request(const int &socket_fd, size_t socket_nbr) {
 		client_len = sizeof(cli_addr);
 		client_socket = accept(socket_fd, (struct sockaddr *) &cli_addr, &client_len);
 		if (client_socket < 0)
-			return (socket_error(ACCEPT_ERROR, *_config, socket_nbr));
-
+			return (server_error(ACCEPT_ERROR, &(*_sockets)[socket_nbr].get_config(), socket_nbr));
 		// Read a message from the client
 		recv(client_socket, client_buf, sizeof(client_buf), 0);
 		request = client_buf;
@@ -107,7 +104,7 @@ int Server::process_incoming_request(const int &socket_fd, size_t socket_nbr) {
 
 		// Echo the message back to the client
 
-		response = generate_response(request);
+		response = generate_response(request, socket_nbr);
 		if (response.empty()) {
 			close(client_socket);
 			return (EXIT_FAILURE);
@@ -121,7 +118,7 @@ int Server::process_incoming_request(const int &socket_fd, size_t socket_nbr) {
 	return (EXIT_SUCCESS);
 }
 
-std::string Server::generate_response(const std::string &request) {
+std::string Server::generate_response(const std::string &request, size_t socket_nbr) {
 	std::string 		response;
 	const char 			*file_path;
 	std::ifstream 		file;
@@ -131,7 +128,7 @@ std::string Server::generate_response(const std::string &request) {
 
 	requested_path = parse_request(request); //todo: cont!
 
-	file_path = _config->get_index().c_str();
+	file_path = (*_sockets)[socket_nbr].get_config().get_index().c_str();
 	std::cout << file_path << std::endl;
 
 	if (access(file_path, F_OK) < 0) {
@@ -156,9 +153,42 @@ std::string	Server::parse_request(const std::string &request) {
 }
 
 
+// TERMINAL FUNCTIONS!!!!!!!!
+
+int	Server::process_cli_input() {
+	switch (_cli.check_input()) {
+		case CLI_EMPTY:
+			return EXIT_SUCCESS;
+		case CLI_FAIL:
+			return (terminate_with_error(EXIT_FAILURE));
+		case CLI_EXIT:
+			exit_server();
+		case CLI_LS:
+			show_connections();
+			break;
+		default:
+			show_manual();
+	}
+	return EXIT_SUCCESS;
+}
+
 //todo: complete with client sockets ???
 void	Server::exit_server() {
 	for (size_t i = 0; i < _sockets->size(); i++)
 		close(_poll_fds[i].fd);
 	exit(EXIT_SUCCESS);
+}
+
+int		Server::terminate_with_error(int) {
+	for (size_t i = 0; i < _sockets->size(); i++)
+		close(_poll_fds[i].fd);
+	return (EXIT_FAILURE);
+}
+
+void 	Server::show_connections() {
+	std::cout << "CALLED LS\n";
+}
+
+void 	Server::show_manual() {
+	std::cout << "CALLED HELP\n";
 }

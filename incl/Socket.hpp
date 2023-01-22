@@ -38,6 +38,6 @@ public:
 	int 						activate();
 
 	//GETTERS
-	pollfd						get_pollfd();
-	Config						get_config();
+	pollfd						get_pollfd()	const;
+	Config&						get_config()	const;
 };

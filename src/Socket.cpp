@@ -78,14 +78,12 @@ void Socket::set_serv_addr() {
 
  * */
 int Socket::init_unblock_sockets() {
-	size_t 	i;
-
 	_socket.events = POLLIN;
 	_socket.fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_socket.fd < 0)
-		return  (socket_error(SOCKET_OPEN_ERROR, _config, i));
+		return  (socket_error(SOCKET_OPEN_ERROR, _config, 0));
 	if (fcntl(_socket.fd, F_SETFL, fcntl(_socket.fd, F_GETFL) | O_NONBLOCK) < 0)
-		return  (socket_error(SOCKET_OPEN_ERROR, _config, i));
+		return  (socket_error(SOCKET_OPEN_ERROR, _config, 0));
 	return (EXIT_SUCCESS);
 }
 
@@ -115,11 +113,11 @@ int	Socket::listen_to_connections() {
 
 
 //GETTERS
-pollfd	Socket::get_pollfd() {
+pollfd	Socket::get_pollfd() const {
 	return (_socket);
 }
 
-Config	Socket::get_config() {
+Config&	Socket::get_config() const {
 	return (*_config);
 }
 

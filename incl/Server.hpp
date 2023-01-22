@@ -26,14 +26,16 @@ private:
 	CLI							_cli;
 
 	//CORE FUNCTIONS
-	int 						resolve_requests();
 	int 						process_incoming_request(const int &socket_fd, size_t socket_nbr);
-	std::string 				generate_response(const std::string &request);
+	std::string 				generate_response(const std::string &request, size_t socket_nbr);
 	std::string					parse_request(const std::string &request);
 
 	//TERMINAL INTERACTION
+	int							process_cli_input();
 	void						exit_server();
-	int 						exit_with_error();
+	int 						terminate_with_error(int);
+	void 						show_connections();
+	void 						show_manual();
 
 public:
 	Server(std::vector<Socket> &sockets);
@@ -41,7 +43,7 @@ public:
 	Server &operator=(const Server &src);
 	~Server();
 
-	void 						run();
+	int 						run();
 };
 
 

@@ -37,11 +37,11 @@ int main(int argc, char **argv) {
 				sockets.push_back(new_socket);
 		}
 	}
-
 	//SERVER CORE (MAIN LOOP)
 	if (!sockets.empty()) {
 		Server	server(sockets);
-		server.run();
+		if (server.run() == EXIT_FAILURE)
+			return (EXIT_FAILURE);
 	}
 
 	return (EXIT_SUCCESS);

@@ -58,9 +58,9 @@ enum chars {
 enum cli_flags {
 	CLI_EMPTY,
 	CLI_FAIL,
-	EXIT,
-	LS,
-	HELP,
+	CLI_EXIT,
+	CLI_LS,
+	CLI_HELP,
 };
 
 //NUMERIC CONSTANTS

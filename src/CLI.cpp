@@ -37,7 +37,7 @@ int CLI::start() {
 	return (EXIT_SUCCESS);
 }
 
-int CLI::process_input() {
+int CLI::check_input() {
 	if (read_input() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	if (_input.empty())
@@ -47,11 +47,11 @@ int CLI::process_input() {
 		*it = std::toupper(*it);
 	std::cout << _input << std::endl;
 
-	if (_input == "EXIT\n")
-		return (EXIT);
-	if (_input == "LS\n")
-		return (LS);
-	return (HELP);
+	if (_input == "CLI_EXIT\n")
+		return (CLI_EXIT);
+	if (_input == "CLI_LS\n")
+		return (CLI_LS);
+	return (CLI_HELP);
 }
 
 int CLI::read_input() {
@@ -65,4 +65,8 @@ int CLI::read_input() {
 	_input.append((std::istreambuf_iterator<char>(std_in)), std::istreambuf_iterator<char>());
 	std_in.close();
 	return (EXIT_SUCCESS);
+}
+
+pollfd CLI::get_pollfd() {
+	return (_std_in);
 }
