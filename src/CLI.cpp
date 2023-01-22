@@ -33,7 +33,7 @@ CLI::~CLI() {}
 
 int CLI::start() {
 	if (fcntl(_std_in.fd, F_SETFL, O_NONBLOCK) < 0)
-		return  (socket_error(SOCKET_OPEN_ERROR, NULL, 0));
+		return  (cli_error(SOCKET_OPEN_ERROR));
 	return (EXIT_SUCCESS);
 }
 
@@ -60,7 +60,7 @@ int CLI::read_input() {
 
 	std_in.open("/dev/stdin");
 	if (!std_in.is_open() || std_in.fail()) {
-		socket_error(SOCKET_OPEN_ERROR, NULL, 0);
+		cli_error(SOCKET_OPEN_ERROR);
 		return (CLI_FAIL);
 	}
 	_input.append((std::istreambuf_iterator<char>(std_in)), std::istreambuf_iterator<char>());
@@ -70,4 +70,15 @@ int CLI::read_input() {
 
 pollfd CLI::get_pollfd() {
 	return (_std_in);
+}
+
+int		CLI::cli_error(int error)	const {
+	switch(error) {
+		case SOCKET_OPEN_ERROR:
+			std::cerr << "Error: failed to open CLI socket" << std::endl;
+			break;
+		default:
+			std::cerr << "CLI: unknown error" << std::endl;
+	}
+	return (EXIT_FAILURE);
 }

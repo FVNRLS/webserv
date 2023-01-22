@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "main.hpp"
+#include "tools.hpp"
 
 std::string trim(std::string &s);
 

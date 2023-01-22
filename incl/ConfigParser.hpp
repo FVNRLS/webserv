@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ConfigParser.hpp                                         :+:      :+:    :+:   */
+/*   ConfigParser.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rmazurit <rmazurit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,8 +12,8 @@
 
 #pragma once
 
-#include "main.hpp"
 #include "Config.hpp"
+
 
 class ConfigParser {
 
@@ -89,8 +89,12 @@ private:
 	void	create_ip_port_combinations();
 	int		check_ip_port_combinations();
 
+	int		parsing_error_basic(int error, const std::string &config_file);
+	int		parsing_error_line(int error, const std::string &config_file, size_t line);
+	int		parsing_error_param(int error, const std::string &config_file, std::string &param);
 
-public:
+
+		public:
 	//BASIC CLASS SETUP
 	ConfigParser();
 	ConfigParser(std::vector<Config> &servers, char *path);

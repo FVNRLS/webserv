@@ -12,10 +12,7 @@
 
 #pragma once
 
-#include "main.hpp"
-#include "Socket.hpp"
 #include "CLI.hpp"
-#include "Config.hpp"
 
 class Server {
 
@@ -37,6 +34,9 @@ private:
 	int 						terminate_with_error(int);
 	void 						show_connections();
 	void 						show_manual();
+
+	//ERROR MANAGEMENT
+	int 						server_error(int error, const Socket &socket);
 
 public:
 	Server(std::vector<Socket> &sockets);

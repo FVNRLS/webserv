@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "Server.hpp"
-#include "Config.hpp"
+
 std::string 				trim(std::string &s);
 std::vector<std::string>	split(std::string &s, char sep);
 
@@ -60,10 +60,8 @@ int Server::run() {
 	_poll_fds.push_back(_cli.get_pollfd());
 
 	while (true) {
-		if (poll(&_poll_fds[0], _num_fds, -1) < 0) {
-
-			return (terminate_with_error(socket_error(POLL_ERROR, NULL, 0)));
-		}
+		if (poll(&_poll_fds[0], _num_fds, -1) < 0)
+			return (terminate_with_error(server_error(POLL_ERROR, _sockets->front())));
 		for (i = 0; i < _sockets->size(); i++) {
 			if (_poll_fds[i].revents & POLLIN) {
 				if (process_request(_poll_fds[i].fd, i) == EXIT_FAILURE)
@@ -88,19 +86,14 @@ int Server::process_request(const int &socket_fd, size_t socket_nbr) {
 		client_len = sizeof(cli_addr);
 		client_socket = accept(socket_fd, (struct sockaddr *) &cli_addr, &client_len);
 		if (client_socket < 0)
-			return (server_error(ACCEPT_ERROR, &(*_sockets)[socket_nbr].get_config(), socket_nbr));
+			return (server_error(ACCEPT_ERROR, (*_sockets)[socket_nbr]));
 
 		request = get_request(client_socket);
 		if (request.empty())
-			return (EXIT_FAILURE);
-			//todo: errorr
-		std::cout << request << std::endl;
+			return (server_error(RECV_ERROR, (*_sockets)[socket_nbr]));
+		std::cout << "PORT: " << (*_sockets)[socket_nbr].get_port() << " request:" << request << std::endl;
 
 		response = generate_response(request, socket_nbr);
-		if (response.empty()) {
-			close(client_socket);
-			return (EXIT_FAILURE);
-		}
 		send(client_socket, response.c_str(), response.length(), 0);
 		close(client_socket);
 
@@ -112,7 +105,7 @@ std::string Server::get_request(int &client_socket) {
 	std::string request;
 
 	if (recv(client_socket, client_buf, sizeof(client_buf), 0) < 0)
-		return ("");
+		return (request);
 	request = client_buf;
 	return (request);
 }
@@ -131,13 +124,13 @@ std::string Server::generate_response(const std::string &request, size_t socket_
 	std::cout << file_path << std::endl;
 
 	if (access(file_path, F_OK) < 0) {
-		parsing_error_basic(NO_FILE, file_path);
-		return ("");
+		server_error(ERROR_404, _sockets->front());
+		return (""); //todo: add error.html
 	}
 	file.open(file_path);
 	if (!file.is_open() || file.fail()) {
-		parsing_error_basic(BAD_PERMISSIONS, file_path);
-		return ("");
+		server_error(ACCESS_DENIED, _sockets->front());
+		return (""); //todo: add error.html
 	}
 	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	body_len << body.length();
@@ -158,7 +151,7 @@ int	Server::process_cli_input() {
 		case CLI_EMPTY:
 			return EXIT_SUCCESS;
 		case CLI_FAIL:
-			return (terminate_with_error(EXIT_FAILURE));
+			return terminate_with_error(server_error(CLI_ERROR, _sockets->front()));
 		case CLI_EXIT:
 			exit_server();
 		case CLI_LS:
@@ -189,4 +182,31 @@ void 	Server::show_connections() {
 
 void 	Server::show_manual() {
 	std::cout << "CALLED HELP\n";
+}
+
+
+int Server::server_error(int error, const Socket &socket) {
+	switch(error) {
+		case POLL_ERROR:
+			std::cerr << "Error: failed polling sockets" << std::endl;
+			break;
+		case ACCEPT_ERROR:
+			std::cerr << "Error: failed to accept connection on port " << socket.get_port() << std::endl;
+			break;
+		case CLI_ERROR:
+			std::cerr << "Error: command line interface failed" << std::endl;
+			break;
+		case RECV_ERROR:
+			std::cerr << "Error: failed to receive message on port " << socket.get_port() << std::endl;
+			break;
+		case ERROR_404:
+			std::cerr << "Error: Page not found!" << std::endl;
+			break;
+		case ACCESS_DENIED:
+			std::cerr << "Error: Access Denied!" << std::endl;
+			break;
+		default:
+			std::cerr << "Server: unknown error" << std::endl;
+	}
+	return (EXIT_FAILURE);
 }

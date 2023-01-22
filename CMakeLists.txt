@@ -30,6 +30,7 @@ add_executable(webserver
         #TOOLS
         src/tools/trim.cpp
         src/tools/split.cpp
+        src/tools/signal_handler.cpp
         incl/tools.hpp
 
-        src/tools/signal_handler.cpp)
+        incl/defines.hpp)

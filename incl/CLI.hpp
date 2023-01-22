@@ -12,8 +12,7 @@
 
 #pragma once
 
-#include "Config.hpp"
-#include "main.hpp"
+#include "Socket.hpp"
 
 
 class CLI {
@@ -22,7 +21,8 @@ private:
 	pollfd		_std_in;
 	std::string	_input;
 
-	//COMMAND LINE INTERFACE FUNCTIONS
+	//ERROR MANAGEMENT
+	int		cli_error(int error)	const;
 
 public:
 	CLI();

@@ -12,7 +12,12 @@
 
 #pragma once
 
-#include "main.hpp"
+#include "defines.hpp"
+#include <vector>
+#include <fstream>
+#include <unistd.h>
+#include <sstream>
+
 
 struct	location {
 	std::string					prefix;

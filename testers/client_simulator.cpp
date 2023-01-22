@@ -20,7 +20,7 @@
 #include <string.h>
 #include <arpa/inet.h>
 
-#define PORT 6969
+#define PORT 8080
 
 int main(int argc, char const *argv[])
 {

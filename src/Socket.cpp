@@ -81,9 +81,9 @@ int Socket::init_unblock_sockets() {
 	_socket.events = POLLIN;
 	_socket.fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_socket.fd < 0)
-		return  (socket_error(SOCKET_OPEN_ERROR, _config, 0));
+		return  (socket_error(SOCKET_OPEN_ERROR));
 	if (fcntl(_socket.fd, F_SETFL, O_NONBLOCK) < 0)
-		return  (socket_error(SOCKET_OPEN_ERROR, _config, 0));
+		return  (socket_error(SOCKET_OPEN_ERROR));
 	return (EXIT_SUCCESS);
 }
 
@@ -96,7 +96,7 @@ int Socket::init_unblock_sockets() {
  * */
 int Socket::bind_socket() {
 	if (bind(_socket.fd, (struct sockaddr *)&_serv_addr, sizeof(_serv_addr)) < 0)
-		return (socket_error(BIND_ERROR, _config, _port));
+		return (socket_error(BIND_ERROR));
 	std::cout << "bind success on " << inet_ntoa(_serv_addr.sin_addr) << ":" << ntohs(_serv_addr.sin_port)
 			  << std::endl; //todo: DEL
 	return (EXIT_SUCCESS);
@@ -107,7 +107,7 @@ int Socket::bind_socket() {
  * */
 int	Socket::listen_to_connections() {
 	if (listen(_socket.fd, MAX_CONNECTIONS) < 0)
-		return (socket_error(LISTEN_ERROR, _config, _port));
+		return (socket_error(LISTEN_ERROR));
 	return (EXIT_SUCCESS);
 }
 
@@ -121,3 +121,24 @@ Config &Socket::get_config() const {
 	return (*_config);
 }
 
+size_t 	Socket::get_port()	const {
+	return _port;
+}
+
+//ERROR MANAGEMENT
+int Socket::socket_error(int error) const {
+	switch(error) {
+		case SOCKET_OPEN_ERROR:
+			std::cerr << "Error: failed to open socket" << std::endl;
+			break;
+		case BIND_ERROR:
+			std::cerr << "Error: failed to bind socket on " << _config->get_ip()  << ":" << _port << std::endl;
+			break;
+		case LISTEN_ERROR:
+			std::cerr << "Error: failed to listen to the socket on port " << get_port() << std::endl;
+			break;
+		default:
+			std::cerr << "Socket: unknown error" << std::endl;
+	}
+	return (EXIT_FAILURE);
+}

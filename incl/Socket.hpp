@@ -13,7 +13,11 @@
 #pragma once
 
 #include "Config.hpp"
-#include "main.hpp"
+#include <poll.h>
+#include <netinet/in.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
 
 class Socket {
 
@@ -29,6 +33,9 @@ private:
 	int 						bind_socket();
 	int							listen_to_connections();
 
+	//ERROR MANAGEMENT
+	int 						socket_error(int error) const;
+
 public:
 	Socket(Config &server_config, size_t port);
 	Socket(const Socket &src);
@@ -39,5 +46,6 @@ public:
 
 	//GETTERS
 	pollfd						get_pollfd()	const;
-	Config&						get_config()	const;
+	Config						&get_config()	const;
+	size_t 						get_port()		const;
 };
