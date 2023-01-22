@@ -117,7 +117,7 @@ pollfd	Socket::get_pollfd() const {
 	return (_socket);
 }
 
-Config&	Socket::get_config() const {
+Config &Socket::get_config() const {
 	return (*_config);
 }
 

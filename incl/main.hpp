@@ -77,6 +77,7 @@ const std::string STR_SEMICOLON 			=	";";
 const std::string EQUAL_SIGN 				=	"=";
 
 //DEFAULTS
+const std::string DEFAULT_PATH = "config/test.conf";
 const std::string DEFAULT_INDEX = "index.html";
 const std::string DEFAULT_ERROR_PAGES_DIR = "config/default_error_pages";
 const std::string DEFAULT_REDIR_FIRST = "config";

@@ -16,10 +16,9 @@
 #include "tools.hpp"
 
 int main(int argc, char **argv) {
-	if (argc != 2)
-		return (parsing_error_basic(ARG_ERR, argv[0]));
-
 	//PARSING
+	if (argc > 2)
+		return (parsing_error_basic(ARG_ERR, argv[0]));
 	std::vector<Config>	server_configs;
 	ConfigParser		parser(server_configs, argv[1]);
 	std::vector<Socket>	sockets;

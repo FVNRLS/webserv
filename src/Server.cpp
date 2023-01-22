@@ -50,7 +50,7 @@ Server::~Server() {}
  * 		If the error is EINTR, the function continues to the next iteration of the loop.
  * 		If the error is not EINTR, the function calls socket_error() and returns an error code.
  * 4. It iterates over the _sockets vector, checking for the POLLIN event on each file descriptor.
- * 		If the POLLIN event is set, it calls the process_incoming_request() function on the file descriptor.
+ * 		If the POLLIN event is set, it calls the process_request() function on the file descriptor.
  * 5. After handling all the _sockets in the vector, it checks if there is any input from the command-line interface (CLI).
  * 		If there is input, it calls the process_cli() function. If the process_cli() function returns an error,
  * 		the function returns an error code.
@@ -71,7 +71,7 @@ int Server::run() {
 		}
 		for (i = 0; i < _sockets->size(); i++) {
 			if (_poll_fds[i].revents & POLLIN) {
-				if (process_incoming_request(_poll_fds[i].fd, i) == EXIT_FAILURE)
+				if (process_request(_poll_fds[i].fd, i) == EXIT_FAILURE)
 					return (terminate_with_error(EXIT_FAILURE));
 			}
 		}
@@ -82,40 +82,44 @@ int Server::run() {
 	}
 }
 
-int Server::process_incoming_request(const int &socket_fd, size_t socket_nbr) {
+int Server::process_request(const int &socket_fd, size_t socket_nbr) {
 		struct sockaddr_in 	cli_addr;
 		socklen_t 			client_len;
 		int 				client_socket;
-		char 				client_buf[1024];
 		std::string 		request;
 		std::string 		content_length;
 		std::string 		response;
 
-
-		// Accept an incoming connection
 		client_len = sizeof(cli_addr);
 		client_socket = accept(socket_fd, (struct sockaddr *) &cli_addr, &client_len);
 		if (client_socket < 0)
 			return (server_error(ACCEPT_ERROR, &(*_sockets)[socket_nbr].get_config(), socket_nbr));
-		// Read a message from the client
-		recv(client_socket, client_buf, sizeof(client_buf), 0);
-		request = client_buf;
-		std::cout << request << std::endl;
 
-		// Echo the message back to the client
+		request = get_request(client_socket);
+		if (request.empty())
+			return (EXIT_FAILURE);
+			//todo: errorr
+		std::cout << request << std::endl;
 
 		response = generate_response(request, socket_nbr);
 		if (response.empty()) {
 			close(client_socket);
 			return (EXIT_FAILURE);
 		}
-
 		send(client_socket, response.c_str(), response.length(), 0);
-
-		// Clear buffer and close the socket
 		close(client_socket);
 
 	return (EXIT_SUCCESS);
+}
+
+std::string Server::get_request(int &client_socket) {
+	char		client_buf[1024];
+	std::string request;
+
+	if (recv(client_socket, client_buf, sizeof(client_buf), 0) < 0)
+		return ("");
+	request = client_buf;
+	return (request);
 }
 
 std::string Server::generate_response(const std::string &request, size_t socket_nbr) {
@@ -153,8 +157,7 @@ std::string	Server::parse_request(const std::string &request) {
 }
 
 
-// TERMINAL FUNCTIONS!!!!!!!!
-
+//TERMINAL FUNCTIONS
 int	Server::process_cli_input() {
 	switch (_cli.check_input()) {
 		case CLI_EMPTY:

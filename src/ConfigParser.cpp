@@ -15,9 +15,11 @@ std::string	trim(std::string &s);
 std::vector<std::string> split(std::string &s, char sep);
 
 //BASIC CLASS SETUP
-ConfigParser::ConfigParser(std::vector<Config> &servers, char *path) : _config_file(path), _serv_mode(false),
+ConfigParser::ConfigParser(std::vector<Config> &servers, char *path) : _config_file(DEFAULT_PATH), _serv_mode(false),
 _line_num(1), _pos(0), _conf_pos(0), _serv_cnt(0), _serv_def_start(0), _serv_def_end(0),
 _i_serv(-1), _i_loc(-1), _serv(&servers) {
+	if (path != NULL)
+		_config_file = path;
 
 	//VECTOR OF VALID SPECIAL CHARACTERS
 	_spec_chars.push_back(OPEN_CURLY_BRACE);

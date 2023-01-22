@@ -26,7 +26,8 @@ private:
 	CLI							_cli;
 
 	//CORE FUNCTIONS
-	int 						process_incoming_request(const int &socket_fd, size_t socket_nbr);
+	int 						process_request(const int &socket_fd, size_t socket_nbr);
+	std::string 				get_request(int &client_socket);
 	std::string 				generate_response(const std::string &request, size_t socket_nbr);
 	std::string					parse_request(const std::string &request);
 
