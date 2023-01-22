@@ -11,28 +11,9 @@
 /* ************************************************************************** */
 
 #include "ConfigParser.hpp"
+#include "Socket.hpp"
 #include "Server.hpp"
 #include "tools.hpp"
-
-int	run_servers(const std::vector<Config> &server_configs, std::vector<Server> &servers) {
-	pid_t	pid;
-
-	for (size_t i = 0; i < server_configs.size(); i++) {
-		pid = fork();
-		if (pid < 0) {
-			perror("Fork failed!\n");
-			return (EXIT_FAILURE);
-		}
-		if (pid == 0) {
-			if (servers[i].run() == EXIT_FAILURE)
-				exit (EXIT_FAILURE); //todo: it will be fork!
-			exit(EXIT_SUCCESS);
-		}
-	}
-	siginfo_t infop;
-	while (waitid(P_ALL, 0, &infop, WEXITED | WSTOPPED | WCONTINUED) == 0);
-	return (EXIT_SUCCESS);
-}
 
 int main(int argc, char **argv) {
 	if (argc != 2)
@@ -41,22 +22,26 @@ int main(int argc, char **argv) {
 	//PARSING
 	std::vector<Config>	server_configs;
 	ConfigParser		parser(server_configs, argv[1]);
-	std::vector<Server> servers;
+	std::vector<Socket>	sockets;
+	Server				server;
 
 	if (parser.parse() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 //	print_configurations(server_configs);
 
-	//SERVER CORE
-	servers.reserve(server_configs.size());
-	for (size_t i = 0; i < server_configs.size(); i++)
-		servers[i] = Server(server_configs[i]);
+	//CREATING PULL OF ACTIVE SOCKETS
+	for (size_t i = 0; i < server_configs.size(); i++) {
+		size_t	num_ports = server_configs[i].get_ports().size();
+		for (size_t j = 0; j < num_ports; j++) {
+			Socket	new_socket(server_configs[i], j);
+			if (new_socket.activate() == EXIT_SUCCESS)
+				sockets.push_back(new_socket);
+		}
+	}
 
-	//TODO: create POLL-Class for request - handling and access sockets through getters! Run servers in while loop and not in forks!
-	//TODO: Shrink serv functionality only until listen()
+	//SERVER CORE (MAIN LOOP)
+	if (!sockets.empty())
+		server.run(sockets);
 
-//	if (servers[0].run() == EXIT_FAILURE)
-//		return (EXIT_FAILURE);
-
-	return (run_servers(server_configs, servers));
+	return (EXIT_SUCCESS);
 }

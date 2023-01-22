@@ -1,17 +1,10 @@
 # ninja log v5
-3	1107	1674321675000000000	CMakeFiles/webserver.dir/src/ConfigParser.cpp.o	68bc7a944fac86c1
-1	121	1674217457000000000	build.ninja	f1bdf160c9682030
-2	562	1674325376000000000	CMakeFiles/webserver.dir/src/error_handler.cpp.o	e1e11c63f4978a7c
-576	690	1674325376000000000	webserver	39c10ba914d4f92d
-3	846	1674321674000000000	CMakeFiles/webserver.dir/src/Config.cpp.o	b11db586e21c9121
-2	576	1674325376000000000	CMakeFiles/webserver.dir/src/main.cpp.o	e4069d92c7575fb2
-0	855	1674156140000000000	CMakeFiles/webserver.dir/src/Client.cpp.o	2a1b3b30d3b309e
-4	716	1674321674000000000	CMakeFiles/webserver.dir/src/tools/split.cpp.o	ea692eaa2ce9bc67
-2	581	1674324631000000000	CMakeFiles/webserver.dir/src/Server.cpp.o	f99adc54d0869dca
-3	640	1674321674000000000	CMakeFiles/webserver.dir/src/tools/trim.cpp.o	6c350b3085de7fbb
-2	446	1674325396000000000	CMakeFiles/webserver.dir/src/error_handler.cpp.o	e1e11c63f4978a7c
-446	511	1674325397000000000	webserver	39c10ba914d4f92d
-2	451	1674325422000000000	CMakeFiles/webserver.dir/src/error_handler.cpp.o	e1e11c63f4978a7c
-451	536	1674325422000000000	webserver	39c10ba914d4f92d
-3	476	1674325616000000000	CMakeFiles/webserver.dir/src/main.cpp.o	e4069d92c7575fb2
-476	557	1674325617000000000	webserver	39c10ba914d4f92d
+5	974	1674390822000000000	CMakeFiles/webserver.dir/src/tools/trim.cpp.o	6c350b3085de7fbb
+4	1144	1674390822000000000	CMakeFiles/webserver.dir/src/Server.cpp.o	f99adc54d0869dca
+4	1144	1674390822000000000	CMakeFiles/webserver.dir/src/error_handler.cpp.o	e1e11c63f4978a7c
+4	1144	1674390822000000000	CMakeFiles/webserver.dir/src/main.cpp.o	e4069d92c7575fb2
+5	1006	1674390822000000000	CMakeFiles/webserver.dir/src/Socket.cpp.o	ff1e410a5c0c5b12
+4	1193	1674390823000000000	CMakeFiles/webserver.dir/src/Config.cpp.o	b11db586e21c9121
+1444	1518	1674390823000000000	webserver	32b234ad1fac6e3b
+5	1194	1674390822000000000	CMakeFiles/webserver.dir/src/tools/split.cpp.o	ea692eaa2ce9bc67
+4	1444	1674390823000000000	CMakeFiles/webserver.dir/src/ConfigParser.cpp.o	68bc7a944fac86c1

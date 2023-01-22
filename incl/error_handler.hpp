@@ -61,6 +61,7 @@ enum server_errors {
 	LISTEN_ERROR,
 	POLL_ERROR,
 	ACCEPT_ERROR,
+	CLI_ERROR,
 };
 
-int server_error(int error, const Config &conf, size_t i);
+int server_error(int error, const Config *conf, size_t i);

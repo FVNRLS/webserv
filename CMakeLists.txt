@@ -18,6 +18,12 @@ add_executable(webserver
         src/error_handler.cpp
         incl/error_handler.hpp
 
+        src/Socket.cpp
+        incl/Socket.hpp
+
+        src/CLI.cpp
+        incl/CLI.hpp
+
         src/Server.cpp
         incl/Server.hpp
 

@@ -5,41 +5,39 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: rmazurit <rmazurit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/12 13:36:52 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/12 13:36:52 by rmazurit         ###   ########.fr       */
+/*   Created: 2023/01/22 10:35:23 by rmazurit          #+#    #+#             */
+/*   Updated: 2023/01/22 10:35:23 by rmazurit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "main.hpp"
-#include "Socket.hpp"
 #include "Config.hpp"
+#include "main.hpp"
 
-class Server {
+class Socket {
 
 private:
-	std::vector<Socket>			_sockets;
-	std::vector<pollfd>			_socket_fds;
+	Config						*_config;
+	sockaddr_in					_serv_addr;
+	pollfd						_socket;
+	size_t 						_port;
 
 	//CORE FUNCTIONS
-	int 						resolve_requests();
-	int 						process_incoming_request(const int &socket_fd, size_t socket_nbr);
-	std::string 				generate_response(const std::string &request);
-	std::string					parse_request(const std::string &request);
-
-	//TERMINAL INTERACTION
-	void						exit_server();
+	void						set_serv_addr();
+	int							init_unblock_sockets();
+	int 						bind_socket();
+	int							listen_to_connections();
 
 public:
-	Server();
-	Server(const Server &src);
-	Server &operator=(const Server &src);
-	~Server();
+	Socket(Config &server_config, size_t port);
+	Socket(const Socket &src);
+	Socket &operator=(const Socket &src);
+	~Socket();
 
-	void 						run(std::vector<Socket> &sockets);
+	int 						activate();
+
+	//GETTERS
+	pollfd						get_socket();
+	Config						get_config();
 };
-
-
-
-

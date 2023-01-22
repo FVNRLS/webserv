@@ -17,9 +17,12 @@
 #include <sstream>
 #include <algorithm>
 #include <string>
+#include <cstring>
+#include <csignal>
 #include <vector>
 #include <list>
 #include <map>
+#include <iomanip>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -41,7 +44,6 @@
 enum chars {
 	NOT_FOUND 			= (-1),
 	SPEC_IDENTIFIER 	= (-2),
-	CLOSE_SERVER_CMD	= (-3),
 	OPEN_CURLY_BRACE 	= '{',
 	CLOSED_CURLY_BRACE	= '}',
  	NEWLINE				= '\n',
@@ -51,6 +53,14 @@ enum chars {
  	HASH				= '#',
  	NULL_TERM			= '\0',
  	TAB					= '\t'
+};
+
+enum cli_flags {
+	CLI_EMPTY,
+	CLI_FAIL,
+	EXIT,
+	LS,
+	HELP,
 };
 
 //NUMERIC CONSTANTS

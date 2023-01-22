@@ -10,6 +10,7 @@ SRC =	./src/main.cpp \
 		./src/Config.cpp \
 		./src/ConfigParser.cpp \
 		./src/error_handler.cpp \
+		./src/Socket.cpp \
 		./src/Server.cpp \
 		./src/tools/split.cpp \
 		./src/tools/trim.cpp

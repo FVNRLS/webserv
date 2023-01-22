@@ -9,5 +9,5 @@ This project is about writing your own HTTP server. You will be able to test it 
 # How does it work?
 ## Setup
 - compile with ``make``, compile with Cmake, compile with GODS HELP....
-- run with ``webserv`` and specify the configuration file
+- activate with ``webserv`` and specify the configuration file
 - pick a browser of your choice and visit the server's website by entering the address specified in the ``*.conf`` file (standard is localhost)
