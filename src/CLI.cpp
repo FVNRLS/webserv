@@ -38,6 +38,7 @@ int CLI::start() {
 }
 
 int CLI::check_input() {
+	_input.clear();
 	if (read_input() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	if (_input.empty())

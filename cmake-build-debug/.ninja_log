@@ -22,3 +22,9 @@
 1114	1180	1674404300000000000	webserver	9fa4fbda2d54f283
 2	556	1674404366000000000	CMakeFiles/webserver.dir/src/Server.cpp.o	f99adc54d0869dca
 556	608	1674404366000000000	webserver	9fa4fbda2d54f283
+2	496	1674406211000000000	CMakeFiles/webserver.dir/src/Socket.cpp.o	ff1e410a5c0c5b12
+3	533	1674406211000000000	CMakeFiles/webserver.dir/src/CLI.cpp.o	d27d696acbe722d7
+3	627	1674406211000000000	CMakeFiles/webserver.dir/src/Server.cpp.o	f99adc54d0869dca
+627	887	1674406212000000000	webserver	9fa4fbda2d54f283
+2	490	1674406389000000000	CMakeFiles/webserver.dir/src/CLI.cpp.o	d27d696acbe722d7
+490	643	1674406389000000000	webserver	9fa4fbda2d54f283
