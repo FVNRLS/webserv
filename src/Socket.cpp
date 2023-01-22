@@ -83,9 +83,9 @@ int Socket::init_unblock_sockets() {
 	_socket.events = POLLIN;
 	_socket.fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_socket.fd < 0)
-		return  (server_error(SOCKET_OPEN_ERROR, _config, i));
+		return  (socket_error(SOCKET_OPEN_ERROR, _config, i));
 	if (fcntl(_socket.fd, F_SETFL, fcntl(_socket.fd, F_GETFL) | O_NONBLOCK) < 0)
-		return  (server_error(SOCKET_OPEN_ERROR, _config, i));
+		return  (socket_error(SOCKET_OPEN_ERROR, _config, i));
 	return (EXIT_SUCCESS);
 }
 
@@ -98,7 +98,7 @@ int Socket::init_unblock_sockets() {
  * */
 int Socket::bind_socket() {
 	if (bind(_socket.fd, (struct sockaddr *)&_serv_addr, sizeof(_serv_addr)) < 0)
-		return (server_error(BIND_ERROR, _config, _port));
+		return (socket_error(BIND_ERROR, _config, _port));
 	std::cout << "bind success on " << inet_ntoa(_serv_addr.sin_addr) << ":" << ntohs(_serv_addr.sin_port)
 			  << std::endl; //todo: DEL
 	return (EXIT_SUCCESS);
@@ -109,13 +109,13 @@ int Socket::bind_socket() {
  * */
 int	Socket::listen_to_connections() {
 	if (listen(_socket.fd, MAX_CONNECTIONS) < 0)
-		return (server_error(LISTEN_ERROR, _config, _port));
+		return (socket_error(LISTEN_ERROR, _config, _port));
 	return (EXIT_SUCCESS);
 }
 
 
 //GETTERS
-pollfd	Socket::get_socket() {
+pollfd	Socket::get_pollfd() {
 	return (_socket);
 }
 

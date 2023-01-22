@@ -38,6 +38,6 @@ public:
 	int 						activate();
 
 	//GETTERS
-	pollfd						get_socket();
+	pollfd						get_pollfd();
 	Config						get_config();
 };

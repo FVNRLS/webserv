@@ -14,13 +14,16 @@
 
 #include "main.hpp"
 #include "Socket.hpp"
+#include "CLI.hpp"
 #include "Config.hpp"
 
 class Server {
 
 private:
-	std::vector<Socket>			_sockets;
-	std::vector<pollfd>			_socket_fds;
+	std::vector<Socket>			*_sockets;
+	std::vector<pollfd>			_poll_fds;
+	size_t 						_num_fds;
+	CLI							_cli;
 
 	//CORE FUNCTIONS
 	int 						resolve_requests();
@@ -30,14 +33,15 @@ private:
 
 	//TERMINAL INTERACTION
 	void						exit_server();
+	int 						exit_with_error();
 
 public:
-	Server();
+	Server(std::vector<Socket> &sockets);
 	Server(const Server &src);
 	Server &operator=(const Server &src);
 	~Server();
 
-	void 						run(std::vector<Socket> &sockets);
+	void 						run();
 };
 
 

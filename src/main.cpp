@@ -23,7 +23,6 @@ int main(int argc, char **argv) {
 	std::vector<Config>	server_configs;
 	ConfigParser		parser(server_configs, argv[1]);
 	std::vector<Socket>	sockets;
-	Server				server;
 
 	if (parser.parse() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
@@ -40,8 +39,10 @@ int main(int argc, char **argv) {
 	}
 
 	//SERVER CORE (MAIN LOOP)
-	if (!sockets.empty())
-		server.run(sockets);
+	if (!sockets.empty()) {
+		Server	server(sockets);
+		server.run();
+	}
 
 	return (EXIT_SUCCESS);
 }

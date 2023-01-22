@@ -64,4 +64,4 @@ enum server_errors {
 	CLI_ERROR,
 };
 
-int server_error(int error, const Config *conf, size_t i);
+int socket_error(int error, const Config *conf, size_t i);

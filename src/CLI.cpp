@@ -33,7 +33,7 @@ CLI::~CLI() {}
 
 int CLI::start() {
 	if (fcntl(_std_in.fd, F_SETFL, fcntl(_std_in.fd, F_GETFL) | O_NONBLOCK) < 0)
-		return  (server_error(SOCKET_OPEN_ERROR, NULL, 0));
+		return  (socket_error(SOCKET_OPEN_ERROR, NULL, 0));
 	return (EXIT_SUCCESS);
 }
 
@@ -59,7 +59,7 @@ int CLI::read_input() {
 
 	std_in.open("/dev/stdin");
 	if (!std_in.is_open() || std_in.fail()) {
-		server_error(SOCKET_OPEN_ERROR, NULL, 0);
+		socket_error(SOCKET_OPEN_ERROR, NULL, 0);
 		return (CLI_FAIL);
 	}
 	_input.append((std::istreambuf_iterator<char>(std_in)), std::istreambuf_iterator<char>());
