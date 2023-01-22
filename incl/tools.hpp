@@ -36,3 +36,4 @@ void	print_configurations(std::vector<Config> &server_configs) {
 
 std::string 				trim(std::string &s);
 std::vector<std::string>	split(std::string &s, char sep);
+void 						silence_sigint();

@@ -18,7 +18,6 @@
 #include <algorithm>
 #include <string>
 #include <cstring>
-#include <csignal>
 #include <vector>
 #include <list>
 #include <map>

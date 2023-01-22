@@ -32,7 +32,7 @@ CLI &CLI::operator=(const CLI &src) {
 CLI::~CLI() {}
 
 int CLI::start() {
-	if (fcntl(_std_in.fd, F_SETFL, fcntl(_std_in.fd, F_GETFL) | O_NONBLOCK) < 0)
+	if (fcntl(_std_in.fd, F_SETFL, O_NONBLOCK) < 0)
 		return  (socket_error(SOCKET_OPEN_ERROR, NULL, 0));
 	return (EXIT_SUCCESS);
 }

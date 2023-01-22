@@ -32,4 +32,4 @@ add_executable(webserver
         src/tools/split.cpp
         incl/tools.hpp
 
-        )
+        src/tools/signal_handler.cpp)

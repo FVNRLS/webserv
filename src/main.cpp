@@ -38,6 +38,7 @@ int main(int argc, char **argv) {
 	}
 	//SERVER CORE (MAIN LOOP)
 	if (!sockets.empty()) {
+		silence_sigint();
 		Server	server(sockets);
 		if (server.run() == EXIT_FAILURE)
 			return (EXIT_FAILURE);

@@ -14,7 +14,8 @@ SRC =	./src/main.cpp \
 		./src/Server.cpp \
 		./src/CLI.cpp \
 		./src/tools/split.cpp \
-		./src/tools/trim.cpp
+		./src/tools/trim.cpp \
+		./src/tools/signal_handler.cpp \
 
 INCL =	./incl/
 

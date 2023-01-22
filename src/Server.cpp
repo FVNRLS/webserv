@@ -45,16 +45,12 @@ Server::~Server() {}
  * 1. The function runs in an infinite loop.
  * 2. Within the loop, it calls the poll() function on the _sockets vector, with a timeout of -1
  * 		(meaning it will wait indefinitely) to wait for incoming connections.
- * 3. It checks the return value of poll() for errors.
- * 		If an error occurs, it checks if the error is EINTR -> indicates that the system call was interrupted by a signal.
- * 		If the error is EINTR, the function continues to the next iteration of the loop.
- * 		If the error is not EINTR, the function calls socket_error() and returns an error code.
- * 4. It iterates over the _sockets vector, checking for the POLLIN event on each file descriptor.
+ * 3. It iterates over the _sockets vector, checking for the POLLIN event on each file descriptor.
  * 		If the POLLIN event is set, it calls the process_request() function on the file descriptor.
- * 5. After handling all the _sockets in the vector, it checks if there is any input from the command-line interface (CLI).
+ * 4. After handling all the _sockets in the vector, it checks if there is any input from the command-line interface (CLI).
  * 		If there is input, it calls the process_cli() function. If the process_cli() function returns an error,
  * 		the function returns an error code.
- * 6. The function exits the infinite loop and returns EXIT_SUCCESS to indicate that it completed successfully.
+ * 5. The function exits the infinite loop and returns EXIT_SUCCESS to indicate that it completed successfully.
  * */
 int Server::run() {
 	size_t i;
@@ -65,8 +61,7 @@ int Server::run() {
 
 	while (true) {
 		if (poll(&_poll_fds[0], _num_fds, -1) < 0) {
-			if (errno == EINTR)
-				continue;
+
 			return (terminate_with_error(socket_error(POLL_ERROR, NULL, 0)));
 		}
 		for (i = 0; i < _sockets->size(); i++) {

@@ -82,7 +82,7 @@ int Socket::init_unblock_sockets() {
 	_socket.fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_socket.fd < 0)
 		return  (socket_error(SOCKET_OPEN_ERROR, _config, 0));
-	if (fcntl(_socket.fd, F_SETFL, fcntl(_socket.fd, F_GETFL) | O_NONBLOCK) < 0)
+	if (fcntl(_socket.fd, F_SETFL, O_NONBLOCK) < 0)
 		return  (socket_error(SOCKET_OPEN_ERROR, _config, 0));
 	return (EXIT_SUCCESS);
 }
