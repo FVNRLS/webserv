@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CLI.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rmazurit <rmazurit@student.42.fr>          +#+  +:+       +#+        */
+/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/22 13:38:32 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/22 13:38:32 by rmazurit         ###   ########.fr       */
+/*   Updated: 2023/01/22 17:44:21 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,9 @@ int CLI::check_input() {
 		*it = std::toupper(*it);
 	std::cout << _input << std::endl;
 
-	if (_input == "CLI_EXIT\n")
+	if (_input == "EXIT\n")
 		return (CLI_EXIT);
-	if (_input == "CLI_LS\n")
+	if (_input == "LS\n")
 		return (CLI_LS);
 	return (CLI_HELP);
 }
