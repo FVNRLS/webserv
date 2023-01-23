@@ -25,6 +25,7 @@ Config &Config::operator=(const Config &src) {
 	_name = src._name;
 	_ip = src._ip;
 	_ports = src._ports;
+	_port = src._port;
 	_root = src._root;
 	_methods = src._methods;
 	_index = src._index;
@@ -32,6 +33,7 @@ Config &Config::operator=(const Config &src) {
 	_error_pages_dir = src._error_pages_dir;
 	_redirect = src._redirect;
 	_locations = src._locations;
+	_is_unique = src._is_unique;
 	return (*this);
 }
 

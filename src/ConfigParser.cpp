@@ -11,8 +11,6 @@
 /* ************************************************************************** */
 
 #include "ConfigParser.hpp"
-std::string	trim(std::string &s);
-std::vector<std::string> split(std::string &s, char sep);
 
 //BASIC CLASS SETUP
 ConfigParser::ConfigParser(std::vector<Config> &servers, char *path) : _config_file(DEFAULT_PATH), _serv_mode(false),
@@ -105,7 +103,7 @@ int	ConfigParser::parse() {
 	if (check_required_param_def() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	extract_configs();
-	
+	set_unique_flags();
 	return EXIT_SUCCESS;
 }
 
@@ -810,9 +808,9 @@ void	ConfigParser::extract_configs() {
 		new_config = *it;
 		for (size_t i = 0; i < it->get_ports().size(); i++)	{
 			new_config._port =  it->get_ports()[i];
-			new_config._ports.clear();
 			_configs->push_back(new_config);
 		}
+		new_config._ports.clear();
 	}
 }
 
@@ -823,10 +821,10 @@ void	ConfigParser::set_unique_flags() {
 	for (size_t i = 0; i < _configs->size() - 1; i++) {
 		port1 = (*_configs)[i].get_port();
 		ip1 = (*_configs)[i].get_ip();
-		for (size_t j = i; i < _configs->size(); j++) {
+		for (size_t j = i + 1; j < _configs->size(); j++) {
 			port2 = (*_configs)[j].get_port();
 			ip2 = (*_configs)[j].get_ip();
-			if (ip1 == ip2 && port1 == port2) {
+			if (port1 == port2 && ip1 == ip2) {
 				(*_configs)[i]._is_unique = false;
 				(*_configs)[j]._is_unique = false;
 			}
