@@ -13,10 +13,10 @@
 #include "Socket.hpp"
 
 //BASIC CLASS SETUP
-Socket::Socket(Config &server_config, size_t port) {
+Socket::Socket(Config &server_config) {
 	_config = &server_config;
-	_port = port;
-	_ip_port_unique = true;
+	_port = _config->get_port();
+	_is_unique = _config->get_is_unique();
 }
 
 Socket::Socket(const Socket &src) {
@@ -65,7 +65,7 @@ void Socket::set_serv_addr() {
 	ip_addr = inet_addr(_config->get_ip().c_str());
 	memset(&_serv_addr, 0, sizeof(_serv_addr));
 	_serv_addr.sin_family = AF_INET;
-	_serv_addr.sin_port = htons(_config->get_ports()[_port]); // server port
+	_serv_addr.sin_port = htons(_config->get_port()); // server port
 	_serv_addr.sin_addr.s_addr = ip_addr; // server ip_address
 }
 
@@ -79,12 +79,19 @@ void Socket::set_serv_addr() {
 
  * */
 int Socket::init_unblock_sockets() {
+	std::string server_name = _config->get_name();
+
 	_socket.events = POLLIN;
 	_socket.fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_socket.fd < 0)
 		return  (socket_error(SOCKET_OPEN_ERROR));
 	if (fcntl(_socket.fd, F_SETFL, O_NONBLOCK) < 0)
 		return  (socket_error(SOCKET_OPEN_ERROR));
+	// If the server name is not unique, set the SO_REUSEADDR option
+	if (!_is_unique) {
+		if (setsockopt(_socket.fd, SOL_SOCKET, SO_REUSEPORT, server_name.c_str(), server_name.length()) < 0)
+			return (socket_error(BIND_ERROR));
+	}
 	return (EXIT_SUCCESS);
 }
 
@@ -96,10 +103,11 @@ int Socket::init_unblock_sockets() {
  * it can be used to send or receive data.
  * */
 int Socket::bind_socket() {
+
+	// Bind the socket to the server address
 	if (bind(_socket.fd, (struct sockaddr *)&_serv_addr, sizeof(_serv_addr)) < 0)
 		return (socket_error(BIND_ERROR));
-	std::cout << "bind success on " << inet_ntoa(_serv_addr.sin_addr) << ":" << ntohs(_serv_addr.sin_port)
-			  << std::endl; //todo: DEL
+	std::cout << "bind success on " << inet_ntoa(_serv_addr.sin_addr) << ":" << ntohs(_serv_addr.sin_port) << std::endl;
 	return (EXIT_SUCCESS);
 }
 
@@ -143,16 +151,3 @@ int Socket::socket_error(int error) const {
 	}
 	return (EXIT_FAILURE);
 }
-
-////todo: refactor to set flags
-//int	Socket::check_ip_port_combinations() {
-//	for (size_t i = 0; i < _serv_cnt - 1; i++) {
-//		for (size_t j = i + 1; j < _serv_cnt; ++j) {
-//			if ((*_serv)[i]._ip_port_comb == (*_serv)[j]._ip_port_comb)
-//				if ((*_serv)[i]._name == (*_serv)[j]._name)
-//					return (parsing_error_param(DUPLICATE_IP_PORT_COMB, _config_file,
-//												(*_serv)[_i_serv]._locations[_i_loc].prefix));
-//		}
-//	}
-//	return (EXIT_SUCCESS);
-//}

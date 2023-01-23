@@ -27,12 +27,9 @@ int main(int argc, char **argv) {
 
 	//CREATING PULL OF ACTIVE SOCKETS
 	for (size_t i = 0; i < server_configs.size(); i++) {
-		size_t	num_ports = server_configs[i].get_ports().size();
-		for (size_t j = 0; j < num_ports; j++) {
-			Socket	new_socket(server_configs[i], j);
-			if (new_socket.activate() == EXIT_SUCCESS)
-				sockets.push_back(new_socket);
-		}
+		Socket	new_socket(server_configs[i]);
+		if (new_socket.activate() == EXIT_SUCCESS)
+			sockets.push_back(new_socket);
 	}
 	//SERVER CORE (MAIN LOOP)
 	if (!sockets.empty()) {

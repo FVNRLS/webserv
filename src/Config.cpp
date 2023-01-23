@@ -170,6 +170,10 @@ std::vector<location>	Config::get_locations() const {
 	return (_locations);
 }
 
+bool Config::get_is_unique() const {
+	return (_is_unique);
+}
+
 std::vector<std::pair<std::string, std::string> >	Config::get_redirect() const {
 	return (_redirect);
 }
