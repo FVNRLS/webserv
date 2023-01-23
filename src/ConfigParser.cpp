@@ -17,7 +17,7 @@ std::vector<std::string> split(std::string &s, char sep);
 //BASIC CLASS SETUP
 ConfigParser::ConfigParser(std::vector<Config> &servers, char *path) : _config_file(DEFAULT_PATH), _serv_mode(false),
 _line_num(1), _pos(0), _conf_pos(0), _serv_cnt(0), _serv_def_start(0), _serv_def_end(0),
-_i_serv(-1), _i_loc(-1), _serv(&servers) {
+_i_serv(-1), _i_loc(-1), _configs(&servers) {
 	if (path != NULL)
 		_config_file = path;
 
@@ -76,7 +76,8 @@ ConfigParser &ConfigParser::operator=(const ConfigParser &src) {
 	_valid_identifiers = src._valid_identifiers;
 	_spec_valid_identifiers = src._spec_valid_identifiers;
 	_valid_methods = src._valid_methods;
-	*_serv = *src._serv; //todo: is it right?
+	_serv = src._serv;
+	_configs = src._configs;
 	_serv_blocks = src._serv_blocks;
 	_tokens = src._tokens;
 	_func_tab = src._func_tab;
@@ -104,7 +105,7 @@ int	ConfigParser::parse() {
 	if (check_required_param_def() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 
-
+	*_configs = _serv;
 	return EXIT_SUCCESS;
 }
 
@@ -183,7 +184,7 @@ int	ConfigParser::split_in_server_blocks() {
 void	ConfigParser::create_servers() {
 	for (size_t i = 0; i < _serv_cnt; i++) {
 		Config	serv;
-		_serv->push_back(serv);
+		_serv.push_back(serv);
 	}
 }
 
@@ -386,7 +387,7 @@ int ConfigParser::add_location() {
 		return (EXIT_FAILURE);
 	loc.max_client_body_size = UINT32_MAX;
 	loc.directory_listing = false;
-	(*_serv)[_i_serv]._locations.push_back(loc);
+	_serv[_i_serv]._locations.push_back(loc);
 	_i_loc++;
 	return (EXIT_SUCCESS);
 }
@@ -396,7 +397,7 @@ int ConfigParser::add_location() {
 int ConfigParser::set_loc_prefix(location &loc) {
 	std::vector<location>	*locs;
 
-	locs = &(*_serv)[_i_serv]._locations;
+	locs = &_serv[_i_serv]._locations;
 	if (_tokens.size() != 2)
 		return (parsing_error_line(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 	for (size_t i = 0; i < locs->size(); i++) {
@@ -411,13 +412,13 @@ int ConfigParser::set_server_name() {
 	size_t	num_tokens;
 
 	num_tokens = _tokens.size();
-	if ((*_serv)[_i_serv]._name.empty()) {
+	if (_serv[_i_serv]._name.empty()) {
 		if (_serv_mode) {
 			if (num_tokens < 2)
 				return (EXIT_SUCCESS);
 			else if (num_tokens > 2)
 				return (parsing_error_line(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
-			(*_serv)[_i_serv]._name = _tokens[1];
+			_serv[_i_serv]._name = _tokens[1];
 			return (EXIT_SUCCESS);
 		}
 		else
@@ -431,10 +432,10 @@ int ConfigParser::set_ip_address() {
 	std::vector<std::string>	_octets;
 	std::vector<long>			_octet_val;
 
-	if ((*_serv)[_i_serv]._ip.empty()) {
+	if (_serv[_i_serv]._ip.empty()) {
 		if (_serv_mode) {
 			if (_tokens.size() == 2) {
-				(*_serv)[_i_serv]._ip = _tokens[1];
+				_serv[_i_serv]._ip = _tokens[1];
 
 				_octets = split(_tokens[1], DOT);
 				if (_octets.size() == 4)
@@ -465,7 +466,7 @@ int ConfigParser::set_port() {
 	std::stringstream 			ss;
 	std::string 				error_string;
 
-	_ports = &(*_serv)[_i_serv]._ports;
+	_ports = &_serv[_i_serv]._ports;
 	if (_serv_mode) {
 		if (_tokens.size() == 2) {
 			port = strtoll(_tokens[1].c_str(), &endptr, 10);
@@ -492,9 +493,9 @@ int ConfigParser::set_root() {
 	std::string *param;
 
 	if (_serv_mode)
-		param = &(*_serv)[_i_serv]._root;
+		param = &_serv[_i_serv]._root;
 	else
-		param = &(*_serv)[_i_serv]._locations[_i_loc].root;
+		param = &_serv[_i_serv]._locations[_i_loc].root;
 	if (!param->empty())
 		return (parsing_error_line(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 	else if (_tokens.size() != 2)
@@ -512,9 +513,9 @@ int ConfigParser::set_allowed_methods() {
 	num_methods = _tokens.size() - 1;
 	num_valid_methods = _valid_methods.size();
 	if (_serv_mode)
-		param = &(*_serv)[_i_serv]._methods;
+		param = &_serv[_i_serv]._methods;
 	else
-		param = &(*_serv)[_i_serv]._locations[_i_loc].methods;
+		param = &_serv[_i_serv]._locations[_i_loc].methods;
 
 	if (!param->empty())
 		return (parsing_error_line(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
@@ -543,9 +544,9 @@ int ConfigParser::set_index() {
 
 	num_tokens = _tokens.size();
 	if (_serv_mode)
-		param = &(*_serv)[_i_serv]._index;
+		param = &_serv[_i_serv]._index;
 	else
-		param = &(*_serv)[_i_serv]._locations[_i_loc].index;
+		param = &_serv[_i_serv]._locations[_i_loc].index;
 	if (!param->empty())
 		return (parsing_error_line(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 	else if (num_tokens > 2)
@@ -564,9 +565,9 @@ int ConfigParser::set_max_client_body_size() {
 
 	num_tokens = _tokens.size();
 	if (_serv_mode)
-		param = &(*_serv)[_i_serv]._max_client_body_size;
+		param = &_serv[_i_serv]._max_client_body_size;
 	else
-		param = &(*_serv)[_i_serv]._locations[_i_loc].max_client_body_size;
+		param = &_serv[_i_serv]._locations[_i_loc].max_client_body_size;
 	if (*param != UINT32_MAX)
 		return (parsing_error_line(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 	else if (num_tokens > 2)
@@ -586,7 +587,7 @@ int ConfigParser::set_error_pages_dir() {
 
 	num_tokens = _tokens.size();
 	if (_serv_mode)
-		param = &(*_serv)[_i_serv]._error_pages_dir;
+		param = &_serv[_i_serv]._error_pages_dir;
 	else
 		return (parsing_error_line(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
 	if (!param->empty())
@@ -607,9 +608,9 @@ int ConfigParser::set_redirection() {
 
 	num_tokens = _tokens.size();
 	if (_serv_mode)
-		param = &(*_serv)[_i_serv]._redirect;
+		param = &_serv[_i_serv]._redirect;
 	else
-		param = &(*_serv)[_i_serv]._locations[_i_loc].redirect;
+		param = &_serv[_i_serv]._locations[_i_loc].redirect;
 	if (!param->empty() && !_serv_mode)
 		return (parsing_error_line(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 
@@ -643,7 +644,7 @@ int ConfigParser::set_allowed_scripts() {
 	if (_serv_mode)
 		return (parsing_error_line(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
 	else
-		param = &(*_serv)[_i_serv]._locations[_i_loc].scripts;
+		param = &_serv[_i_serv]._locations[_i_loc].scripts;
 
 	if (num_tokens == 1) {
 		pair.first = DEFAULT_REDIR_FIRST;
@@ -670,7 +671,7 @@ int ConfigParser::set_directory_listing() {
 	num_tokens = _tokens.size();
 	if (_serv_mode)
 		return (parsing_error_line(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
-	else if ((*_serv)[_i_serv]._locations[_i_loc].directory_listing == true)
+	else if (_serv[_i_serv]._locations[_i_loc].directory_listing == true)
 		return (parsing_error_line(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 	else if (num_tokens > 2)
 		return (parsing_error_line(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
@@ -678,7 +679,7 @@ int ConfigParser::set_directory_listing() {
 		if (_tokens[1] == "false")
 			return (EXIT_SUCCESS);
 		else if (_tokens[1] == "true")
-			(*_serv)[_i_serv]._locations[_i_loc].directory_listing = true;
+			_serv[_i_serv]._locations[_i_loc].directory_listing = true;
 		else
 			return (parsing_error_line(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
 	}
@@ -691,11 +692,11 @@ int ConfigParser::set_cgi_path() {
 	num_tokens = _tokens.size();
 	if (_serv_mode)
 		return (parsing_error_line(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
-	else if (!(*_serv)[_i_serv]._locations[_i_loc].cgi_path.empty())
+	else if (!_serv[_i_serv]._locations[_i_loc].cgi_path.empty())
 		return (parsing_error_line(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 	else if (num_tokens > 2)
 		return (parsing_error_line(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
-	(*_serv)[_i_serv]._locations[_i_loc].cgi_path = _tokens[1];
+	_serv[_i_serv]._locations[_i_loc].cgi_path = _tokens[1];
 	return (EXIT_SUCCESS);
 }
 
@@ -725,12 +726,12 @@ int ConfigParser::check_server_name() {
 	std::stringstream 	ss;
 	std::string			*name;
 
-	name = &(*_serv)[_i_serv]._name;
+	name = &_serv[_i_serv]._name;
 	ss << "Default_Server_" << _i_serv;
 	if (name->empty())
 		*name = ss.str();
-	for (size_t i = 0; i < _serv->size(); i++) {
-		if (*name == (*_serv)[i]._name && i != _i_serv)
+	for (size_t i = 0; i < _serv.size(); i++) {
+		if (*name == _serv[i]._name && i != _i_serv)
 			return (parsing_error_param(SERVER_NAME_NOT_UNIQUE, _config_file, *name));
 	}
 	return (EXIT_SUCCESS);
@@ -739,34 +740,34 @@ int ConfigParser::check_server_name() {
 int ConfigParser::check_ip_address() {
 	std::string	*ip;
 
-	ip = &(*_serv)[_i_serv]._ip;
+	ip = &_serv[_i_serv]._ip;
 	if (ip->empty())
-		return (parsing_error_param(NO_IP_ADDRESS, _config_file, (*_serv)[_i_serv]._name));
+		return (parsing_error_param(NO_IP_ADDRESS, _config_file, _serv[_i_serv]._name));
 	return (EXIT_SUCCESS);
 }
 
 int ConfigParser::check_ports() {
 	std::vector <long>	*ports;
 
-	ports = &(*_serv)[_i_serv]._ports;
+	ports = &_serv[_i_serv]._ports;
 	if (ports->empty())
-		return (parsing_error_param(NO_PORTS, _config_file, (*_serv)[_i_serv]._name));
+		return (parsing_error_param(NO_PORTS, _config_file, _serv[_i_serv]._name));
 	return (EXIT_SUCCESS);
 }
 
 int ConfigParser::check_root() {
 	std::string	*root;
 
-	root = &(*_serv)[_i_serv]._root;
+	root = &_serv[_i_serv]._root;
 	if (root->empty())
-		return (parsing_error_param(NO_ROOT, _config_file, (*_serv)[_i_serv]._name));
+		return (parsing_error_param(NO_ROOT, _config_file, _serv[_i_serv]._name));
 	return (EXIT_SUCCESS);
 }
 
 int ConfigParser::check_loc_config() {
 	size_t		num_locs;
 
-	num_locs = (*_serv)[_i_serv]._locations.size();
+	num_locs = _serv[_i_serv]._locations.size();
 	for (_i_loc = 0; _i_loc < num_locs; _i_loc++) {
 		if (check_loc_index() == EXIT_FAILURE)
 			return (EXIT_FAILURE);
@@ -779,24 +780,24 @@ int ConfigParser::check_loc_config() {
 int ConfigParser::check_loc_index() {
 	std::string	*index;
 
-	index = &(*_serv)[_i_serv]._locations[_i_loc].index;
+	index = &_serv[_i_serv]._locations[_i_loc].index;
 	if (index->empty())
-		return (parsing_error_param(NO_INDEX, _config_file, (*_serv)[_i_serv]._locations[_i_loc].prefix));
+		return (parsing_error_param(NO_INDEX, _config_file, _serv[_i_serv]._locations[_i_loc].prefix));
 	return (EXIT_SUCCESS);
 }
 
 void 	ConfigParser::check_loc_root() {
 	std::string	*root;
 
-	root = &(*_serv)[_i_serv]._locations[_i_loc].root;
+	root = &_serv[_i_serv]._locations[_i_loc].root;
 	if (root->empty())
-		*root = (*_serv)[_i_serv]._locations[_i_loc].prefix;
+		*root = _serv[_i_serv]._locations[_i_loc].prefix;
 }
 
 void 	ConfigParser::check_cgi_path() {
 	std::string	*cgi;
 
-	cgi = &(*_serv)[_i_serv]._locations[_i_loc].cgi_path;
+	cgi = &_serv[_i_serv]._locations[_i_loc].cgi_path;
 	if (cgi->empty())
 		*cgi = DEFAULT_CGI_PATH;
 }
