@@ -29,7 +29,7 @@ _i_serv(-1), _i_loc(-1), _configs(&servers) {
 	_spec_chars.push_back(NULL_TERM);
 
 	//PAIRS OF VALID CONFIGURATION IDENTIFIERS AND FUNCTION POINTERS
-	_valid_identifiers.push_back("server_name"); 			_func_tab.push_back(&ConfigParser::set_server_name);
+	_valid_identifiers.push_back("server_name"); 			_func_tab.push_back(&ConfigParser::set_server_name_and_alias);
 	_valid_identifiers.push_back("ip_address");				_func_tab.push_back(&ConfigParser::set_ip_address);
 	_valid_identifiers.push_back("port");					_func_tab.push_back(&ConfigParser::set_port);
 	_valid_identifiers.push_back("root");					_func_tab.push_back(&ConfigParser::set_root);
@@ -406,7 +406,7 @@ int ConfigParser::set_loc_prefix(location &loc) {
 	return (EXIT_SUCCESS);
 }
 
-int ConfigParser::set_server_name() {
+int ConfigParser::set_server_name_and_alias() {
 	size_t	num_tokens;
 
 	num_tokens = _tokens.size();
@@ -417,6 +417,7 @@ int ConfigParser::set_server_name() {
 			else if (num_tokens > 2)
 				return (parsing_error_line(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 			_serv[_i_serv]._name = _tokens[1];
+			_serv[_i_serv]._alias = "www." + _serv[_i_serv]._name + ".com";
 			return (EXIT_SUCCESS);
 		}
 		else
@@ -723,11 +724,15 @@ int ConfigParser::check_serv_config() {
 int ConfigParser::check_server_name() {
 	std::stringstream 	ss;
 	std::string			*name;
+	std::string			*alias;
 
 	name = &_serv[_i_serv]._name;
+	alias = &_serv[_i_serv]._alias;
 	ss << "Default_Server_" << _i_serv;
-	if (name->empty())
+	if (name->empty()) {
 		*name = ss.str();
+		*alias = "www." + *name + ".com";
+	}
 	for (size_t i = 0; i < _serv.size(); i++) {
 		if (*name == _serv[i]._name && i != _i_serv)
 			return (parsing_error_param(SERVER_NAME_NOT_UNIQUE, _config_file, *name));

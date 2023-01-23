@@ -55,6 +55,8 @@ Server::~Server() {}
 int Server::run() {
 	size_t i;
 
+	print_configurations();
+
 	if (_cli.start() == EXIT_FAILURE)
 		exit_server();
 	_poll_fds.push_back(_cli.get_pollfd());

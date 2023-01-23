@@ -62,7 +62,7 @@ private:
 	int		get_func_index();
 	int 	add_location();
 	int 	set_loc_prefix(location &loc);
-	int 	set_server_name();
+	int 	set_server_name_and_alias();
 	int 	set_ip_address();
 	int 	set_port();
 	int 	set_root();

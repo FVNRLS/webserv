@@ -23,6 +23,7 @@ Config &Config::operator=(const Config &src) {
 	if (this == &src)
 		return (*this);
 	_name = src._name;
+	_alias = src._alias;
 	_ip = src._ip;
 	_ports = src._ports;
 	_port = src._port;
@@ -49,6 +50,7 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 	o << std::endl << "\033[31m****** SERVER " << s_upper_name << " *******\033[0m" << std::endl << std::endl;
 	o << "\033[33m****** SERVER CONFIGURATION *******\033[0m" << std::endl;
 	o << std::left << std::setw(28) << "NAME:" << s->get_name() << std::endl;
+	o << std::left << std::setw(28) << "ALIAS:" << s->get_alias() << std::endl;
 	o << std::left << std::setw(28) << "IP ADDRESS:" << s->get_ip() << std::endl;
 	o << std::left << std::setw(28) << "PORT:" << s->get_port() << std::endl;
 	o << std::left << std::setw(28) << "ROOT:" << s->get_root() << std::endl;
@@ -132,6 +134,10 @@ Config::~Config() {}
 //GETTERS
 std::string Config::get_name() const {
 	return (_name);
+}
+
+std::string	Config::get_alias() const {
+	return (_alias);
 }
 
 std::string	Config::get_ip() const {

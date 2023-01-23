@@ -32,6 +32,7 @@ class Config {
 private:
 	friend class 				ConfigParser;
 	std::string					_name;
+	std::string 				_alias;
 	std::string 				_ip;
 	std::vector<long> 			_ports;
 	long						_port;
@@ -55,6 +56,7 @@ public:
 
 	//GETTERS
 	std::string					get_name() const;
+	std::string					get_alias() const;
 	std::string					get_ip() const;
 	std::vector<long>			get_ports() const;
 	long						get_port() const;
