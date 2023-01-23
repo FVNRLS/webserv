@@ -45,4 +45,5 @@ public:
 	pollfd						get_pollfd()	const;
 	Config						&get_config()	const;
 	size_t 						get_port()		const;
+	bool 						get_is_unique() const;
 };

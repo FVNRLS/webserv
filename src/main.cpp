@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 	if (parser.parse() == EXIT_FAILURE)
 		return EXIT_FAILURE;
 
-	//CREATING PULL OF ACTIVE SOCKETS
+	//CREATING PULL OF ACTIVE SOCKETS //TODO: problem with unique flag!
 	for (size_t i = 0; i < server_configs.size(); i++) {
 		Socket	new_socket(server_configs[i]);
 		if (new_socket.activate() == EXIT_SUCCESS)

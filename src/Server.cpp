@@ -12,9 +12,6 @@
 
 #include "Server.hpp"
 
-std::string 				trim(std::string &s);
-std::vector<std::string>	split(std::string &s, char sep);
-
 //BASIC CLASS SETUP
 Server::Server(std::vector<Socket> &sockets) {
 	_sockets = &sockets;
@@ -78,28 +75,86 @@ int Server::run() {
 }
 
 int Server::process_request(const int &socket_fd, size_t socket_nbr) {
-		struct sockaddr_in 	cli_addr;
-		socklen_t 			client_len;
-		int 				client_socket;
-		std::string 		request;
-		std::string 		content_length;
-		std::string 		response;
+	bool 				socket_is_unique;
 
-		client_len = sizeof(cli_addr);
-		client_socket = accept(socket_fd, (struct sockaddr *) &cli_addr, &client_len);
-		if (client_socket < 0)
-			return (server_error(ACCEPT_ERROR, (*_sockets)[socket_nbr]));
-
-		request = get_request(client_socket);
-		if (request.empty())
-			return (server_error(RECV_ERROR, (*_sockets)[socket_nbr]));
-		std::cout << "PORT: " << (*_sockets)[socket_nbr].get_port() << " request:" << request << std::endl;
-
-		response = generate_response(request, socket_nbr);
-		send(client_socket, response.c_str(), response.length(), 0);
-		close(client_socket);
-
+	socket_is_unique = (*_sockets)[socket_nbr].get_is_unique();
+	if (socket_is_unique) {
+		if (serve_on_port(socket_fd, socket_nbr) == EXIT_FAILURE)
+			return (EXIT_FAILURE);
+	}
+	else if (serve_on_virtual_host(socket_fd, socket_nbr) < 0)
+		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
+}
+
+int Server::serve_on_port(const int &socket_fd, size_t socket_nbr) {
+	std::string 		content_length;
+	std::string 		response;
+	struct sockaddr_in 	cli_addr;
+	std::string 		request;
+	socklen_t 			client_len;
+	int 				client_socket;
+	client_socket = accept(socket_fd, (struct sockaddr *) &cli_addr, &client_len);
+	if (client_socket < 0)
+		return (server_error(ACCEPT_ERROR, (*_sockets)[socket_nbr]));
+
+	client_len = sizeof(cli_addr);
+	request = get_request(client_socket);
+	if (request.empty())
+		return (server_error(RECV_ERROR, (*_sockets)[socket_nbr]));
+	std::cout << "PORT: " << (*_sockets)[socket_nbr].get_port() << " request:" << request << std::endl;
+
+	response = generate_response(request, socket_nbr);
+	send(client_socket, response.c_str(), response.length(), 0);
+	close(client_socket);
+	return (EXIT_FAILURE);
+}
+
+int Server::serve_on_virtual_host(const int &socket_fd, size_t socket_nbr) {
+	char				buf[4096];
+	int 				client_socket;
+	std::string 		domain;
+	std::stringstream	ss;
+	std::string 		request;
+	std::string 		name;
+	std::string 		alias;
+
+	name = (*_sockets)[socket_nbr].get_config().get_name();
+	alias = (*_sockets)[socket_nbr].get_config().get_alias();
+
+	client_socket = accept(socket_fd, NULL, NULL);
+	recv(client_socket, buf, 4096, 0);
+	ss << recv(client_socket, buf, 4096, 0);
+	request = ss.str();
+
+	//todo: probalby unuseful! but that's how we can get the domain name!
+//	struct hostent *host = gethostbyname(alias.c_str());
+//	if (host == NULL)
+//		std::cout << "Error: Invalid domain name" << std::endl;
+//	std::cout << host << std::endl;
+
+
+	domain = extract_domain(request);
+	std::cout << domain << std::endl;
+	if (domain == name || domain == alias) {
+		char response[] = "Hello from server!";
+		send(client_socket, response, sizeof(response), 0);
+	}
+	close(client_socket);
+	return (EXIT_SUCCESS);
+}
+
+std::string Server::extract_domain(std::string &request) {
+	std::string domain;
+	std::stringstream ss(request);
+	std::string line;
+	while (std::getline(ss, line)) {
+		if (line.find("Host:") == 0) {
+			domain = line.substr(6);
+			break;
+		}
+	}
+	return domain;
 }
 
 std::string Server::get_request(int &client_socket) {

@@ -407,17 +407,23 @@ int ConfigParser::set_loc_prefix(location &loc) {
 }
 
 int ConfigParser::set_server_name_and_alias() {
-	size_t	num_tokens;
+	size_t		num_tokens;
+	std::string *server_name;
+
+	server_name = &_serv[_i_serv]._name;
 
 	num_tokens = _tokens.size();
-	if (_serv[_i_serv]._name.empty()) {
+	if (server_name->empty()) {
 		if (_serv_mode) {
 			if (num_tokens < 2)
 				return (EXIT_SUCCESS);
 			else if (num_tokens > 2)
 				return (parsing_error_line(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
-			_serv[_i_serv]._name = _tokens[1];
-			_serv[_i_serv]._alias = "www." + _serv[_i_serv]._name + ".com";
+			*server_name = _tokens[1];
+			for (size_t i = 0; i < server_name->length(); i++) {
+				(*server_name)[i] = tolower((*server_name)[i]);
+			}
+			_serv[_i_serv]._alias = "www." + (*server_name) + ".com";
 			return (EXIT_SUCCESS);
 		}
 		else
@@ -728,7 +734,7 @@ int ConfigParser::check_server_name() {
 
 	name = &_serv[_i_serv]._name;
 	alias = &_serv[_i_serv]._alias;
-	ss << "Default_Server_" << _i_serv;
+	ss << "default_server_" << _i_serv;
 	if (name->empty()) {
 		*name = ss.str();
 		*alias = "www." + *name + ".com";
@@ -819,6 +825,7 @@ void	ConfigParser::extract_configs() {
 	}
 }
 
+//TODO: doesn't work properly!!!!
 void	ConfigParser::set_unique_flags() {
 	std::string	ip1, ip2;
 	long		port1, port2;

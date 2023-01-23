@@ -80,6 +80,7 @@ void Socket::set_serv_addr() {
  * */
 int Socket::init_unblock_sockets() {
 	std::string server_name = _config->get_name();
+	std::string server_alias = _config->get_alias();
 
 	_socket.events = POLLIN;
 	_socket.fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -87,9 +88,10 @@ int Socket::init_unblock_sockets() {
 		return  (socket_error(SOCKET_OPEN_ERROR));
 	if (fcntl(_socket.fd, F_SETFL, O_NONBLOCK) < 0)
 		return  (socket_error(SOCKET_OPEN_ERROR));
-	// If the server name is not unique, set the SO_REUSEADDR option
-	if (!_is_unique) {
-		if (setsockopt(_socket.fd, SOL_SOCKET, SO_REUSEPORT, server_name.c_str(), server_name.length()) < 0)
+	if (!_is_unique) { //todo: find out, what is right: SO_REUSEADDR or SO_REUSEPORT ????
+		if (setsockopt(_socket.fd, SOL_SOCKET, SO_REUSEADDR, server_name.c_str(), server_name.length()) < 0)
+			return (socket_error(BIND_ERROR));
+		if (setsockopt(_socket.fd, SOL_SOCKET, SO_REUSEADDR, server_alias.c_str(), server_alias.length()) < 0)
 			return (socket_error(BIND_ERROR));
 	}
 	return (EXIT_SUCCESS);
@@ -132,6 +134,10 @@ Config &Socket::get_config() const {
 
 size_t 	Socket::get_port()	const {
 	return _port;
+}
+
+bool	Socket::get_is_unique() const {
+	return (_is_unique);
 }
 
 //ERROR MANAGEMENT
