@@ -29,3 +29,10 @@
 3	823	1674471542000000000	CMakeFiles/webserver.dir/src/Config.cpp.o	b11db586e21c9121
 3	1117	1674471542000000000	CMakeFiles/webserver.dir/src/ConfigParser.cpp.o	68bc7a944fac86c1
 1117	1272	1674471542000000000	webserver	d38037a610dcd0fc
+6	589	1674472345000000000	CMakeFiles/webserver.dir/src/CLI.cpp.o	d27d696acbe722d7
+6	596	1674472345000000000	CMakeFiles/webserver.dir/src/main.cpp.o	e4069d92c7575fb2
+7	645	1674472345000000000	CMakeFiles/webserver.dir/src/Server.cpp.o	f99adc54d0869dca
+2	435	1674472350000000000	CMakeFiles/webserver.dir/src/Socket.cpp.o	ff1e410a5c0c5b12
+435	699	1674472350000000000	webserver	d38037a610dcd0fc
+5	1250	1674473540000000000	CMakeFiles/webserver.dir/src/ConfigParser.cpp.o	68bc7a944fac86c1
+1250	1557	1674473540000000000	webserver	d38037a610dcd0fc

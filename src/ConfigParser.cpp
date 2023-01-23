@@ -103,6 +103,9 @@ int	ConfigParser::parse() {
 		return (EXIT_FAILURE);
 	if (check_required_param_def() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
+
+
+
 	return (EXIT_SUCCESS);
 }
 
@@ -456,15 +459,28 @@ int ConfigParser::set_ip_address() {
 }
 
 int ConfigParser::set_port() {
-	char *endptr;
-	long port;
+	char 						*endptr;
+	long 						port;
+	std::vector<long>			*_ports;
+	std::vector<long>::iterator it;
+	std::stringstream 			ss;
+	std::string 				error_string;
 
+	_ports = &(*_serv)[_i_serv]._ports;
 	if (_serv_mode) {
 		if (_tokens.size() == 2) {
 			port = strtoll(_tokens[1].c_str(), &endptr, 10);
 			if (endptr == _tokens[1] || *endptr != '\0' || port > MAX_PORT_NUM || port < 1)
 				return (parsing_error_line(INVALID_PARAMETER, _config_file, get_line_num(_tokens[0])));
-			(*_serv)[_i_serv]._ports.push_back(port);
+			_ports->push_back(port);
+			std::sort(_ports->begin(), _ports->end());
+			it = std::adjacent_find(_ports->begin(), _ports->end());
+			if (it != _ports->end()) {
+				ss << port;
+				error_string =  ss.str();
+				return (parsing_error_param(DUPLICATE_IP_PORT_COMB, _config_file, error_string));
+			}
+
 			return (EXIT_SUCCESS);
 		}
 		return (parsing_error_line(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));

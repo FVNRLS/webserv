@@ -16,6 +16,7 @@
 Socket::Socket(Config &server_config, size_t port) {
 	_config = &server_config;
 	_port = port;
+	_ip_port_unique = true;
 }
 
 Socket::Socket(const Socket &src) {
@@ -143,8 +144,8 @@ int Socket::socket_error(int error) const {
 	return (EXIT_FAILURE);
 }
 
-//todo: refactor to set flags
-//int	ConfigParser::check_ip_port_combinations() {
+////todo: refactor to set flags
+//int	Socket::check_ip_port_combinations() {
 //	for (size_t i = 0; i < _serv_cnt - 1; i++) {
 //		for (size_t j = i + 1; j < _serv_cnt; ++j) {
 //			if ((*_serv)[i]._ip_port_comb == (*_serv)[j]._ip_port_comb)

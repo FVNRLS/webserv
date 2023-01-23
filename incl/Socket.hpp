@@ -22,8 +22,10 @@ private:
 	sockaddr_in					_serv_addr;
 	pollfd						_socket;
 	size_t 						_port;
+	bool 						_ip_port_unique;
 
 	//CORE FUNCTIONS
+	int							check_ip_port_combinations();
 	void						set_serv_addr();
 	int							init_unblock_sockets();
 	int 						bind_socket();
