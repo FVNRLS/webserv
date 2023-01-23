@@ -180,6 +180,11 @@ void 	Server::show_connections() {
 	std::cout << "CALLED LS\n";
 }
 
+void	Server::print_configurations() {
+	for (size_t i = 0; i < (*_sockets).size(); i++)
+		std::cout << &(*_sockets)[i].get_config() << std::endl;
+}
+
 void 	Server::show_manual() {
 	std::cout << "CALLED HELP\n";
 }
@@ -210,3 +215,5 @@ int Server::server_error(int error, const Socket &socket) {
 	}
 	return (EXIT_FAILURE);
 }
+
+

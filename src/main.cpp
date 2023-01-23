@@ -10,15 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ConfigParser.hpp"
-#include "Server.hpp"
-#include "tools.hpp"
-
+#include "main.hpp"
 
 int main(int argc, char **argv) {
 	//PARSING
-	if (argc > 2)
-		return (parsing_error_basic(ARG_ERR, argv[0]));
+	if (argc > 2) {
+		std::cerr << "Error: invalid number of arguments" << std::endl;
+		return (EXIT_FAILURE);
+	}
 	std::vector<Config>	server_configs;
 	ConfigParser		parser(server_configs, argv[1]);
 	std::vector<Socket>	sockets;

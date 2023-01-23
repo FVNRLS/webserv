@@ -14,7 +14,6 @@
 
 #include "Config.hpp"
 
-
 class ConfigParser {
 
 private:

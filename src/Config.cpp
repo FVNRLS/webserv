@@ -142,6 +142,7 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 Config::~Config() {}
 
 
+
 //GETTERS
 std::string Config::get_name() const {
 	return (_name);

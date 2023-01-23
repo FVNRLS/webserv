@@ -13,7 +13,31 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
+#include <fstream>
+#include <unistd.h>
+#include <sstream>
+#include <termios.h>
+#include <csignal>
+#include <cstddef>
+#include <poll.h>
+#include <netinet/in.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
 
+template <typename T>
+void	print_vector(T vector, size_t size) {
+	if (size == 0)
+		return;
+	for (size_t i = 0; i < size; i++) {
+		if (i < size - 1)
+			std::cout << vector[i] << ' ';
+		else
+			std::cout << vector[i];
+	}
+	std::cout << std::endl;
+}
 
 //CHARACTERS
 enum chars {
@@ -63,7 +87,6 @@ const std::string RESPONSE_HEADER = "HTTP/1.1 200 OK\nContent-Type: html\nConten
 
 //PARSING ERRORS
 enum parsing_errors {
-	ARG_ERR,
 	INVALID_EXTENSION,
 	NO_SERVER,
 	BAD_PERMISSIONS,

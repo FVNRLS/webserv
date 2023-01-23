@@ -831,9 +831,7 @@ int	ConfigParser::parsing_error_basic(int error, const std::string &config_file)
 	else
 		filename = config_file.substr(slash_pos + 1);
 
-	if (error == ARG_ERR)
-		std::cerr << "Error: invalid number of arguments" << std::endl;
-	else if (error == INVALID_EXTENSION)
+	if (error == INVALID_EXTENSION)
 		std::cerr << "Error: invalid extension of configuration file " << filename << std::endl;
 	else if (error == NO_SERVER)
 		std::cerr << "Error: no server specified in configuration file " << filename << std::endl;

@@ -12,27 +12,7 @@
 
 #pragma once
 
-#include "Config.hpp"
-
-//TEMPLATES
-template <typename T>
-
-void	print_vector(T vector, size_t size) {
-	if (size == 0)
-		return;
-	for (size_t i = 0; i < size; i++) {
-		if (i < size - 1)
-			std::cout << vector[i] << ' ';
-		else
-			std::cout << vector[i];
-	}
-	std::cout << std::endl;
-}
-
-void	print_configurations(std::vector<Config> &server_configs) {
-	for (size_t i = 0; i < server_configs.size(); i++)
-		std::cout << &server_configs[i] << std::endl;
-}
+#include "defines.hpp"
 
 std::string 				trim(std::string &s);
 std::vector<std::string>	split(std::string &s, char sep);

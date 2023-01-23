@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 98)
 include_directories(./incl)
 
 add_executable(webserver
+        incl/defines.hpp
+
         src/main.cpp
         incl/main.hpp
 
@@ -28,9 +30,7 @@ add_executable(webserver
         incl/Server.hpp
 
         #TOOLS
-        src/tools/trim.cpp
-        src/tools/split.cpp
-        src/tools/signal_handler.cpp
+        src/tools.cpp
         incl/tools.hpp
 
-        incl/defines.hpp)
+        )

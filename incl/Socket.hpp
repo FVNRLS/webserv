@@ -13,11 +13,7 @@
 #pragma once
 
 #include "Config.hpp"
-#include <poll.h>
-#include <netinet/in.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
+
 
 class Socket {
 

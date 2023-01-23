@@ -12,12 +12,7 @@
 
 #pragma once
 
-#include "defines.hpp"
-#include <vector>
-#include <fstream>
-#include <unistd.h>
-#include <sstream>
-
+#include "tools.hpp"
 
 struct	location {
 	std::string					prefix;
@@ -54,6 +49,8 @@ public:
 	Config(const Config &src);
 	Config &operator=(const Config &src);
 	~Config();
+
+
 
 	//GETTERS
 	std::string					get_name() const;

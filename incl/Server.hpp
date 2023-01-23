@@ -33,10 +33,12 @@ private:
 	void						exit_server();
 	int 						terminate_with_error(int);
 	void 						show_connections();
+	void						print_configurations();
 	void 						show_manual();
 
 	//ERROR MANAGEMENT
 	int 						server_error(int error, const Socket &socket);
+
 
 public:
 	Server(std::vector<Socket> &sockets);
