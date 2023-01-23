@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 13:28:14 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/23 13:20:23 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/01/23 14:35:49 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,10 +87,14 @@ private:
 	void 	check_loc_root();
 	void 	check_cgi_path();
 
+	//FORMING OF UNIQUE CONFIGS
+	void	extract_configs();
+	void	set_unique_flags();
+
+	//ERROR MANAGEMENT
 	int		parsing_error_basic(int error, const std::string &config_file);
 	int		parsing_error_line(int error, const std::string &config_file, size_t line);
 	int		parsing_error_param(int error, const std::string &config_file, std::string &param);
-
 
 		public:
 	//BASIC CLASS SETUP

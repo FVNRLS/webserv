@@ -104,8 +104,8 @@ int	ConfigParser::parse() {
 		return (EXIT_FAILURE);
 	if (check_required_param_def() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
-
-	*_configs = _serv;
+	extract_configs();
+	
 	return EXIT_SUCCESS;
 }
 
@@ -800,6 +800,38 @@ void 	ConfigParser::check_cgi_path() {
 	cgi = &_serv[_i_serv]._locations[_i_loc].cgi_path;
 	if (cgi->empty())
 		*cgi = DEFAULT_CGI_PATH;
+}
+
+
+void	ConfigParser::extract_configs() {
+	Config new_config;
+
+	for (std::vector<Config>::iterator it = _serv.begin(); it != _serv.end(); it++) {
+		new_config = *it;
+		for (size_t i = 0; i < it->get_ports().size(); i++)	{
+			new_config._port =  it->get_ports()[i];
+			new_config._ports.clear();
+			_configs->push_back(new_config);
+		}
+	}
+}
+
+void	ConfigParser::set_unique_flags() {
+	std::string	ip1, ip2;
+	long		port1, port2;
+
+	for (size_t i = 0; i < _configs->size() - 1; i++) {
+		port1 = (*_configs)[i].get_port();
+		ip1 = (*_configs)[i].get_ip();
+		for (size_t j = i; i < _configs->size(); j++) {
+			port2 = (*_configs)[j].get_port();
+			ip2 = (*_configs)[j].get_ip();
+			if (ip1 == ip2 && port1 == port2) {
+				(*_configs)[i]._is_unique = false;
+				(*_configs)[j]._is_unique = false;
+			}
+		}
+	}
 }
 
 
