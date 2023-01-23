@@ -15,7 +15,7 @@ std::string	trim(std::string &s);
 std::vector<std::string> split(std::string &s, char sep);
 
 //BASIC CLASS SETUP
-ConfigParser::ConfigParser(char *path) : _config_file(DEFAULT_PATH), _serv_mode(false),
+ConfigParser::ConfigParser(std::vector<Config> &servers, char *path) : _config_file(DEFAULT_PATH), _serv_mode(false),
 _line_num(1), _pos(0), _conf_pos(0), _serv_cnt(0), _serv_def_start(0), _serv_def_end(0),
 _i_serv(-1), _i_loc(-1), _serv(&servers) {
 	if (path != NULL)
@@ -105,7 +105,7 @@ int	ConfigParser::parse() {
 		return (EXIT_FAILURE);
 
 
-
+	return EXIT_SUCCESS;
 }
 
 int	ConfigParser::check_extension() {
