@@ -34,7 +34,6 @@ private:
 	std::string					_name;
 	std::string 				_ip;
 	std::vector<long> 			_ports;
-	std::vector<std::string>	_ip_port_comb;
 	std::string 				_root;
 	std::vector<std::string>	_methods;
 	std::string 				_index;
@@ -62,7 +61,6 @@ public:
 	long long 					get_max_client_body_size() const;
 	std::string 				get_error_pages_dir() const;
 	std::vector<location>		get_locations() const;
-	std::vector<std::string>	get_ip_port_comb() const;
 	std::vector<std::pair<std::string, std::string> >	get_redirect() const;
 };
 

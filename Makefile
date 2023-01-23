@@ -9,7 +9,6 @@ FLAGS = -Wall -Wextra -Werror -std=c++98
 SRC =	./src/main.cpp \
 		./src/Config.cpp \
 		./src/ConfigParser.cpp \
-		./src/error_handler.cpp \
 		./src/Socket.cpp \
 		./src/Server.cpp \
 		./src/CLI.cpp \

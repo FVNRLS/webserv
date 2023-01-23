@@ -691,9 +691,6 @@ int ConfigParser::check_required_param_def() {
 		if (check_serv_config() == EXIT_FAILURE || check_loc_config() == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 	}
-	create_ip_port_combinations();
-	if (check_ip_port_combinations() == EXIT_FAILURE)
-		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
@@ -787,35 +784,6 @@ void 	ConfigParser::check_cgi_path() {
 	cgi = &(*_serv)[_i_serv]._locations[_i_loc].cgi_path;
 	if (cgi->empty())
 		*cgi = DEFAULT_CGI_PATH;
-}
-
-void	ConfigParser::create_ip_port_combinations() {
-	std::stringstream 	ss;
-	std::string 		comb;
-
-	for (size_t i = 0; i < _serv_cnt; i++) {
-		for (size_t j = 0; j < (*_serv)[i]._ports.size(); j++) {
-			ss << (*_serv)[i]._ports[j];
-			comb = (*_serv)[i]._ip + "::" + ss.str();
-			(*_serv)[i]._ip_port_comb.push_back(comb);
-			comb.clear();
-			ss.clear();
-			ss.str("");
-		}
-	}
-}
-
-int	ConfigParser::check_ip_port_combinations() {
-	std::vector <std::string>			combs;
-	std::vector<std::string>::iterator 	it;
-
-	for (size_t i = 0; i < _serv_cnt; i++)
-		combs.insert(combs.end(), (*_serv)[i]._ip_port_comb.begin(), (*_serv)[i]._ip_port_comb.end());
-	std::sort(combs.begin(), combs.end());
-	it = std::adjacent_find(combs.begin(), combs.end());
-	if (it != combs.end())
-		return (parsing_error_param(DUPLICATE_IP_PORT_COMB, _config_file, *it));
-	return (EXIT_SUCCESS);
 }
 
 

@@ -142,3 +142,16 @@ int Socket::socket_error(int error) const {
 	}
 	return (EXIT_FAILURE);
 }
+
+//todo: refactor to set flags
+//int	ConfigParser::check_ip_port_combinations() {
+//	for (size_t i = 0; i < _serv_cnt - 1; i++) {
+//		for (size_t j = i + 1; j < _serv_cnt; ++j) {
+//			if ((*_serv)[i]._ip_port_comb == (*_serv)[j]._ip_port_comb)
+//				if ((*_serv)[i]._name == (*_serv)[j]._name)
+//					return (parsing_error_param(DUPLICATE_IP_PORT_COMB, _config_file,
+//												(*_serv)[_i_serv]._locations[_i_loc].prefix));
+//		}
+//	}
+//	return (EXIT_SUCCESS);
+//}

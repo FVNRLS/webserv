@@ -85,8 +85,6 @@ private:
 	int 	check_loc_index();
 	void 	check_loc_root();
 	void 	check_cgi_path();
-	void	create_ip_port_combinations();
-	int		check_ip_port_combinations();
 
 	int		parsing_error_basic(int error, const std::string &config_file);
 	int		parsing_error_line(int error, const std::string &config_file, size_t line);

@@ -17,9 +17,6 @@ add_executable(webserver
         src/ConfigParser.cpp
         incl/ConfigParser.hpp
 
-        src/error_handler.cpp
-        incl/error_handler.hpp
-
         src/Socket.cpp
         incl/Socket.hpp
 

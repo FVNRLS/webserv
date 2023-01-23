@@ -24,7 +24,6 @@ int main(int argc, char **argv) {
 
 	if (parser.parse() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
-//	print_configurations(server_configs);
 
 	//CREATING PULL OF ACTIVE SOCKETS
 	for (size_t i = 0; i < server_configs.size(); i++) {

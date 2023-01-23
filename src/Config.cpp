@@ -57,14 +57,6 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 			o << s->get_ports()[j] << std::endl;
 	}
 
-	o << std::left << std::setw(28) << "IP-PORTS COMBINATIONS:";
-	for (size_t j = 0; j < s->get_ports().size(); j++) {
-		if (j == 0)
-			o << s->get_ip_port_comb()[j] << std::endl;
-		else
-			o  << "							" << s->get_ip_port_comb()[j] << std::endl;
-	}
-
 	o << std::left << std::setw(28) << "ROOT:" << s->get_root() << std::endl;
 
 	if (!s->get_methods().empty()) {
@@ -182,8 +174,4 @@ std::vector<location>	Config::get_locations() const {
 
 std::vector<std::pair<std::string, std::string> >	Config::get_redirect() const {
 	return (_redirect);
-}
-
-std::vector<std::string>	Config::get_ip_port_comb() const {
-	return (_ip_port_comb);
 }
