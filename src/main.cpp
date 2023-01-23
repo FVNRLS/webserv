@@ -22,7 +22,8 @@ int main(int argc, char **argv) {
 	ConfigParser		parser(server_configs, argv[1]);
 	std::vector<Socket>	sockets;
 
-	if (parser.parse() == EXIT_FAILURE)
+	server_configs = parser.parse();
+	if (server_configs.empty())
 		return (EXIT_FAILURE);
 
 	//CREATING PULL OF ACTIVE SOCKETS

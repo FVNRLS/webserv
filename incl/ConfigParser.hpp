@@ -34,6 +34,7 @@ private:
 	std::vector<std::string>				_spec_valid_identifiers;
 	std::vector<std::string>				_valid_methods;
 	std::vector<Config> 					*_serv;
+	std::vector<Config>						_configs;
 	std::vector<std::string>				_serv_blocks;
 	std::vector<std::string>				_tokens;
 	std::vector<int (ConfigParser::*)()> 	_func_tab;
