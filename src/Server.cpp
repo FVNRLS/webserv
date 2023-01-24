@@ -43,12 +43,14 @@ int Server::run() {
 		exit_server();
 	_poll_fds.push_back(_cli.get_pollfd());
 
+
 	while (true) {
 		if (poll(&_poll_fds[0], _num_fds, -1) < 0)
 			return (terminate_with_error(server_error(POLL_ERROR, _sockets.front())));
 		for (i = 0; i < _sockets.size(); i++) {
+
 			if (_poll_fds[i].revents & POLLIN) {
-				if (process_request(_sockets[i]) == EXIT_FAILURE)
+				if (process_request(_sockets[i], _poll_fds[i]) == EXIT_FAILURE)
 					return (terminate_with_error(EXIT_FAILURE));
 			}
 		}
@@ -59,20 +61,20 @@ int Server::run() {
 	}
 }
 
-int Server::process_request(const Socket &socket) {
+int Server::process_request(const Socket &socket, pollfd &poll_fd) {
 	bool 				socket_is_unique;
 
 	socket_is_unique = socket.get_is_unique();
 	if (socket_is_unique) {
-		if (serve_on_port(socket) == EXIT_FAILURE)
+		if (serve_on_port(socket, poll_fd) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 	}
-	else if (serve_on_virtual_host(socket) < 0)
+	else if (serve_on_virtual_host(socket, poll_fd) < 0)
 		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
-int Server::serve_on_port(const Socket &socket) {
+int Server::serve_on_port(const Socket &socket, pollfd &poll_fd) {
 	std::string 		content_length;
 	std::string 		response;
 	struct sockaddr_in 	client_addr = {};
@@ -80,9 +82,8 @@ int Server::serve_on_port(const Socket &socket) {
 	socklen_t 			client_len;
 	int 				client_socket;
 
-	client_addr = socket.get_serv_addr();
-	client_len = sizeof(socket.get_serv_addr());
-	client_socket = accept(socket.get_pollfd().fd, (struct sockaddr *) &client_addr, &client_len);
+	client_len = sizeof(client_addr);
+	client_socket = accept(poll_fd.fd, (struct sockaddr *) &client_addr, &client_len);
 	if (client_socket < 0)
 		return (server_error(ACCEPT_ERROR, socket));
 	if (fcntl(client_socket, F_SETFL, O_NONBLOCK) < 0)
@@ -102,7 +103,7 @@ int Server::serve_on_port(const Socket &socket) {
 	return (EXIT_SUCCESS);
 }
 
-int Server::serve_on_virtual_host(const Socket &socket) {
+int Server::serve_on_virtual_host(const Socket &socket, pollfd &poll_fd) {
 	char				buf[4096];
 	int 				client_socket;
 	std::string 		domain;

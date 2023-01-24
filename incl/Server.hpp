@@ -23,9 +23,9 @@ private:
 	CLI							_cli;
 
 	//CORE FUNCTIONS
-	int 						process_request(const Socket &socket);
-	int 						serve_on_virtual_host(const Socket &socket);
-	int 						serve_on_port(const Socket &socket);
+	int 						process_request(const Socket &socket, pollfd &poll_fd);
+	int 						serve_on_port(const Socket &socket, pollfd &poll_fd);
+	int 						serve_on_virtual_host(const Socket &socket, pollfd &poll_fd);
 	std::string 				extract_domain(std::string &request);
 
 
