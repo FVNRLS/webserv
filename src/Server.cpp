@@ -101,10 +101,13 @@ int Server::serve_on_port(const int &socket_fd, size_t socket_nbr) {
 	client_len = sizeof(cli_addr);
 	request = get_request(client_socket);
 	if (request.empty())
-		return (server_error(RECV_ERROR, (*_sockets)[socket_nbr]));
-	std::cout << "PORT: " << (*_sockets)[socket_nbr].get_port() << "\nrequest:\n" << request << std::endl;
+		server_error(RECV_ERROR, (*_sockets)[socket_nbr]);
 
-	response = generate_response(request, socket_nbr);
+	std::cout << "------------------------------------------------------------" << std::endl <<  "PORT: "
+	<< (*_sockets)[socket_nbr].get_port() << "\nREQUEST:\n" << request
+	<< "------------------------------------------------------------" << std::endl;
+
+	response = generate_response(request);
 	send(client_socket, response.c_str(), response.length(), 0);
 	close(client_socket);
 	return (EXIT_FAILURE);
@@ -167,13 +170,14 @@ std::string Server::get_request(int &client_socket) {
 	return (request);
 }
 
-std::string Server::generate_response(const std::string &request, size_t socket_nbr) {
+std::string Server::generate_response(const std::string &request) {
 	std::string 		response;
 	const char 			*file_path;
 	std::ifstream 		file;
 	std::string 		body;
 	std::string 		requested_path;
 	std::stringstream 	body_len;
+	(void) request;
 
 //	requested_path = get_requested_path(request); //todo: cont!
 

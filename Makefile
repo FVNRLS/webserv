@@ -38,4 +38,7 @@ fclean: clean
 
 re: fclean all
 
+run: $(NAME)
+	./webserv config/test2.conf
+
 .PHONY: all clean fclean re

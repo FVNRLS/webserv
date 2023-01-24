@@ -30,7 +30,7 @@ private:
 
 
 	std::string 				get_request(int &client_socket);
-	std::string 				generate_response(const std::string &request, size_t socket_nbr);
+	std::string 				generate_response(const std::string &request);
 	std::string					get_requested_path(const std::string &request);
 
 	//TERMINAL INTERACTION
