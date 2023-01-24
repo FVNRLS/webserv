@@ -141,3 +141,7 @@ enum cli_flags {
 	CLI_LS,
 	CLI_HELP,
 };
+
+enum server_constants {
+	TIMEOUT	 = 5000,
+};

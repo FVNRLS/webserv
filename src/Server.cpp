@@ -43,9 +43,8 @@ int Server::run() {
 		exit_server();
 	_poll_fds.push_back(_cli.get_pollfd());
 
-
 	while (true) {
-		if (poll(&_poll_fds[0], _num_fds, -1) < 0)
+		if (poll(&_poll_fds[0], _num_fds, TIMEOUT) < 0)
 			return (terminate_with_error(server_error(POLL_ERROR, _sockets.front())));
 		for (i = 0; i < _sockets.size(); i++) {
 
@@ -59,10 +58,11 @@ int Server::run() {
 				return EXIT_FAILURE;
 		}
 	}
+
 }
 
 int Server::process_request(const Socket &socket, pollfd &poll_fd) {
-	bool 				socket_is_unique;
+	bool	socket_is_unique;
 
 	socket_is_unique = socket.get_is_unique();
 	if (socket_is_unique) {
@@ -77,30 +77,78 @@ int Server::process_request(const Socket &socket, pollfd &poll_fd) {
 int Server::serve_on_port(const Socket &socket, pollfd &poll_fd) {
 	std::string 		content_length;
 	std::string 		response;
-	struct sockaddr_in 	client_addr = {};
+	struct sockaddr 	client_addr = {};
 	std::string 		request;
 	socklen_t 			client_len;
 	int 				client_socket;
 
 	client_len = sizeof(client_addr);
-	client_socket = accept(poll_fd.fd, (struct sockaddr *) &client_addr, &client_len);
+	client_socket = accept(poll_fd.fd, &client_addr, &client_len);
 	if (client_socket < 0)
 		return (server_error(ACCEPT_ERROR, socket));
 	if (fcntl(client_socket, F_SETFL, O_NONBLOCK) < 0)
 		return (EXIT_FAILURE);
 
-	request = get_request(client_socket);
-	if (request.empty())
-		return (server_error(RECV_ERROR, socket));
+//	request = get_request(client_socket);
+//	if (request.empty())
+//		return (server_error(RECV_ERROR, socket));
 
-	std::cout << "------------------------------------------------------------" << std::endl <<  "PORT: "
-	<< socket.get_port() << "\nREQUEST:\n" << request
-	<< "------------------------------------------------------------" << std::endl;
+	char 	buffer[1024];
+	long 	bytes;
+	while ((bytes = recv(client_socket, buffer, sizeof(buffer), 0)) > 0)
+		request += std::string(buffer, bytes);
+	if(bytes < 0) {
+		if (errno != EAGAIN && errno != EWOULDBLOCK) {
+			return (server_error(RECV_ERROR, socket));
+		}
+	}
+	std::cout << request << std::endl;
 
 	response = generate_response(request);
 	send(client_socket, response.c_str(), response.length(), 0);
 	close(client_socket);
 	return (EXIT_SUCCESS);
+}
+
+std::string Server::get_request(int &socket) {
+	char		client_buf[1024];
+	std::string request;
+
+	if (recv(socket, client_buf, sizeof(client_buf), 0) <= 0)
+		return (request);
+	request = client_buf;
+	return (request);
+}
+
+std::string Server::generate_response(const std::string &request) {
+	std::string 		response;
+	const char 			*file_path;
+	std::ifstream 		file;
+	std::string 		body;
+	std::string 		requested_path;
+	std::stringstream 	body_len;
+	(void) request;
+
+//	requested_path = get_requested_path(request); //todo: cont!
+
+	file_path = DEFAULT_INDEX_PAGE.c_str();
+//	std::cout << file_path << std::endl;
+
+	if (access(file_path, F_OK) < 0) {
+		server_error(ERROR_404, _sockets.front());
+		return (""); //todo: add error.html
+	}
+	file.open(file_path);
+	if (!file.is_open() || file.fail()) {
+		server_error(ACCESS_DENIED, _sockets.front());
+		return (""); //todo: add error.html
+	}
+	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	body_len << body.length();
+	response = RESPONSE_HEADER + body_len.str() + "\n\n" + body;
+	file.close();
+
+	return (response);
 }
 
 int Server::serve_on_virtual_host(const Socket &socket, pollfd &poll_fd) {
@@ -115,7 +163,7 @@ int Server::serve_on_virtual_host(const Socket &socket, pollfd &poll_fd) {
 	name = socket.get_config().get_name();
 	alias = socket.get_config().get_alias();
 
-	client_socket = accept(socket.get_pollfd().fd, NULL, NULL);
+	client_socket = accept(poll_fd.fd, NULL, NULL);
 	recv(client_socket, buf, 4096, 0);
 	ss << recv(client_socket, buf, 4096, 0);
 	request = ss.str();
@@ -148,47 +196,6 @@ std::string Server::extract_domain(std::string &request) {
 		}
 	}
 	return domain;
-}
-
-std::string Server::get_request(int &socket) {
-	char		client_buf[1024];
-	std::string request;
-
-	if (recv(socket, client_buf, sizeof(client_buf), 0) <= 0)
-		return (request);
-	request = client_buf;
-	return (request);
-}
-
-std::string Server::generate_response(const std::string &request) {
-	std::string 		response;
-	const char 			*file_path;
-	std::ifstream 		file;
-	std::string 		body;
-	std::string 		requested_path;
-	std::stringstream 	body_len;
-	(void) request;
-
-//	requested_path = get_requested_path(request); //todo: cont!
-
-	file_path = DEFAULT_INDEX_PAGE.c_str();
-	std::cout << file_path << std::endl;
-
-	if (access(file_path, F_OK) < 0) {
-		server_error(ERROR_404, _sockets.front());
-		return (""); //todo: add error.html
-	}
-	file.open(file_path);
-	if (!file.is_open() || file.fail()) {
-		server_error(ACCESS_DENIED, _sockets.front());
-		return (""); //todo: add error.html
-	}
-	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-	body_len << body.length();
-	response = RESPONSE_HEADER + body_len.str() + "\n\n" + body;
-	file.close();
-
-	return (response);
 }
 
 std::string	Server::get_requested_path(const std::string &request) {

@@ -46,9 +46,6 @@ int	Socket::activate() {
 		return (EXIT_FAILURE);
 	if (listen_to_connections() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
-
-//	for (std::vector<pollfd>::iterator it = _socket_fds.begin(); it != _socket_fds.end(); it++)
-//		close(it->fd);
 	return (EXIT_SUCCESS);
 }
 
@@ -84,11 +81,13 @@ int Socket::init_unblock_sockets() {
 	std::string server_alias = _config->get_alias();
 
 	_socket.events = POLLIN;
-	_socket.fd = socket(AF_INET, SOCK_STREAM, 0);
+	_socket.fd = socket(AF_INET, SOCK_STREAM, 0);;
 	if (_socket.fd < 0)
 		return  (socket_error(SOCKET_OPEN_ERROR));
+
 	if (fcntl(_socket.fd, F_SETFL, O_NONBLOCK) < 0)
 		return  (socket_error(SOCKET_OPEN_ERROR));
+
 	if (!_is_unique) { //todo: find out, what is right: SO_REUSEADDR or SO_REUSEPORT ????
 		if (setsockopt(_socket.fd, SOL_SOCKET, SO_REUSEADDR, server_name.c_str(), server_name.length()) < 0)
 			return (socket_error(BIND_ERROR));
@@ -106,8 +105,6 @@ int Socket::init_unblock_sockets() {
  * it can be used to send or receive data.
  * */
 int Socket::bind_socket() {
-
-	// Bind the socket to the server address
 	if (bind(_socket.fd, (struct sockaddr *)&_serv_addr, sizeof(_serv_addr)) < 0)
 		return (socket_error(BIND_ERROR));
 	std::cout << "bind success on " << inet_ntoa(_serv_addr.sin_addr) << ":" << ntohs(_serv_addr.sin_port) << std::endl;
