@@ -102,7 +102,7 @@ int Server::serve_on_port(const int &socket_fd, size_t socket_nbr) {
 	request = get_request(client_socket);
 	if (request.empty())
 		return (server_error(RECV_ERROR, (*_sockets)[socket_nbr]));
-	std::cout << "PORT: " << (*_sockets)[socket_nbr].get_port() << " request:" << request << std::endl;
+	std::cout << "PORT: " << (*_sockets)[socket_nbr].get_port() << "\nrequest:\n" << request << std::endl;
 
 	response = generate_response(request, socket_nbr);
 	send(client_socket, response.c_str(), response.length(), 0);
@@ -175,9 +175,9 @@ std::string Server::generate_response(const std::string &request, size_t socket_
 	std::string 		requested_path;
 	std::stringstream 	body_len;
 
-	requested_path = parse_request(request); //todo: cont!
+//	requested_path = get_requested_path(request); //todo: cont!
 
-	file_path = (*_sockets)[socket_nbr].get_config().get_index().c_str();
+	file_path = DEFAULT_INDEX_PAGE.c_str();
 	std::cout << file_path << std::endl;
 
 	if (access(file_path, F_OK) < 0) {
@@ -197,7 +197,8 @@ std::string Server::generate_response(const std::string &request, size_t socket_
 	return (response);
 }
 
-std::string	Server::parse_request(const std::string &request) {
+std::string	Server::get_requested_path(const std::string &request) {
+
 	return (request);
 }
 

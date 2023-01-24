@@ -557,7 +557,7 @@ int ConfigParser::set_index() {
 	else if (num_tokens > 2)
 		return (parsing_error_line(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 	else if (num_tokens == 1)
-		*param = DEFAULT_INDEX;
+		*param = DEFAULT_INDEX_PAGE;
 	else if (num_tokens == 2)
 		*param = _tokens[1];
 	return (EXIT_SUCCESS);
@@ -825,7 +825,6 @@ void	ConfigParser::extract_configs() {
 	}
 }
 
-//TODO: doesn't work properly!!!!
 void	ConfigParser::set_unique_flags() {
 	std::string	ip1, ip2;
 	long		port1, port2;

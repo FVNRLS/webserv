@@ -31,6 +31,7 @@ int main(int argc, char **argv) {
 		if (new_socket.activate() == EXIT_SUCCESS)
 			sockets.push_back(new_socket);
 	}
+
 	//SERVER CORE (MAIN LOOP)
 	if (!sockets.empty()) {
 		silence_sigint();

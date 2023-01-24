@@ -30,6 +30,7 @@ Socket &Socket::operator=(const Socket &src) { //todo: check after finishing the
 	_serv_addr = src._serv_addr;
 	_socket = src._socket;
 	_port = src._port;
+	_is_unique = src._is_unique;
 	return (*this);
 }
 
