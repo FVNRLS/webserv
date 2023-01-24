@@ -13,28 +13,13 @@
 #include "Server.hpp"
 
 //BASIC CLASS SETUP
-Server::Server(std::vector<Socket> &sockets) {
-	_sockets = &sockets;
+Server::Server(std::vector<Socket> &sockets) : _sockets(sockets) {
 	_num_fds = sockets.size() + 1;
 	for (size_t i = 0; i < sockets.size(); i++)
 		_poll_fds.push_back(sockets[i].get_pollfd());
 }
 
-Server::Server(const Server &src) {
-	*this = src;
-}
-
-//todo: check after finishing the class
-Server &Server::operator=(const Server &src) {
-	if (this == &src)
-		return (*this);
-	_sockets = src._sockets;
-//	_poll_fds = src._poll_fds;
-	return (*this);
-}
-
 Server::~Server() {}
-
 
 //MEMBER FUNCTIONS
 
@@ -52,7 +37,7 @@ Server::~Server() {}
 int Server::run() {
 	size_t i;
 
-	print_configurations();
+//	print_configurations();
 
 	if (_cli.start() == EXIT_FAILURE)
 		exit_server();
@@ -60,10 +45,10 @@ int Server::run() {
 
 	while (true) {
 		if (poll(&_poll_fds[0], _num_fds, -1) < 0)
-			return (terminate_with_error(server_error(POLL_ERROR, _sockets->front())));
-		for (i = 0; i < _sockets->size(); i++) {
+			return (terminate_with_error(server_error(POLL_ERROR, _sockets.front())));
+		for (i = 0; i < _sockets.size(); i++) {
 			if (_poll_fds[i].revents & POLLIN) {
-				if (process_request(_poll_fds[i].fd, i) == EXIT_FAILURE)
+				if (process_request(_sockets[i]) == EXIT_FAILURE)
 					return (terminate_with_error(EXIT_FAILURE));
 			}
 		}
@@ -74,46 +59,50 @@ int Server::run() {
 	}
 }
 
-int Server::process_request(const int &socket_fd, size_t socket_nbr) {
+int Server::process_request(const Socket &socket) {
 	bool 				socket_is_unique;
 
-	socket_is_unique = (*_sockets)[socket_nbr].get_is_unique();
+	socket_is_unique = socket.get_is_unique();
 	if (socket_is_unique) {
-		if (serve_on_port(socket_fd, socket_nbr) == EXIT_FAILURE)
+		if (serve_on_port(socket) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 	}
-	else if (serve_on_virtual_host(socket_fd, socket_nbr) < 0)
+	else if (serve_on_virtual_host(socket) < 0)
 		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
-int Server::serve_on_port(const int &socket_fd, size_t socket_nbr) {
+int Server::serve_on_port(const Socket &socket) {
 	std::string 		content_length;
 	std::string 		response;
-	struct sockaddr_in 	cli_addr;
+	struct sockaddr_in 	client_addr = {};
 	std::string 		request;
 	socklen_t 			client_len;
 	int 				client_socket;
-	client_socket = accept(socket_fd, (struct sockaddr *) &cli_addr, &client_len);
-	if (client_socket < 0)
-		return (server_error(ACCEPT_ERROR, (*_sockets)[socket_nbr]));
 
-	client_len = sizeof(cli_addr);
+	client_addr = socket.get_serv_addr();
+	client_len = sizeof(socket.get_serv_addr());
+	client_socket = accept(socket.get_pollfd().fd, (struct sockaddr *) &client_addr, &client_len);
+	if (client_socket < 0)
+		return (server_error(ACCEPT_ERROR, socket));
+	if (fcntl(client_socket, F_SETFL, O_NONBLOCK) < 0)
+		return (EXIT_FAILURE);
+
 	request = get_request(client_socket);
 	if (request.empty())
-		server_error(RECV_ERROR, (*_sockets)[socket_nbr]);
+		return (server_error(RECV_ERROR, socket));
 
 	std::cout << "------------------------------------------------------------" << std::endl <<  "PORT: "
-	<< (*_sockets)[socket_nbr].get_port() << "\nREQUEST:\n" << request
+	<< socket.get_port() << "\nREQUEST:\n" << request
 	<< "------------------------------------------------------------" << std::endl;
 
 	response = generate_response(request);
 	send(client_socket, response.c_str(), response.length(), 0);
 	close(client_socket);
-	return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
 }
 
-int Server::serve_on_virtual_host(const int &socket_fd, size_t socket_nbr) {
+int Server::serve_on_virtual_host(const Socket &socket) {
 	char				buf[4096];
 	int 				client_socket;
 	std::string 		domain;
@@ -122,10 +111,10 @@ int Server::serve_on_virtual_host(const int &socket_fd, size_t socket_nbr) {
 	std::string 		name;
 	std::string 		alias;
 
-	name = (*_sockets)[socket_nbr].get_config().get_name();
-	alias = (*_sockets)[socket_nbr].get_config().get_alias();
+	name = socket.get_config().get_name();
+	alias = socket.get_config().get_alias();
 
-	client_socket = accept(socket_fd, NULL, NULL);
+	client_socket = accept(socket.get_pollfd().fd, NULL, NULL);
 	recv(client_socket, buf, 4096, 0);
 	ss << recv(client_socket, buf, 4096, 0);
 	request = ss.str();
@@ -160,11 +149,11 @@ std::string Server::extract_domain(std::string &request) {
 	return domain;
 }
 
-std::string Server::get_request(int &client_socket) {
+std::string Server::get_request(int &socket) {
 	char		client_buf[1024];
 	std::string request;
 
-	if (recv(client_socket, client_buf, sizeof(client_buf), 0) < 0)
+	if (recv(socket, client_buf, sizeof(client_buf), 0) <= 0)
 		return (request);
 	request = client_buf;
 	return (request);
@@ -185,12 +174,12 @@ std::string Server::generate_response(const std::string &request) {
 	std::cout << file_path << std::endl;
 
 	if (access(file_path, F_OK) < 0) {
-		server_error(ERROR_404, _sockets->front());
+		server_error(ERROR_404, _sockets.front());
 		return (""); //todo: add error.html
 	}
 	file.open(file_path);
 	if (!file.is_open() || file.fail()) {
-		server_error(ACCESS_DENIED, _sockets->front());
+		server_error(ACCESS_DENIED, _sockets.front());
 		return (""); //todo: add error.html
 	}
 	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
@@ -213,7 +202,7 @@ int	Server::process_cli_input() {
 		case CLI_EMPTY:
 			return EXIT_SUCCESS;
 		case CLI_FAIL:
-			return terminate_with_error(server_error(CLI_ERROR, _sockets->front()));
+			return terminate_with_error(server_error(CLI_ERROR, _sockets.front()));
 		case CLI_EXIT:
 			exit_server();
 		case CLI_LS:
@@ -227,13 +216,13 @@ int	Server::process_cli_input() {
 
 //todo: complete with client sockets ???
 void	Server::exit_server() {
-	for (size_t i = 0; i < _sockets->size(); i++)
+	for (size_t i = 0; i < _sockets.size(); i++)
 		close(_poll_fds[i].fd);
 	exit(EXIT_SUCCESS);
 }
 
 int		Server::terminate_with_error(int) {
-	for (size_t i = 0; i < _sockets->size(); i++)
+	for (size_t i = 0; i < _sockets.size(); i++)
 		close(_poll_fds[i].fd);
 	return (EXIT_FAILURE);
 }
@@ -243,8 +232,8 @@ void 	Server::show_connections() {
 }
 
 void	Server::print_configurations() {
-	for (size_t i = 0; i < (*_sockets).size(); i++)
-		std::cout << &(*_sockets)[i].get_config() << std::endl;
+	for (size_t i = 0; i < _sockets.size(); i++)
+		std::cout << &_sockets[i].get_config() << std::endl;
 }
 
 void 	Server::show_manual() {

@@ -133,6 +133,10 @@ Config &Socket::get_config() const {
 	return (*_config);
 }
 
+const sockaddr_in	&Socket::get_serv_addr() const {
+	return (_serv_addr);
+}
+
 size_t 	Socket::get_port()	const {
 	return _port;
 }

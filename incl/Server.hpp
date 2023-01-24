@@ -17,19 +17,19 @@
 class Server {
 
 private:
-	std::vector<Socket>			*_sockets;
+	const std::vector<Socket>	&_sockets;
 	std::vector<pollfd>			_poll_fds;
 	size_t 						_num_fds;
 	CLI							_cli;
 
 	//CORE FUNCTIONS
-	int 						process_request(const int &socket_fd, size_t socket_nbr);
-	int 						serve_on_virtual_host(const int &socket_fd, size_t socket_nbr);
-	int 						serve_on_port(const int &socket_fd, size_t socket_nbr);
+	int 						process_request(const Socket &socket);
+	int 						serve_on_virtual_host(const Socket &socket);
+	int 						serve_on_port(const Socket &socket);
 	std::string 				extract_domain(std::string &request);
 
 
-	std::string 				get_request(int &client_socket);
+	std::string 				get_request(int &socket);
 	std::string 				generate_response(const std::string &request);
 	std::string					get_requested_path(const std::string &request);
 

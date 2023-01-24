@@ -42,8 +42,9 @@ public:
 	int 						activate();
 
 	//GETTERS
-	pollfd						get_pollfd()	const;
 	Config						&get_config()	const;
+	const sockaddr_in			&get_serv_addr() const;
+	pollfd						get_pollfd()	const;
 	size_t 						get_port()		const;
 	bool 						get_is_unique() const;
 };
