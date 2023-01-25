@@ -40,9 +40,6 @@ Server::~Server() {}
  * 5. The function exits the infinite loop and returns EXIT_SUCCESS to indicate that it completed successfully.
  * */
 int Server::run() {
-
-//	print_configurations();
-
 	while (true) {
 		if (poll(_poll_fds.data(), _poll_fds.size(), TIMEOUT) < 0)
 			return (terminate_with_error(server_error(POLL_ERROR, _sockets.front())));
@@ -264,7 +261,6 @@ int	Server::process_cli_input() {
 	return EXIT_SUCCESS;
 }
 
-//todo: complete with client sockets ???
 void	Server::exit_server() {
 	for (size_t i = 0; i < _sockets.size(); i++)
 		close(_poll_fds[i].fd);
@@ -278,11 +274,11 @@ int		Server::terminate_with_error(int) {
 }
 
 void 	Server::show_connections() {
-	std::cout << "CALLED LS\n";
+	print_configurations();
 }
 
 void	Server::print_configurations() {
-	for (size_t i = 0; i < _sockets.size(); i++)
+	for (size_t i = 1; i < _sockets.size(); i++)
 		std::cout << &_sockets[i].get_config() << std::endl;
 }
 
