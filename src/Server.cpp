@@ -179,6 +179,29 @@ void	Server::delete_invalid_fds() {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//TODO:implement later
+//---------------------------------------------------------------------------------------------------------------------
+
 //VIRTUAL HOSTING
 int Server::process_request(const Socket &socket, pollfd &poll_fd) {
 	(void )poll_fd;
@@ -287,6 +310,7 @@ void 	Server::show_manual() {
 }
 
 
+//ERROR MANAGEMENT
 int Server::server_error(int error, const Socket &socket) {
 	switch(error) {
 		case POLL_ERROR:
