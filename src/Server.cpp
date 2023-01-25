@@ -40,6 +40,9 @@ Server::~Server() {}
  * 5. The function exits the infinite loop and returns EXIT_SUCCESS to indicate that it completed successfully.
  * */
 int Server::run() {
+
+//	print_configurations();
+
 	while (true) {
 		if (poll(_poll_fds.data(), _poll_fds.size(), TIMEOUT) < 0)
 			return (terminate_with_error(server_error(POLL_ERROR, _sockets.front())));
@@ -76,7 +79,6 @@ int Server::accept_requests() {
 				return (EXIT_FAILURE);
 			client_pollfd.events = POLLIN;
 			_poll_fds.push_back(client_pollfd);
-			_poll_fds[i].revents = 0;
 		}
 	}
 	return (EXIT_SUCCESS);
@@ -88,7 +90,7 @@ int Server::resolve_requests() {
 	std::string 		response;
 
 	for (size_t i = _sockets.size();  i < _poll_fds.size(); i++) {
-		if (check_client(_poll_fds[i]) == EXIT_FAILURE)
+		if (check_connection(_poll_fds[i]) == EXIT_FAILURE)
 			continue;
 		if (_poll_fds[i].revents & POLLIN) {
 			request = get_request(_poll_fds[i].fd);
@@ -100,12 +102,13 @@ int Server::resolve_requests() {
 		if (_poll_fds[i].revents == POLLOUT) {
 			response = generate_response(request);
 			send(_poll_fds[i].fd, response.c_str(), response.length(), 0);
+			close(_poll_fds[i].fd);
 		}
 	}
 	return (EXIT_SUCCESS);
 }
 
-int Server::check_client(pollfd &pfd) {
+int Server::check_connection(pollfd &pfd) {
 	if (pfd.revents & POLLERR || pfd.revents & POLLHUP || pfd.revents & POLLNVAL) {
 		shutdown(pfd.fd, SHUT_RDWR);
 		close(pfd.fd);
@@ -118,7 +121,6 @@ int Server::check_client(pollfd &pfd) {
 std::string Server::get_request(int &client_fd) {
 	char 	buffer[1024];
 	std::string request;
-	long 	bytes;
 
 	if ((recv(client_fd, buffer, sizeof(buffer), MSG_DONTWAIT)) < 0) {
 		server_error(RECV_ERROR);
@@ -180,16 +182,11 @@ void	Server::delete_invalid_fds() {
 
 
 
-
-
-
-
-
-
-
 //VIRTUAL HOSTING
 int Server::process_request(const Socket &socket, pollfd &poll_fd) {
-	bool	socket_is_unique;
+	(void )poll_fd;
+	(void )socket;
+	//	bool	socket_is_unique;
 
 //	socket_is_unique = socket.get_is_unique();
 //	if (socket_is_unique) {

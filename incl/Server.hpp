@@ -26,9 +26,9 @@ private:
 	int 						accept_requests();
 	int 						resolve_requests();
 	std::string 				get_request(int &client_fd);
-	std::string 				generate_response(const std::string &request);
 	std::string					get_requested_path(const std::string &request);
-	int 						check_client(pollfd& pfd);
+	std::string 				generate_response(const std::string &request);
+	int 						check_connection(pollfd& pfd);
 	void						delete_invalid_fds();
 
 
