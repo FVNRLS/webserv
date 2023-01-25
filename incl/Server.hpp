@@ -18,7 +18,7 @@ class Server {
 
 private:
 	const std::vector<Socket>	&_sockets;
-	std::vector<pollfd>			_poll_fds;
+	std::vector<pollfd>			_pfds;
 	CLI							_cli;
 
 	//CORE FUNCTIONS
@@ -26,8 +26,8 @@ private:
 	int 						accept_requests();
 	int 						resolve_requests();
 	std::string 				get_request(int &client_fd);
-	std::string					get_requested_path(const std::string &request);
 	std::string 				generate_response(const std::string &request);
+	std::string					get_requested_path(const std::string &request);
 	int 						check_connection(pollfd& pfd);
 	void						delete_invalid_fds();
 

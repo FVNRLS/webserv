@@ -16,11 +16,11 @@
 Server::Server(std::vector<Socket> &sockets) : _sockets(sockets) {
 	if (_cli.start() == EXIT_FAILURE)
 		exit_server();
-	_poll_fds.push_back(_cli.get_pollfd());
+	_pfds.push_back(_cli.get_pollfd());
 
 	for (size_t i = 1; i < sockets.size(); i++) {
-		_poll_fds.push_back(sockets[i].get_pollfd());
-		_poll_fds[i].events = POLLIN;
+		_pfds.push_back(sockets[i].get_pollfd());
+		_pfds[i].events = POLLIN;
 	}
 }
 
@@ -29,7 +29,7 @@ Server::~Server() {}
 //MEMBER FUNCTIONS
 int Server::run() {
 	while (true) {
-		if (poll(_poll_fds.data(), _poll_fds.size(), TIMEOUT) < 0)
+		if (poll(_pfds.data(), _pfds.size(), 1000) < 0)
 			return (terminate_with_error(server_error(POLL_ERROR, _sockets.front())));
 		if (check_cli() == EXIT_FAILURE)
 			return (EXIT_FAILURE);
@@ -38,12 +38,12 @@ int Server::run() {
 		if (resolve_requests() == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 		delete_invalid_fds();
-		std::cout << "NUM FD'S:		" << _poll_fds.size() << std::endl;
+		std::cout << "NUM FD'S:		" << _pfds.size() << std::endl;
 	}
 }
 
 int	Server::check_cli() {
-	if (_poll_fds[0].revents & POLLIN) {
+	if (_pfds[0].revents & POLLIN) {
 		if (process_cli_input() == EXIT_FAILURE)
 			return EXIT_FAILURE;
 	}
@@ -56,15 +56,15 @@ int Server::accept_requests() {
 	pollfd				client_pollfd = {};
 
 	for (size_t i = 1; i < _sockets.size(); i++) {
-		if (_poll_fds[i].revents & POLLIN) {
+		if (_pfds[i].revents & POLLIN) {
 			client_len = sizeof(client_addr);
-			client_pollfd.fd = accept(_poll_fds[i].fd, &client_addr, &client_len);
+			client_pollfd.fd = accept(_pfds[i].fd, &client_addr, &client_len);
 			if (client_pollfd.fd < 0)
 				return (server_error(ACCEPT_ERROR, _sockets[i]));
 			if (fcntl(client_pollfd.fd, F_SETFL, O_NONBLOCK) < 0)
 				return (EXIT_FAILURE);
 			client_pollfd.events = POLLIN;
-			_poll_fds.push_back(client_pollfd);
+			_pfds.push_back(client_pollfd);
 		}
 	}
 	return (EXIT_SUCCESS);
@@ -75,20 +75,20 @@ int Server::resolve_requests() {
 	std::string 		request;
 	std::string 		response;
 
-	for (size_t i = _sockets.size();  i < _poll_fds.size(); i++) {
-		if (check_connection(_poll_fds[i]) == EXIT_FAILURE)
+	for (size_t i = _sockets.size(); i < _pfds.size(); i++) {
+		if (check_connection(_pfds[i]) == EXIT_FAILURE)
 			continue;
-		if (_poll_fds[i].revents & POLLIN) {
-			request = get_request(_poll_fds[i].fd);
+		if (_pfds[i].revents & POLLIN) {
+			request = get_request(_pfds[i].fd);
 			if (request.empty())
 				return (EXIT_FAILURE);
-			_poll_fds[i].revents = POLLOUT;
+			_pfds[i].revents = POLLOUT;
 		}
 		//todo: change status!
-		if (_poll_fds[i].revents == POLLOUT) {
+		if (_pfds[i].revents == POLLOUT) {
 			response = generate_response(request);
-			send(_poll_fds[i].fd, response.c_str(), response.length(), 0);
-			close(_poll_fds[i].fd);
+			send(_pfds[i].fd, response.c_str(), response.length(), 0);
+			close(_pfds[i].fd);
 		}
 	}
 	return (EXIT_SUCCESS);
@@ -110,13 +110,16 @@ std::string Server::get_request(int &client_fd) {
 
 	if ((recv(client_fd, buffer, sizeof(buffer), MSG_DONTWAIT)) < 0) {
 		server_error(RECV_ERROR);
-		return "";
+		return (EMPTY_STRING);
 	}
 	request = buffer;
 	std::cout << request << std::endl;
 	return (request);
 }
 
+//TODO: CONT HERE!
+//problem: we don't know on which socket wea re working! ---> poss. solution: vector of pairs with socket
+// and associated fd --> search in vector with fast algorithm and get the right socket with conf
 std::string Server::generate_response(const std::string &request) {
 	std::string 		response;
 	const char 			*file_path;
@@ -126,7 +129,7 @@ std::string Server::generate_response(const std::string &request) {
 	std::stringstream 	body_len;
 	(void) request;
 
-//	requested_path = get_requested_path(request); //todo: cont!
+	requested_path = get_requested_path(request); //todo: cont!
 
 	file_path = DEFAULT_INDEX_PAGE.c_str();
 //	std::cout << file_path << std::endl;
@@ -150,15 +153,16 @@ std::string Server::generate_response(const std::string &request) {
 
 std::string	Server::get_requested_path(const std::string &request) {
 
+
 	return (request);
 }
 
 void	Server::delete_invalid_fds() {
-	std::vector<pollfd>::iterator it = _poll_fds.begin();
+	std::vector<pollfd>::iterator it = _pfds.begin();
 
-	while (it != _poll_fds.end()) {
+	while (it != _pfds.end()) {
 		if (it->fd == -1) {
-			it = _poll_fds.erase(it);
+			it = _pfds.erase(it);
 		} else {
 			++it;
 		}
@@ -275,13 +279,13 @@ int	Server::process_cli_input() {
 
 void	Server::exit_server() {
 	for (size_t i = 0; i < _sockets.size(); i++)
-		close(_poll_fds[i].fd);
+		close(_pfds[i].fd);
 	exit(EXIT_SUCCESS);
 }
 
 int		Server::terminate_with_error(int) {
 	for (size_t i = 0; i < _sockets.size(); i++)
-		close(_poll_fds[i].fd);
+		close(_pfds[i].fd);
 	return (EXIT_FAILURE);
 }
 

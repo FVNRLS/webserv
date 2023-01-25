@@ -69,6 +69,7 @@ enum num_constants {
 const std::string STR_CLOSED_CURLY_BRACE	=	"}";
 const std::string STR_SEMICOLON 			=	";";
 const std::string EQUAL_SIGN 				=	"=";
+const std::string EMPTY_STRING				=	"";
 
 //DEFAULTS
 const std::string DEFAULT_PATH = "config/test.conf";
@@ -143,5 +144,10 @@ enum cli_flags {
 };
 
 enum server_constants {
-	TIMEOUT	 = 5000,
+	TIMEOUT	 = 5000, //in milliseconds
 };
+
+
+
+// GET / HTTP/1.1
+// GET /index.html HTTP/1.1
