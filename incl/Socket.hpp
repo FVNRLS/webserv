@@ -34,6 +34,7 @@ private:
 	int 						socket_error(int error) const;
 
 public:
+	Socket();
 	Socket(Config &server_config);
 	Socket(const Socket &src);
 	Socket &operator=(const Socket &src);

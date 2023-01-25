@@ -14,11 +14,13 @@
 
 //BASIC CLASS SETUP
 Server::Server(std::vector<Socket> &sockets) : _sockets(sockets) {
-	_num_fds = sockets.size() + 1;
+	if (_cli.start() == EXIT_FAILURE)
+		exit_server();
+	_poll_fds.push_back(_cli.get_pollfd());
+
 	for (size_t i = 0; i < sockets.size(); i++) {
 		_poll_fds.push_back(sockets[i].get_pollfd());
 		_poll_fds[i].events = POLLIN;
-		_poll_fds[i].revents = 0;
 	}
 }
 
@@ -38,86 +40,112 @@ Server::~Server() {}
  * 5. The function exits the infinite loop and returns EXIT_SUCCESS to indicate that it completed successfully.
  * */
 int Server::run() {
-	size_t i;
 
 //	print_configurations();
-
-	if (_cli.start() == EXIT_FAILURE)
-		exit_server();
-	_poll_fds.push_back(_cli.get_pollfd());
-
 	while (true) {
-		if (poll(&_poll_fds[0], _num_fds, TIMEOUT) < 0)
+		if (poll(_poll_fds.data(), _poll_fds.size(), TIMEOUT) < 0)
 			return (terminate_with_error(server_error(POLL_ERROR, _sockets.front())));
-		for (i = 0; i < _sockets.size(); i++) {
-			if (_poll_fds[i].revents & POLLIN) {
-				if (process_request(_sockets[i], _poll_fds[i]) == EXIT_FAILURE)
-					return (terminate_with_error(EXIT_FAILURE));
-			}
-		}
-		if (_poll_fds[i].revents & POLLIN) {
-			if (process_cli_input() == EXIT_FAILURE)
-				return EXIT_FAILURE;
-		}
+		if (check_cli() == EXIT_FAILURE)
+			return (EXIT_FAILURE);
+		if (accept_requests() == EXIT_FAILURE)
+			return (EXIT_FAILURE);
+		if (resolve_requests() == EXIT_FAILURE)
+			return (EXIT_FAILURE);
+
 	}
 }
 
-int Server::process_request(const Socket &socket, pollfd &poll_fd) {
-	bool	socket_is_unique;
-
-	socket_is_unique = socket.get_is_unique();
-	if (socket_is_unique) {
-		if (serve_on_port(socket, poll_fd) == EXIT_FAILURE)
-			return (EXIT_FAILURE);
+int	Server::check_cli() {
+	if (_poll_fds[0].revents & POLLIN) {
+		if (process_cli_input() == EXIT_FAILURE)
+			return EXIT_FAILURE;
 	}
-	else if (serve_on_virtual_host(socket, poll_fd) < 0)
-		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
-int Server::serve_on_port(const Socket &socket, pollfd &poll_fd) {
-	std::string 		content_length;
-	std::string 		response;
-	struct sockaddr 	client_addr = {};
-	std::string 		request;
+int Server::accept_requests() {
 	socklen_t 			client_len;
-	int 				client_socket;
+	struct sockaddr 	client_addr = {};
+	pollfd				client_pollfd = {};
 
-	client_len = sizeof(client_addr);
-	client_socket = accept(poll_fd.fd, &client_addr, &client_len);
-	if (client_socket < 0)
-		return (server_error(ACCEPT_ERROR, socket));
-	if (fcntl(client_socket, F_SETFL, O_NONBLOCK) < 0)
-		return (EXIT_FAILURE);
 
-//	request = get_request(client_socket);
-//	if (request.empty())
-//		return (server_error(RECV_ERROR, socket));
+	for (size_t i = 1; i < _poll_fds.size(); i++) {
+		if (_poll_fds[i].revents & POLLIN) {
+			client_len = sizeof(client_addr);
+			client_pollfd.fd = accept(_poll_fds[i].fd, &client_addr, &client_len);
+			if (client_pollfd.fd < 0)
+				return (server_error(ACCEPT_ERROR, _sockets[i]));
 
-	char 	buffer[1024];
-	long 	bytes;
-	while ((bytes = recv(client_socket, buffer, sizeof(buffer), 0)) > 0)
-		request += std::string(buffer, bytes);
-	if(bytes < 0) {
-		if (errno != EAGAIN && errno != EWOULDBLOCK) {
-			return (server_error(RECV_ERROR, socket));
+			if (fcntl(client_pollfd.fd, F_SETFL, O_NONBLOCK) < 0)
+				return (EXIT_FAILURE);
+			client_pollfd.events = POLLIN;
+			_poll_fds.push_back(client_pollfd);
 		}
+	}
+	return (EXIT_SUCCESS);
+}
+
+//int Server::process_request(const Socket &socket, pollfd &poll_fd) {
+//	bool	socket_is_unique;
+//
+//	socket_is_unique = socket.get_is_unique();
+//	if (socket_is_unique) {
+//		if (resolve_requests(socket, poll_fd) == EXIT_FAILURE)
+//			return (EXIT_FAILURE);
+//	}
+//	else if (serve_on_virtual_host(socket, poll_fd) < 0)
+//		return (EXIT_FAILURE);
+//	return (EXIT_SUCCESS);
+//}
+
+int Server::resolve_requests() {
+	std::string 		content_length;
+	std::string 		request;
+	std::string 		response;
+
+	for (size_t i = _sockets.size() + 1;  i < _poll_fds.size(); i++) {
+		if (check_client(_poll_fds[i]) == EXIT_FAILURE)
+			continue;
+		if (_poll_fds[i].revents & POLLIN) {
+			request = get_request(_poll_fds[i].fd);
+			if (request.empty())
+				return (EXIT_FAILURE);
+			_poll_fds[i].events = POLLOUT;
+		}
+		//change status!
+		response = generate_response(request);
+		send_response()
+
+
+
+	}
+
+}
+
+int Server::check_client(pollfd &pfd) {
+	if (pfd.revents & POLLERR || pfd.revents & POLLHUP || pfd.revents & POLLNVAL) {
+		shutdown(pfd.fd, SHUT_RDWR);
+		close(pfd.fd);
+		pfd.fd = -1;
+		return EXIT_FAILURE;
+	}
+	return EXIT_SUCCESS;
+}
+
+std::string Server::get_request(int &client_fd) {
+	char 	buffer[1024];
+	std::string request;
+	long 	bytes;
+
+
+	while ((bytes = recv(client_fd, buffer, sizeof(buffer), 0)) > 0)
+		request += std::string(buffer, bytes);
+	if (bytes < 0) {
+		server_error(RECV_ERROR);
+		return "";
 	}
 	std::cout << request << std::endl;
-
-	response = generate_response(request);
-	send(client_socket, response.c_str(), response.length(), 0);
-	close(client_socket);
-	return (EXIT_SUCCESS);
-}
-
-std::string Server::get_request(int &socket) {
-	char		client_buf[1024];
-	std::string request;
-
-	if (recv(socket, client_buf, sizeof(client_buf), 0) <= 0)
-		return (request);
-	request = client_buf;
+	request = buffer;
 	return (request);
 }
 
@@ -129,6 +157,12 @@ std::string Server::generate_response(const std::string &request) {
 	std::string 		requested_path;
 	std::stringstream 	body_len;
 	(void) request;
+
+
+	send(client_socket, response.c_str(), response.length(), 0);
+	close(client_socket);
+	return (EXIT_SUCCESS);
+
 
 //	requested_path = get_requested_path(request); //todo: cont!
 
@@ -204,7 +238,6 @@ std::string	Server::get_requested_path(const std::string &request) {
 	return (request);
 }
 
-
 //TERMINAL FUNCTIONS
 int	Server::process_cli_input() {
 	switch (_cli.check_input()) {
@@ -262,7 +295,7 @@ int Server::server_error(int error, const Socket &socket) {
 			std::cerr << "Error: command line interface failed" << std::endl;
 			break;
 		case RECV_ERROR:
-			std::cerr << "Error: failed to receive message on port " << socket.get_port() << std::endl;
+			std::cerr << "Error: failed to receive request" << std::endl;
 			break;
 		case ERROR_404:
 			std::cerr << "Error: Page not found!" << std::endl;

@@ -12,6 +12,8 @@
 
 #include "Socket.hpp"
 
+Socket::Socket() {}
+
 //BASIC CLASS SETUP
 Socket::Socket(Config &server_config) {
 	_config = &server_config;
