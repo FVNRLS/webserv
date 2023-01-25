@@ -62,7 +62,7 @@ enum num_constants {
 	MAX_PORT_NUM			= 65535,
 	MIN_CLIENT_BODY_SIZE	= 10,
 	NEGATIVE_OFFSET			= 75,
-	MAX_CONNECTIONS			= 5,
+	MAX_CONNECTIONS			= 10,
 };
 
 //STRINGS

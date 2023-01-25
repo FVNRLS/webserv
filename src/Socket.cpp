@@ -84,6 +84,12 @@ int Socket::init_unblock_sockets() {
 	if (_socket.fd < 0)
 		return  (socket_error(SOCKET_OPEN_ERROR));
 
+	int on = 1;
+	setsockopt(_socket.fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+	if (fcntl(_socket.fd, F_SETFL, O_NONBLOCK) < 0)
+		return (socket_error(SOCKET_OPEN_ERROR));
+
+	//virtual part
 	if (!_is_unique) { //todo: find out, what is right: SO_REUSEADDR or SO_REUSEPORT ????
 		if (setsockopt(_socket.fd, SOL_SOCKET, SO_REUSEADDR, server_name.c_str(), server_name.length()) < 0)
 			return (socket_error(BIND_ERROR));
@@ -101,7 +107,7 @@ int Socket::init_unblock_sockets() {
  * it can be used to send or receive data.
  * */
 int Socket::bind_socket() {
-	if (bind(_socket.fd, (struct sockaddr *)&_serv_addr, sizeof(_serv_addr)) < 0)
+	if (bind(_socket.fd, reinterpret_cast<struct sockaddr *>(&_serv_addr), sizeof(_serv_addr)) < 0)
 		return (socket_error(BIND_ERROR));
 	std::cout << "bind success on " << inet_ntoa(_serv_addr.sin_addr) << ":" << ntohs(_serv_addr.sin_port) << std::endl;
 	return (EXIT_SUCCESS);
@@ -115,7 +121,6 @@ int	Socket::listen_to_connections() {
 		return (socket_error(LISTEN_ERROR));
 	return (EXIT_SUCCESS);
 }
-
 
 //GETTERS
 pollfd	Socket::get_pollfd() const {

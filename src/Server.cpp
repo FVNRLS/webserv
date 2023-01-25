@@ -19,8 +19,6 @@ Server::Server(std::vector<Socket> &sockets) : _sockets(sockets) {
 		_poll_fds.push_back(sockets[i].get_pollfd());
 		_poll_fds[i].events = POLLIN;
 		_poll_fds[i].revents = 0;
-		if (fcntl(_poll_fds[i].fd, F_SETFL, O_NONBLOCK) < 0)
-			terminate_with_error(EXIT_FAILURE);
 	}
 }
 
@@ -48,23 +46,20 @@ int Server::run() {
 		exit_server();
 	_poll_fds.push_back(_cli.get_pollfd());
 
-
-
-
-//	while (true) {
-//		if (poll(&_poll_fds[0], _num_fds, TIMEOUT) < 0)
-//			return (terminate_with_error(server_error(POLL_ERROR, _sockets.front())));
-//		for (i = 0; i < _sockets.size(); i++) {
-//			if (_poll_fds[i].revents & POLLIN) {
-//				if (process_request(_sockets[i], _poll_fds[i]) == EXIT_FAILURE)
-//					return (terminate_with_error(EXIT_FAILURE));
-//			}
-//		}
-//		if (_poll_fds[i].revents & POLLIN) {
-//			if (process_cli_input() == EXIT_FAILURE)
-//				return EXIT_FAILURE;
-//		}
-//	}
+	while (true) {
+		if (poll(&_poll_fds[0], _num_fds, TIMEOUT) < 0)
+			return (terminate_with_error(server_error(POLL_ERROR, _sockets.front())));
+		for (i = 0; i < _sockets.size(); i++) {
+			if (_poll_fds[i].revents & POLLIN) {
+				if (process_request(_sockets[i], _poll_fds[i]) == EXIT_FAILURE)
+					return (terminate_with_error(EXIT_FAILURE));
+			}
+		}
+		if (_poll_fds[i].revents & POLLIN) {
+			if (process_cli_input() == EXIT_FAILURE)
+				return EXIT_FAILURE;
+		}
+	}
 }
 
 int Server::process_request(const Socket &socket, pollfd &poll_fd) {

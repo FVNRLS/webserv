@@ -12,3 +12,7 @@
 2	1175	1674569539000000000	CMakeFiles/webserver.dir/src/ConfigParser.cpp.o	68bc7a944fac86c1
 0	106	1674638492000000000	build.ninja	f1bdf160c9682030
 680	875	1674413968000000000	CMakeFiles/webserver.dir/src/tools/signal_handler.cpp.o	86328085b87a2fdb
+6	961	1674638779000000000	CMakeFiles/webserver.dir/src/Server.cpp.o	f99adc54d0869dca
+961	1326	1674638780000000000	webserver	d38037a610dcd0fc
+16	530	1674639640000000000	CMakeFiles/webserver.dir/src/Socket.cpp.o	ff1e410a5c0c5b12
+530	914	1674639641000000000	webserver	d38037a610dcd0fc
