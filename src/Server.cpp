@@ -18,7 +18,7 @@ Server::Server(std::vector<Socket> &sockets) : _sockets(sockets) {
 		exit_server();
 	_poll_fds.push_back(_cli.get_pollfd());
 
-	for (size_t i = 0; i < sockets.size(); i++) {
+	for (size_t i = 1; i < sockets.size(); i++) {
 		_poll_fds.push_back(sockets[i].get_pollfd());
 		_poll_fds[i].events = POLLIN;
 	}
@@ -40,8 +40,6 @@ Server::~Server() {}
  * 5. The function exits the infinite loop and returns EXIT_SUCCESS to indicate that it completed successfully.
  * */
 int Server::run() {
-
-//	print_configurations();
 	while (true) {
 		if (poll(_poll_fds.data(), _poll_fds.size(), TIMEOUT) < 0)
 			return (terminate_with_error(server_error(POLL_ERROR, _sockets.front())));
@@ -68,18 +66,17 @@ int Server::accept_requests() {
 	struct sockaddr 	client_addr = {};
 	pollfd				client_pollfd = {};
 
-
-	for (size_t i = 1; i < _poll_fds.size(); i++) {
+	for (size_t i = 1; i < _sockets.size(); i++) {
 		if (_poll_fds[i].revents & POLLIN) {
 			client_len = sizeof(client_addr);
 			client_pollfd.fd = accept(_poll_fds[i].fd, &client_addr, &client_len);
 			if (client_pollfd.fd < 0)
 				return (server_error(ACCEPT_ERROR, _sockets[i]));
-
 			if (fcntl(client_pollfd.fd, F_SETFL, O_NONBLOCK) < 0)
 				return (EXIT_FAILURE);
 			client_pollfd.events = POLLIN;
 			_poll_fds.push_back(client_pollfd);
+			_poll_fds[i].revents = 0;
 		}
 	}
 	return (EXIT_SUCCESS);
@@ -90,17 +87,17 @@ int Server::resolve_requests() {
 	std::string 		request;
 	std::string 		response;
 
-	for (size_t i = _sockets.size() + 1;  i < _poll_fds.size(); i++) {
+	for (size_t i = _sockets.size();  i < _poll_fds.size(); i++) {
 		if (check_client(_poll_fds[i]) == EXIT_FAILURE)
 			continue;
 		if (_poll_fds[i].revents & POLLIN) {
 			request = get_request(_poll_fds[i].fd);
 			if (request.empty())
 				return (EXIT_FAILURE);
-			_poll_fds[i].events = POLLOUT;
+			_poll_fds[i].revents = POLLOUT;
 		}
 		//todo: change status!
-		else if (_poll_fds[i].revents == POLLOUT) {
+		if (_poll_fds[i].revents == POLLOUT) {
 			response = generate_response(request);
 			send(_poll_fds[i].fd, response.c_str(), response.length(), 0);
 		}
@@ -123,15 +120,12 @@ std::string Server::get_request(int &client_fd) {
 	std::string request;
 	long 	bytes;
 
-
-	while ((bytes = recv(client_fd, buffer, sizeof(buffer), 0)) > 0)
-		request += std::string(buffer, bytes);
-	if (bytes < 0) {
+	if ((recv(client_fd, buffer, sizeof(buffer), MSG_DONTWAIT)) < 0) {
 		server_error(RECV_ERROR);
 		return "";
 	}
-	std::cout << request << std::endl;
 	request = buffer;
+	std::cout << request << std::endl;
 	return (request);
 }
 
