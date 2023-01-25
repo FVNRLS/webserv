@@ -24,16 +24,18 @@ private:
 	//CORE FUNCTIONS
 	int							check_cli();
 	int 						accept_requests();
-	int 						process_request(const Socket &socket, pollfd &poll_fd);
-	int 						check_client(pollfd& pfd);
 	int 						resolve_requests();
-	int 						serve_on_virtual_host(const Socket &socket, pollfd &poll_fd);
-	std::string 				extract_domain(std::string &request);
-
-
 	std::string 				get_request(int &client_fd);
 	std::string 				generate_response(const std::string &request);
 	std::string					get_requested_path(const std::string &request);
+	int 						check_client(pollfd& pfd);
+	void						delete_invalid_fds();
+
+
+		//VIRTUAL HOSTING //todo: later!
+	int 						process_request(const Socket &socket, pollfd &poll_fd);
+	int 						serve_on_virtual_host(const Socket &socket, pollfd &poll_fd);
+	std::string 				extract_domain(std::string &request);
 
 	//TERMINAL INTERACTION
 	int							process_cli_input();

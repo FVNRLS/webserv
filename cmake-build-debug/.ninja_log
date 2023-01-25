@@ -16,3 +16,11 @@
 961	1326	1674638780000000000	webserver	d38037a610dcd0fc
 16	530	1674639640000000000	CMakeFiles/webserver.dir/src/Socket.cpp.o	ff1e410a5c0c5b12
 530	914	1674639641000000000	webserver	d38037a610dcd0fc
+20	1266	1674655093000000000	CMakeFiles/webserver.dir/src/Socket.cpp.o	ff1e410a5c0c5b12
+21	1286	1674655093000000000	CMakeFiles/webserver.dir/src/tools.cpp.o	6f8ff94345625a0d
+20	1405	1674655093000000000	CMakeFiles/webserver.dir/src/CLI.cpp.o	d27d696acbe722d7
+19	1405	1674655093000000000	CMakeFiles/webserver.dir/src/main.cpp.o	e4069d92c7575fb2
+20	1413	1674655093000000000	CMakeFiles/webserver.dir/src/Config.cpp.o	b11db586e21c9121
+21	1413	1674655093000000000	CMakeFiles/webserver.dir/src/Server.cpp.o	f99adc54d0869dca
+20	1567	1674655093000000000	CMakeFiles/webserver.dir/src/ConfigParser.cpp.o	68bc7a944fac86c1
+1567	1733	1674655094000000000	webserver	d38037a610dcd0fc

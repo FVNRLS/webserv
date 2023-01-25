@@ -51,7 +51,7 @@ int Server::run() {
 			return (EXIT_FAILURE);
 		if (resolve_requests() == EXIT_FAILURE)
 			return (EXIT_FAILURE);
-
+		delete_invalid_fds();
 	}
 }
 
@@ -85,19 +85,6 @@ int Server::accept_requests() {
 	return (EXIT_SUCCESS);
 }
 
-//int Server::process_request(const Socket &socket, pollfd &poll_fd) {
-//	bool	socket_is_unique;
-//
-//	socket_is_unique = socket.get_is_unique();
-//	if (socket_is_unique) {
-//		if (resolve_requests(socket, poll_fd) == EXIT_FAILURE)
-//			return (EXIT_FAILURE);
-//	}
-//	else if (serve_on_virtual_host(socket, poll_fd) < 0)
-//		return (EXIT_FAILURE);
-//	return (EXIT_SUCCESS);
-//}
-
 int Server::resolve_requests() {
 	std::string 		content_length;
 	std::string 		request;
@@ -112,14 +99,13 @@ int Server::resolve_requests() {
 				return (EXIT_FAILURE);
 			_poll_fds[i].events = POLLOUT;
 		}
-		//change status!
-		response = generate_response(request);
-		send_response()
-
-
-
+		//todo: change status!
+		else if (_poll_fds[i].revents == POLLOUT) {
+			response = generate_response(request);
+			send(_poll_fds[i].fd, response.c_str(), response.length(), 0);
+		}
 	}
-
+	return (EXIT_SUCCESS);
 }
 
 int Server::check_client(pollfd &pfd) {
@@ -158,12 +144,6 @@ std::string Server::generate_response(const std::string &request) {
 	std::stringstream 	body_len;
 	(void) request;
 
-
-	send(client_socket, response.c_str(), response.length(), 0);
-	close(client_socket);
-	return (EXIT_SUCCESS);
-
-
 //	requested_path = get_requested_path(request); //todo: cont!
 
 	file_path = DEFAULT_INDEX_PAGE.c_str();
@@ -184,6 +164,47 @@ std::string Server::generate_response(const std::string &request) {
 	file.close();
 
 	return (response);
+}
+
+std::string	Server::get_requested_path(const std::string &request) {
+
+	return (request);
+}
+
+void	Server::delete_invalid_fds() {
+	std::vector<pollfd>::iterator it = _poll_fds.begin();
+
+	while (it != _poll_fds.end()) {
+		if (it->fd == -1) {
+			it = _poll_fds.erase(it);
+		} else {
+			++it;
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+//VIRTUAL HOSTING
+int Server::process_request(const Socket &socket, pollfd &poll_fd) {
+	bool	socket_is_unique;
+
+//	socket_is_unique = socket.get_is_unique();
+//	if (socket_is_unique) {
+//		if (resolve_requests(socket, poll_fd) == EXIT_FAILURE)
+//			return (EXIT_FAILURE);
+//	}
+//	else if (serve_on_virtual_host(socket, poll_fd) < 0)
+//		return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
 }
 
 int Server::serve_on_virtual_host(const Socket &socket, pollfd &poll_fd) {
@@ -233,10 +254,6 @@ std::string Server::extract_domain(std::string &request) {
 	return domain;
 }
 
-std::string	Server::get_requested_path(const std::string &request) {
-
-	return (request);
-}
 
 //TERMINAL FUNCTIONS
 int	Server::process_cli_input() {
