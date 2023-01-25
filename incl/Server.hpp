@@ -32,7 +32,7 @@ private:
 	void						delete_invalid_fds();
 
 
-		//VIRTUAL HOSTING //todo: later!
+	//VIRTUAL HOSTING //todo: later!
 	int 						process_request(const Socket &socket, pollfd &poll_fd);
 	int 						serve_on_virtual_host(const Socket &socket, pollfd &poll_fd);
 	std::string 				extract_domain(std::string &request);

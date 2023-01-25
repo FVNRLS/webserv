@@ -27,18 +27,6 @@ Server::Server(std::vector<Socket> &sockets) : _sockets(sockets) {
 Server::~Server() {}
 
 //MEMBER FUNCTIONS
-
-/*
- * 1. The function runs in an infinite loop.
- * 2. Within the loop, it calls the poll() function on the _sockets vector, with a timeout of -1
- * 		(meaning it will wait indefinitely) to wait for incoming connections.
- * 3. It iterates over the _sockets vector, checking for the POLLIN event on each file descriptor.
- * 		If the POLLIN event is set, it calls the process_request() function on the file descriptor.
- * 4. After handling all the _sockets in the vector, it checks if there is any input from the command-line interface (CLI).
- * 		If there is input, it calls the process_cli() function. If the process_cli() function returns an error,
- * 		the function returns an error code.
- * 5. The function exits the infinite loop and returns EXIT_SUCCESS to indicate that it completed successfully.
- * */
 int Server::run() {
 	while (true) {
 		if (poll(_poll_fds.data(), _poll_fds.size(), TIMEOUT) < 0)
@@ -50,6 +38,7 @@ int Server::run() {
 		if (resolve_requests() == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 		delete_invalid_fds();
+		std::cout << "NUM FD'S:		" << _poll_fds.size() << std::endl;
 	}
 }
 
