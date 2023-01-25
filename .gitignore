@@ -1,0 +1,7 @@
+.vscode
+cmake-build-debug/**
+**/*.a
+**/*.o
+webserv
+a.out
+.DS_Store
