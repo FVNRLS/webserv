@@ -80,12 +80,8 @@ int Socket::init_unblock_sockets() {
 	std::string server_name = _config->get_name();
 	std::string server_alias = _config->get_alias();
 
-	_socket.events = POLLIN;
 	_socket.fd = socket(AF_INET, SOCK_STREAM, 0);;
 	if (_socket.fd < 0)
-		return  (socket_error(SOCKET_OPEN_ERROR));
-
-	if (fcntl(_socket.fd, F_SETFL, O_NONBLOCK) < 0)
 		return  (socket_error(SOCKET_OPEN_ERROR));
 
 	if (!_is_unique) { //todo: find out, what is right: SO_REUSEADDR or SO_REUSEPORT ????
