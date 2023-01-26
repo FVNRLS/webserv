@@ -29,7 +29,7 @@ Server::~Server() {}
 //MEMBER FUNCTIONS
 int Server::run() {
 	while (true) {
-		if (poll(_pfds.data(), _pfds.size(), 1000) < 0)
+		if (poll(_pfds.data(), _pfds.size(), TIMEOUT) < 0)
 			return (terminate_with_error(server_error(POLL_ERROR, _sockets.front())));
 		if (check_cli() == EXIT_FAILURE)
 			return (EXIT_FAILURE);
@@ -38,7 +38,7 @@ int Server::run() {
 		if (resolve_requests() == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 		delete_invalid_fds();
-		std::cout << "NUM FD'S:		" << _pfds.size() << std::endl;
+//		std::cout << "NUM FD'S:		" << _pfds.size() << std::endl; //todo: check on high loaded server!
 	}
 }
 
@@ -54,6 +54,7 @@ int Server::accept_requests() {
 	socklen_t 			client_len;
 	struct sockaddr 	client_addr = {};
 	pollfd				client_pollfd = {};
+	request_handler		request;
 
 	for (size_t i = 1; i < _sockets.size(); i++) {
 		if (_pfds[i].revents & POLLIN) {
@@ -65,6 +66,8 @@ int Server::accept_requests() {
 				return (EXIT_FAILURE);
 			client_pollfd.events = POLLIN;
 			_pfds.push_back(client_pollfd);
+			request.socket = _sockets[i];
+			_requests[client_pollfd.fd] = request;
 		}
 	}
 	return (EXIT_SUCCESS);
@@ -79,10 +82,13 @@ int Server::resolve_requests() {
 		if (check_connection(_pfds[i]) == EXIT_FAILURE)
 			continue;
 		if (_pfds[i].revents & POLLIN) {
-			request = get_request(_pfds[i].fd);
-			if (request.empty())
+			if (get_request(_pfds[i].fd) == EXIT_FAILURE)
 				return (EXIT_FAILURE);
-			_pfds[i].revents = POLLOUT;
+			request = (_requests.find(_pfds[i].fd))->second.buf;
+			if (request.find("\r\n\r\n") != std::string::npos) {
+				std::cout << request << std::endl;
+				_pfds[i].revents = POLLOUT;
+			}
 		}
 		//todo: change status!
 		if (_pfds[i].revents == POLLOUT) {
@@ -104,17 +110,18 @@ int Server::check_connection(pollfd &pfd) {
 	return EXIT_SUCCESS;
 }
 
-std::string Server::get_request(int &client_fd) {
-	char 	buffer[1024];
-	std::string request;
+int	Server::get_request(int &client_fd) {
+	char 										buffer[10];
+	std::map<int, request_handler>::iterator	it;
+	int 										bytes;
 
-	if ((recv(client_fd, buffer, sizeof(buffer), MSG_DONTWAIT)) < 0) {
-		server_error(RECV_ERROR);
-		return (EMPTY_STRING);
-	}
-	request = buffer;
-	std::cout << request << std::endl;
-	return (request);
+	bytes = recv(client_fd, buffer, sizeof(buffer), MSG_DONTWAIT);
+	if (bytes < 0)
+		return (server_error(RECV_ERROR));
+	it = _requests.find(client_fd);
+	(*it).second.buf += std::string(buffer, bytes);
+//	std::cout << (*it).second.buf << std::endl;
+	return (EXIT_SUCCESS);
 }
 
 //TODO: CONT HERE!

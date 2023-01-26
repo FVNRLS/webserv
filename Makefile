@@ -12,6 +12,7 @@ SRC =	./src/main.cpp \
 		./src/Socket.cpp \
 		./src/Server.cpp \
 		./src/CLI.cpp \
+		./src/RequestHandler.cpp \
 		./src/tools.cpp \
 
 

@@ -26,8 +26,10 @@ add_executable(webserver
         src/Server.cpp
         incl/Server.hpp
 
+        src/RequestHandler.cpp
+        incl/RequestHandler.hpp
+
         #TOOLS
         src/tools.cpp
-        incl/tools.hpp
+        incl/tools.hpp)
 
-      )

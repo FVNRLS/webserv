@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 #include <fstream>
 #include <unistd.h>
 #include <sstream>

@@ -14,18 +14,25 @@
 
 #include "CLI.hpp"
 
+struct request_handler {
+	Socket		socket;
+	std::string buf;
+
+};
+
 class Server {
 
 private:
-	const std::vector<Socket>	&_sockets;
-	std::vector<pollfd>			_pfds;
-	CLI							_cli;
+	const std::vector<Socket>		&_sockets;
+	std::vector<pollfd>				_pfds;
+	CLI								_cli;
+	std::map<int, request_handler>	_requests;
 
 	//CORE FUNCTIONS
 	int							check_cli();
 	int 						accept_requests();
 	int 						resolve_requests();
-	std::string 				get_request(int &client_fd);
+	int							get_request(int &client_fd);
 	std::string 				generate_response(const std::string &request);
 	std::string					get_requested_path(const std::string &request);
 	int 						check_connection(pollfd& pfd);
