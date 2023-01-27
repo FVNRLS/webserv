@@ -12,7 +12,7 @@ SRC =	./src/main.cpp \
 		./src/Socket.cpp \
 		./src/Server.cpp \
 		./src/CLI.cpp \
-		./src/RequestHandler.cpp \
+		./src/ResponseGenerator.cpp \
 		./src/tools.cpp \
 
 
@@ -40,6 +40,6 @@ fclean: clean
 re: fclean all
 
 run: $(NAME)
-	./webserv config/test2.conf
+	./webserv config/vs_code.conf
 
 .PHONY: all clean fclean re

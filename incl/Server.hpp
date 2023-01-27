@@ -54,7 +54,7 @@ private:
 
 	//ERROR MANAGEMENT
 	int 						system_call_error(int error, const Socket &socket = Socket());
-	int 						server_error(int error, int pfd, const Socket &socket = Socket());
+	int 						server_error(int error, int &pfd, const Socket &socket = Socket());
 
 		public:
 	Server(std::vector<Socket> &sockets);

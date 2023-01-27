@@ -73,7 +73,7 @@ const std::string EQUAL_SIGN 				=	"=";
 const std::string EMPTY_STRING				=	"";
 
 //DEFAULTS
-const std::string DEFAULT_PATH = "config/test.conf";
+const std::string DEFAULT_PATH = "config/clion_test.conf";
 const std::string DEFAULT_INDEX_PAGE = "../html/index.html";
 const std::string DEFAULT_ERROR_PAGES_DIR = "config/default_error_pages";
 const std::string DEFAULT_REDIR_FIRST = "config";

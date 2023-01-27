@@ -90,16 +90,15 @@ int Server::resolve_requests() {
 			request = (_requests.find(_pfds[i].fd))->second.buf;
 			it = _requests.find(_pfds[i].fd);
 			max_client_body_size = (*it).second.socket.get_config().get_max_client_body_size();
-			if (request.length() > max_client_body_size) {
-				server_error(BAD_REQUEST, _pfds[i].fd, _sockets[i]);
+			if (static_cast<long long>(request.length()) > max_client_body_size) {
+				server_error(BAD_REQUEST, _pfds[i].fd, (*it).second.socket);
 				close(_pfds[i].fd);
 			}
-			else if (request.find("\r\n\r\n") != std::string::npos) {
-				std::cout << request << std::endl;
+			else if (request.find("\r\n\r\n") != std::string::npos)
 				_pfds[i].revents = POLLOUT;
-			}
 		}
 		if (_pfds[i].revents == POLLOUT) {
+			std::cout << request << std::endl;
 			response = generate_response(request);
 			send(_pfds[i].fd, response.c_str(), response.length(), 0);
 			close(_pfds[i].fd);
@@ -119,7 +118,7 @@ int Server::check_connection(pollfd &pfd) {
 }
 
 int	Server::get_request(int &client_fd) {
-	char 										buffer[10];
+	char 										buffer[100];
 	std::map<int, request_handler>::iterator	it;
 	long 										bytes;
 
@@ -143,6 +142,7 @@ std::string Server::generate_response(const std::string &request) {
 	requested_path = get_requested_path(request);
 
 	file_path = DEFAULT_INDEX_PAGE.c_str();
+//file_path = ("/Users/rmazurit/Documents/42_Projects/webserv/config/error_pages/400.html"); //just for quick testing of pages
 //	std::cout << file_path << std::endl;
 
 	if (access(file_path, F_OK) < 0) {
@@ -339,12 +339,15 @@ int Server::system_call_error(int error, const Socket &socket) {
 	return (EXIT_FAILURE);
 }
 
-int Server::server_error(int error, int pfd,  const Socket &socket) {
-	std::ifstream 			file;
-	std:std::stringstream	error_code;
-	std::string 			error_file;
-	std::string 			error_page_path;
-	std::string 			response;
+int Server::server_error(int error, int &pfd,  const Socket &socket) {
+	std::ifstream 		file;
+	std::stringstream	error_code;
+	std::string 		error_file;
+	std::string 		error_page_path;
+	std::string 		body;
+	std::stringstream 	body_len;
+	std::string 		response;
+
 
 	error_code << error;
 	error_file = error_code.str() + ".html";
@@ -355,7 +358,10 @@ int Server::server_error(int error, int pfd,  const Socket &socket) {
 	if (!file.is_open() || file.fail())
 		return (system_call_error(ACCESS_DENIED, socket));
 
-	response.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	body_len << body.length();
+	response = RESPONSE_HEADER + body_len.str() + "\n\n" + body;
+
 	send(pfd, response.c_str(), response.length(), 0);
 
 	file.close();
