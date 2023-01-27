@@ -90,7 +90,6 @@ int Server::resolve_requests() {
 				_pfds[i].revents = POLLOUT;
 			}
 		}
-		//todo: change status!
 		if (_pfds[i].revents == POLLOUT) {
 			response = generate_response(request);
 			send(_pfds[i].fd, response.c_str(), response.length(), 0);
@@ -124,9 +123,6 @@ int	Server::get_request(int &client_fd) {
 	return (EXIT_SUCCESS);
 }
 
-//TODO: CONT HERE!
-//problem: we don't know on which socket wea re working! ---> poss. solution: vector of pairs with socket
-// and associated fd --> search in vector with fast algorithm and get the right socket with conf
 std::string Server::generate_response(const std::string &request) {
 	std::string 		response;
 	const char 			*file_path;
@@ -136,7 +132,7 @@ std::string Server::generate_response(const std::string &request) {
 	std::stringstream 	body_len;
 	(void) request;
 
-	requested_path = get_requested_path(request); //todo: cont!
+	requested_path = get_requested_path(request);
 
 	file_path = DEFAULT_INDEX_PAGE.c_str();
 //	std::cout << file_path << std::endl;
@@ -168,11 +164,10 @@ void	Server::delete_invalid_fds() {
 	std::vector<pollfd>::iterator it = _pfds.begin();
 
 	while (it != _pfds.end()) {
-		if (it->fd == -1) {
+		if (it->fd == -1)
 			it = _pfds.erase(it);
-		} else {
-			++it;
-		}
+		else
+			it++;
 	}
 }
 
