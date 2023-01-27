@@ -10,9 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "main.hpp"
+#include "ConfigParser.hpp"
+#include "Server.hpp"
 
 int main(int argc, char **argv) {
+
 	//PARSING
 	if (argc > 2) {
 		std::cerr << "Error: invalid number of arguments" << std::endl;

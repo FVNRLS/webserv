@@ -30,7 +30,7 @@ Server::~Server() {}
 int Server::run() {
 	while (true) {
 		if (poll(_pfds.data(), _pfds.size(), TIMEOUT) < 0)
-			return (terminate_with_error(server_error(POLL_ERROR, _sockets.front())));
+			return (terminate_with_error(system_call_error(POLL_ERROR, _sockets.front())));
 		if (check_cli() == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 		if (accept_requests() == EXIT_FAILURE)
@@ -61,7 +61,7 @@ int Server::accept_requests() {
 			client_len = sizeof(client_addr);
 			client_pollfd.fd = accept(_pfds[i].fd, &client_addr, &client_len);
 			if (client_pollfd.fd < 0)
-				return (server_error(ACCEPT_ERROR, _sockets[i]));
+				return (system_call_error(ACCEPT_ERROR, _sockets[i]));
 			if (fcntl(client_pollfd.fd, F_SETFL, O_NONBLOCK) < 0)
 				return (EXIT_FAILURE);
 			client_pollfd.events = POLLIN;
@@ -77,6 +77,9 @@ int Server::resolve_requests() {
 	std::string 		content_length;
 	std::string 		request;
 	std::string 		response;
+	long long 			max_client_body_size;
+	std::map<int, request_handler>::iterator	it;
+
 
 	for (size_t i = _sockets.size(); i < _pfds.size(); i++) {
 		if (check_connection(_pfds[i]) == EXIT_FAILURE)
@@ -85,7 +88,13 @@ int Server::resolve_requests() {
 			if (get_request(_pfds[i].fd) == EXIT_FAILURE)
 				return (EXIT_FAILURE);
 			request = (_requests.find(_pfds[i].fd))->second.buf;
-			if (request.find("\r\n\r\n") != std::string::npos) {
+			it = _requests.find(_pfds[i].fd);
+			max_client_body_size = (*it).second.socket.get_config().get_max_client_body_size();
+			if (request.length() > max_client_body_size) {
+				server_error(BAD_REQUEST, _pfds[i].fd, _sockets[i]);
+				close(_pfds[i].fd);
+			}
+			else if (request.find("\r\n\r\n") != std::string::npos) {
 				std::cout << request << std::endl;
 				_pfds[i].revents = POLLOUT;
 			}
@@ -112,14 +121,13 @@ int Server::check_connection(pollfd &pfd) {
 int	Server::get_request(int &client_fd) {
 	char 										buffer[10];
 	std::map<int, request_handler>::iterator	it;
-	int 										bytes;
+	long 										bytes;
 
 	bytes = recv(client_fd, buffer, sizeof(buffer), MSG_DONTWAIT);
 	if (bytes < 0)
-		return (server_error(RECV_ERROR));
+		return (system_call_error(RECV_ERROR));
 	it = _requests.find(client_fd);
 	(*it).second.buf += std::string(buffer, bytes);
-//	std::cout << (*it).second.buf << std::endl;
 	return (EXIT_SUCCESS);
 }
 
@@ -138,12 +146,12 @@ std::string Server::generate_response(const std::string &request) {
 //	std::cout << file_path << std::endl;
 
 	if (access(file_path, F_OK) < 0) {
-		server_error(ERROR_404, _sockets.front());
+		system_call_error(PAGE_NOT_FOUND, _sockets.front());
 		return (""); //todo: add error.html
 	}
 	file.open(file_path);
 	if (!file.is_open() || file.fail()) {
-		server_error(ACCESS_DENIED, _sockets.front());
+		system_call_error(ACCESS_DENIED, _sockets.front());
 		return (""); //todo: add error.html
 	}
 	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
@@ -267,7 +275,7 @@ int	Server::process_cli_input() {
 		case CLI_EMPTY:
 			return EXIT_SUCCESS;
 		case CLI_FAIL:
-			return terminate_with_error(server_error(CLI_ERROR, _sockets.front()));
+			return terminate_with_error(system_call_error(CLI_ERROR, _sockets.front()));
 		case CLI_EXIT:
 			exit_server();
 		case CLI_LS:
@@ -306,30 +314,51 @@ void 	Server::show_manual() {
 
 
 //ERROR MANAGEMENT
-int Server::server_error(int error, const Socket &socket) {
+int Server::system_call_error(int error, const Socket &socket) {
 	switch(error) {
 		case POLL_ERROR:
-			std::cerr << "Error: failed polling sockets" << std::endl;
+			std::cerr << "Error: Failed polling sockets" << std::endl;
 			break;
 		case ACCEPT_ERROR:
-			std::cerr << "Error: failed to accept connection on port " << socket.get_port() << std::endl;
+			std::cerr << "Error: Failed to accept connection on port " << socket.get_port() << std::endl;
 			break;
 		case CLI_ERROR:
-			std::cerr << "Error: command line interface failed" << std::endl;
+			std::cerr << "Error: Command line interface failed" << std::endl;
 			break;
 		case RECV_ERROR:
-			std::cerr << "Error: failed to receive request" << std::endl;
-			break;
-		case ERROR_404:
-			std::cerr << "Error: Page not found!" << std::endl;
+			std::cerr << "Error: Failed to receive request" << std::endl;
 			break;
 		case ACCESS_DENIED:
 			std::cerr << "Error: Access Denied!" << std::endl;
 			break;
+
+
 		default:
 			std::cerr << "Server: unknown error" << std::endl;
 	}
 	return (EXIT_FAILURE);
 }
 
+int Server::server_error(int error, int pfd,  const Socket &socket) {
+	std::ifstream 			file;
+	std:std::stringstream	error_code;
+	std::string 			error_file;
+	std::string 			error_page_path;
+	std::string 			response;
+
+	error_code << error;
+	error_file = error_code.str() + ".html";
+	error_page_path = socket.get_config().get_error_pages_dir() + error_file;
+	if (access(error_page_path.c_str(), F_OK) < 0)
+		return (system_call_error(ACCESS_DENIED, socket));
+	file.open(error_page_path);
+	if (!file.is_open() || file.fail())
+		return (system_call_error(ACCESS_DENIED, socket));
+
+	response.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	send(pfd, response.c_str(), response.length(), 0);
+
+	file.close();
+	return (EXIT_SUCCESS);
+}
 

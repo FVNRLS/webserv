@@ -10,5 +10,26 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "RequestHandler.hpp"
+#include "ResponseGenerator.hpp"
 
+//BASIC CLASS SETUP
+ResponseGenerator::ResponseGenerator(const std::string &response) : _response(response) {
+
+}
+
+ResponseGenerator::ResponseGenerator(const ResponseGenerator &src) { *this = src; }
+
+ResponseGenerator	&ResponseGenerator::operator=(const ResponseGenerator &src) {
+	if (this == &src)
+		return (*this);
+	_response = src._response;
+	return (*this);
+}
+
+ResponseGenerator::~ResponseGenerator() {}
+
+
+//MEMBER FUNCTIONS
+std::string	ResponseGenerator::get_location() {
+	return ("");
+}
