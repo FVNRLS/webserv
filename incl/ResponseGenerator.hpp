@@ -17,18 +17,19 @@
 class ResponseGenerator {
 
 private:
+	pollfd		_pfd;
+	Socket		_socket;
+	std::string _request;
 	std::string	_response;
 
 
+	std::string			get_requested_path();
 
 public:
-	ResponseGenerator(const std::string &response);
+	ResponseGenerator(pollfd &pfd, request_handler &args);
 	ResponseGenerator(const ResponseGenerator &src);
 	ResponseGenerator &operator=(const ResponseGenerator &src);
 	~ResponseGenerator();
 
-	std::string get_location();
-
-
-
+	std::string 		generate_response();
 };

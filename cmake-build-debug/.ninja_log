@@ -79,3 +79,17 @@
 894	1280	1674826410000000000	webserver	580a964b5ded81ea
 2	850	1674826607000000000	CMakeFiles/webserver.dir/src/Server.cpp.o	f99adc54d0869dca
 851	1392	1674826607000000000	webserver	580a964b5ded81ea
+5	956	1674836218000000000	CMakeFiles/webserver.dir/src/Socket.cpp.o	ff1e410a5c0c5b12
+6	1019	1674836218000000000	CMakeFiles/webserver.dir/src/CLI.cpp.o	d27d696acbe722d7
+6	1019	1674836218000000000	CMakeFiles/webserver.dir/src/tools.cpp.o	6f8ff94345625a0d
+5	1090	1674836218000000000	CMakeFiles/webserver.dir/src/Config.cpp.o	b11db586e21c9121
+5	1468	1674836219000000000	CMakeFiles/webserver.dir/src/ConfigParser.cpp.o	68bc7a944fac86c1
+1	528	1674837695000000000	CMakeFiles/webserver.dir/src/main.cpp.o	e4069d92c7575fb2
+2	516	1674838955000000000	CMakeFiles/webserver.dir/src/main.cpp.o	e4069d92c7575fb2
+2	704	1674838955000000000	CMakeFiles/webserver.dir/src/Server.cpp.o	f99adc54d0869dca
+5	523	1674839055000000000	CMakeFiles/webserver.dir/src/main.cpp.o	e4069d92c7575fb2
+2	469	1674844070000000000	CMakeFiles/webserver.dir/src/ResponseGenerator.cpp.o	dda5fc6a5b26d21c
+3	32	1674844098000000000	CMakeFiles/webserver.dir/src/ResponseGenerator.cpp.o	dda5fc6a5b26d21c
+2	562	1674844099000000000	CMakeFiles/webserver.dir/src/main.cpp.o	e4069d92c7575fb2
+2	756	1674844099000000000	CMakeFiles/webserver.dir/src/Server.cpp.o	f99adc54d0869dca
+756	1054	1674844099000000000	webserver	580a964b5ded81ea

@@ -77,34 +77,50 @@ int Server::resolve_requests() {
 	std::string 		content_length;
 	std::string 		request;
 	std::string 		response;
-	long long 			max_client_body_size;
-	std::map<int, request_handler>::iterator	it;
 
 
 	for (size_t i = _sockets.size(); i < _pfds.size(); i++) {
 		if (check_connection(_pfds[i]) == EXIT_FAILURE)
 			continue;
 		if (_pfds[i].revents & POLLIN) {
-			if (get_request(_pfds[i].fd) == EXIT_FAILURE)
+			if (accumulate_request(_pfds[i].fd) == EXIT_FAILURE)
 				return (EXIT_FAILURE);
-			request = (_requests.find(_pfds[i].fd))->second.buf;
-			it = _requests.find(_pfds[i].fd);
-			max_client_body_size = (*it).second.socket.get_config().get_max_client_body_size();
-			if (static_cast<long long>(request.length()) > max_client_body_size) {
-				server_error(BAD_REQUEST, _pfds[i].fd, (*it).second.socket);
-				close(_pfds[i].fd);
-			}
-			else if (request.find("\r\n\r\n") != std::string::npos)
-				_pfds[i].revents = POLLOUT;
+			if (check_request(request, _pfds[i]) == EXIT_FAILURE)
+				return (EXIT_FAILURE);
 		}
 		if (_pfds[i].revents == POLLOUT) {
 			std::cout << request << std::endl;
-			response = generate_response(request);
+
+			std::map<int, request_handler>::iterator	it;
+			it = _requests.find(_pfds[i].fd);
+			request_handler copy;
+
+			copy.buf = (*it).second.buf;
+			copy.socket = (*it).second.socket;
+
+			ResponseGenerator	resp_gen(_pfds[i], copy);
+			response = resp_gen.generate_response();
 			send(_pfds[i].fd, response.c_str(), response.length(), 0);
 			close(_pfds[i].fd);
 		}
 	}
 	return (EXIT_SUCCESS);
+}
+
+int	Server::check_request(std::string &request, pollfd &pfd) {
+	std::map<int, request_handler>::iterator	it;
+	long long 									max_client_body_size;
+
+	request = (_requests.find(pfd.fd))->second.buf;
+	it = _requests.find(pfd.fd);
+	max_client_body_size = (*it).second.socket.get_config().get_max_client_body_size();
+	if (static_cast<long long>(request.length()) > max_client_body_size) {
+		if (server_error(BAD_REQUEST, pfd.fd, (*it).second.socket) == EXIT_FAILURE)
+			return (EXIT_FAILURE);
+		close(pfd.fd);
+	}
+	else if (request.find("\r\n\r\n") != std::string::npos)
+		pfd.revents = POLLOUT;
 }
 
 int Server::check_connection(pollfd &pfd) {
@@ -117,7 +133,7 @@ int Server::check_connection(pollfd &pfd) {
 	return EXIT_SUCCESS;
 }
 
-int	Server::get_request(int &client_fd) {
+int	Server::accumulate_request(int &client_fd) {
 	char 										buffer[100];
 	std::map<int, request_handler>::iterator	it;
 	long 										bytes;
@@ -128,44 +144,6 @@ int	Server::get_request(int &client_fd) {
 	it = _requests.find(client_fd);
 	(*it).second.buf += std::string(buffer, bytes);
 	return (EXIT_SUCCESS);
-}
-
-std::string Server::generate_response(const std::string &request) {
-	std::string 		response;
-	const char 			*file_path;
-	std::ifstream 		file;
-	std::string 		body;
-	std::string 		requested_path;
-	std::stringstream 	body_len;
-	(void) request;
-
-	requested_path = get_requested_path(request);
-
-	file_path = DEFAULT_INDEX_PAGE.c_str();
-//file_path = ("/Users/rmazurit/Documents/42_Projects/webserv/config/error_pages/400.html"); //just for quick testing of pages
-//	std::cout << file_path << std::endl;
-
-	if (access(file_path, F_OK) < 0) {
-		system_call_error(PAGE_NOT_FOUND, _sockets.front());
-		return (""); //todo: add error.html
-	}
-	file.open(file_path);
-	if (!file.is_open() || file.fail()) {
-		system_call_error(ACCESS_DENIED, _sockets.front());
-		return (""); //todo: add error.html
-	}
-	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-	body_len << body.length();
-	response = RESPONSE_HEADER + body_len.str() + "\n\n" + body;
-	file.close();
-
-	return (response);
-}
-
-std::string	Server::get_requested_path(const std::string &request) {
-
-
-	return (request);
 }
 
 void	Server::delete_invalid_fds() {
@@ -339,7 +317,7 @@ int Server::system_call_error(int error, const Socket &socket) {
 	return (EXIT_FAILURE);
 }
 
-int Server::server_error(int error, int &pfd,  const Socket &socket) {
+int Server::server_error(int error, int &pfd, const Socket &socket) {
 	std::ifstream 		file;
 	std::stringstream	error_code;
 	std::string 		error_file;
@@ -347,7 +325,6 @@ int Server::server_error(int error, int &pfd,  const Socket &socket) {
 	std::string 		body;
 	std::stringstream 	body_len;
 	std::string 		response;
-
 
 	error_code << error;
 	error_file = error_code.str() + ".html";
@@ -361,9 +338,7 @@ int Server::server_error(int error, int &pfd,  const Socket &socket) {
 	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	body_len << body.length();
 	response = RESPONSE_HEADER + body_len.str() + "\n\n" + body;
-
 	send(pfd, response.c_str(), response.length(), 0);
-
 	file.close();
 	return (EXIT_SUCCESS);
 }

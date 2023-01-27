@@ -12,12 +12,12 @@
 
 #pragma once
 
+#include "ResponseGenerator.hpp"
 #include "CLI.hpp"
 
 struct request_handler {
 	Socket		socket;
 	std::string buf;
-
 };
 
 class Server {
@@ -32,9 +32,8 @@ private:
 	int							check_cli();
 	int 						accept_requests();
 	int 						resolve_requests();
-	int							get_request(int &client_fd);
-	std::string 				generate_response(const std::string &request);
-	std::string					get_requested_path(const std::string &request);
+	int							accumulate_request(int &client_fd);
+	int 						check_request(std::string &request, pollfd &pfd);
 	int 						check_connection(pollfd& pfd);
 	void						delete_invalid_fds();
 
@@ -56,10 +55,8 @@ private:
 	int 						system_call_error(int error, const Socket &socket = Socket());
 	int 						server_error(int error, int &pfd, const Socket &socket = Socket());
 
-		public:
+public:
 	Server(std::vector<Socket> &sockets);
-	Server(const Server &src);
-	Server &operator=(const Server &src);
 	~Server();
 
 	int 						run();

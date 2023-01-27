@@ -126,7 +126,7 @@ enum socket_errors {
 	LISTEN_ERROR,
 };
 
-//SERVER ERRORS
+//SYSTEM CALL ERRORS
 enum server_system_call_errors {
 	CLI_ERROR,
 	POLL_ERROR,
@@ -135,6 +135,7 @@ enum server_system_call_errors {
 	ACCESS_DENIED,
 };
 
+//ERROR CODES
 enum error_codes {
 	BAD_REQUEST 	= 400,
 	PAGE_NOT_FOUND	= 404,
