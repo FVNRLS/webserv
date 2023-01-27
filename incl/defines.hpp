@@ -127,13 +127,17 @@ enum socket_errors {
 };
 
 //SERVER ERRORS
-enum server_errors {
+enum server_system_call_errors {
 	CLI_ERROR,
 	POLL_ERROR,
 	ACCEPT_ERROR,
 	RECV_ERROR,
-	ERROR_404,
-	ACCESS_DENIED
+	ACCESS_DENIED,
+};
+
+enum error_codes {
+	BAD_REQUEST 	= 400,
+	PAGE_NOT_FOUND	= 404,
 };
 
 enum cli_flags {
@@ -145,7 +149,7 @@ enum cli_flags {
 };
 
 enum server_constants {
-	TIMEOUT	 = 5000, //in milliseconds
+	TIMEOUT	 	= 5000, //in milliseconds
 };
 
 

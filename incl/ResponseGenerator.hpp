@@ -13,3 +13,22 @@
 #pragma once
 
 #include "Server.hpp"
+
+class ResponseGenerator {
+
+private:
+	std::string	_response;
+
+
+
+public:
+	ResponseGenerator(const std::string &response);
+	ResponseGenerator(const ResponseGenerator &src);
+	ResponseGenerator &operator=(const ResponseGenerator &src);
+	~ResponseGenerator();
+
+	std::string get_location();
+
+
+
+};

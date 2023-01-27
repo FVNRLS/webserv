@@ -53,10 +53,10 @@ private:
 	void 						show_manual();
 
 	//ERROR MANAGEMENT
-	int 						server_error(int error, const Socket &socket = Socket());
+	int 						system_call_error(int error, const Socket &socket = Socket());
+	int 						server_error(int error, int pfd, const Socket &socket = Socket());
 
-
-public:
+		public:
 	Server(std::vector<Socket> &sockets);
 	Server(const Server &src);
 	Server &operator=(const Server &src);
