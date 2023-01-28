@@ -14,7 +14,17 @@
 
 //BASIC CLASS SETUP
 ResponseGenerator::ResponseGenerator(pollfd &pfd, const Socket &socket, std::string &request) :
-		_pfd(pfd), _socket(socket), _request(request) {}
+		_pfd(pfd), _socket(socket), _request(request) {
+
+	//VECTOR OF VALID LOCATIONS FOR PATH REQUEST
+	_valid_locs.push_back(socket.get_config().get_index());
+	_valid_locs.push_back(socket.get_config().get_root());
+	for (int i = 0; i < socket.get_config().get_locations().size(); i++) {
+		_valid_locs.push_back(socket.get_config().get_locations()[i].prefix);
+		_valid_locs.push_back(socket.get_config().get_locations()[i].root);
+		_valid_locs.push_back(socket.get_config().get_locations()[i].cgi_path);
+	}
+}
 
 ResponseGenerator::ResponseGenerator(std::vector<Socket> &sockets, const ResponseGenerator &src) :
 		_socket(src._socket), _request(src._request) { *this = src; }
@@ -36,16 +46,19 @@ std::string ResponseGenerator::generate_response() {
 	std::string 		file_path;
 	std::ifstream 		file;
 
-//	requested_path = get_requested_path(request);
-
 	if (check_max_client_body_size() == EXIT_FAILURE) {
 		create_error_code_response(BAD_REQUEST);
 		return (_response);
 	}
 
-	file_path = _socket.get_config().get_index();
-	if (create_response(file_path, file) == EXIT_FAILURE)
-		return (EMPTY_STRING);
+	file_path = extract_requested_path();
+	if (file_path.empty()) {
+		create_error_code_response(PAGE_NOT_FOUND);
+		return (_response);
+	}
+	create_response(file_path, file);
+//	if (create_response(file_path, file) == EXIT_FAILURE)
+//		return (EMPTY_STRING);
 	return (_response);
 }
 
@@ -58,9 +71,34 @@ int	ResponseGenerator::check_max_client_body_size() {
 	return (EXIT_SUCCESS);
 }
 
-std::string	ResponseGenerator::get_requested_path() {
+std::string	ResponseGenerator::extract_requested_path() {
+	std::vector<std::string>	tokens;
+	std::string 				first_request_line;
+	size_t 						nl_pos;
+	std::string 				requested_path;
+	std::string 				full_path;
 
-	return ("");
+	nl_pos = _request.find(NEWLINE);
+	if (nl_pos != std::string::npos) {
+		first_request_line =  _request.substr(0, nl_pos);
+	}
+
+	tokens = split(first_request_line, SPACE);
+	if (tokens.empty())
+		return (EMPTY_STRING);
+	requested_path = tokens[1];
+	full_path = get_full_location_path(requested_path);
+	return (full_path);
+}
+
+std::string ResponseGenerator::get_full_location_path(std::string &file_path) {
+	if (file_path == "/")
+		file_path = _socket.get_config().get_index();
+	for (int i = 0; i < _valid_locs.size(); i++) {
+		if (std::equal(file_path.rbegin(), file_path.rend(), _valid_locs[i].rbegin()))
+			file_path = _valid_locs[i];
+	}
+	return (file_path);
 }
 
 int ResponseGenerator::create_response(std::string &file_path, std::ifstream &file) {
@@ -75,18 +113,22 @@ int ResponseGenerator::create_response(std::string &file_path, std::ifstream &fi
 }
 
 int ResponseGenerator::create_response_body(std::string &file_path, std::ifstream &file) {
-	if (open_file(file_path, file) == EXIT_FAILURE)
+	if (access(file_path.c_str(), F_OK) < 0) {
+		create_error_code_response(PAGE_NOT_FOUND);
 		return (EXIT_FAILURE);
+	}
+	if (open_file(file_path, file) == EXIT_FAILURE) {
+		create_error_code_response(FORBIDDEN);
+		return (EXIT_FAILURE);
+	}
 	_body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	return (EXIT_SUCCESS);
 }
 
 int ResponseGenerator::open_file(std::string &file_path, std::ifstream &file) {
-	if (access(file_path.c_str(), F_OK) < 0)
-		return (system_call_error(ACCESS_DENIED, _socket));
 	file.open(file_path);
 	if (!file.is_open() || file.fail())
-		return (system_call_error(ACCESS_DENIED, _socket));
+		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
@@ -94,9 +136,6 @@ int ResponseGenerator::open_file(std::string &file_path, std::ifstream &file) {
 //ERROR MANAGEMENT
 int ResponseGenerator::system_call_error(int error, const Socket &socket) {
 	switch(error) {
-		case ACCESS_DENIED:
-			std::cerr << "Error: Access Denied" << std::endl;
-			break;
 		default:
 			std::cerr << "Server: Unknown Error" << std::endl;
 	}

@@ -17,7 +17,6 @@ Server::Server(std::vector<Socket> &sockets) : _sockets(sockets) {
 	if (_cli.start() == EXIT_FAILURE)
 		exit_server();
 	_pfds.push_back(_cli.get_pollfd());
-
 	for (size_t i = 1; i < sockets.size(); i++) {
 		_pfds.push_back(sockets[i].get_pollfd());
 		_pfds[i].events = POLLIN;
@@ -83,12 +82,14 @@ int Server::resolve_requests() {
 	for (size_t i = _sockets.size(); i < _pfds.size(); i++) {
 		if (check_connection(_pfds[i]) == EXIT_FAILURE)
 			continue;
+		//REQUEST
 		if (_pfds[i].revents & POLLIN) {
 			if (accumulate_request(_pfds[i].fd) == EXIT_FAILURE)
 				return (EXIT_FAILURE);
-			if (check_request(request, _pfds[i]) == EXIT_FAILURE)
-				return (EXIT_FAILURE);
+			if (check_for_request_end(request, _pfds[i]) == true)
+				_pfds[i].revents = POLLOUT;
 		}
+		//RESPONSE
 		if (_pfds[i].revents == POLLOUT) {
 			std::cout << request << std::endl;
 			it = _requests.find(_pfds[i].fd);
@@ -104,17 +105,16 @@ int Server::resolve_requests() {
 	return (EXIT_SUCCESS);
 }
 
-int	Server::check_request(std::string &request, pollfd &pfd) {
+bool	Server::check_for_request_end(std::string &request, pollfd &pfd) {
 	std::map<int, request_handler>::iterator	it;
 	long long 									max_client_body_size;
 
 	request = (_requests.find(pfd.fd))->second.buf;
 	it = _requests.find(pfd.fd);
-	max_client_body_size = (*it).second.socket.get_config().get_max_client_body_size();
-	if (static_cast<long long>((request.length()) > max_client_body_size)
-		|| (request.find("\r\n\r\n") != std::string::npos))
-		pfd.revents = POLLOUT;
-	return (EXIT_SUCCESS);
+	max_client_body_size = (*it).second.socket.get_config().get_max_client_body_size(); //todo: double check - stupid!
+	if (static_cast<long long>((request.length()) > max_client_body_size) || (request.find(END_OF_REQUEST) != std::string::npos))
+		return (true);
+	return (false);
 }
 
 int Server::check_connection(pollfd &pfd) {

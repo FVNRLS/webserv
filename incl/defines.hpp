@@ -70,17 +70,18 @@ enum num_constants {
 const std::string STR_CLOSED_CURLY_BRACE	=	"}";
 const std::string STR_SEMICOLON 			=	";";
 const std::string EQUAL_SIGN 				=	"=";
-const std::string EMPTY_STRING				=	"";
+const std::string EMPTY_STRING;
 
 //DEFAULTS
-const std::string DEFAULT_PATH = "config/clion_test.conf";
-const std::string DEFAULT_INDEX_PAGE = "../html/index.html";
-const std::string DEFAULT_ERROR_PAGES_DIR = "config/default_error_pages";
-const std::string DEFAULT_REDIR_FIRST = "config";
-const std::string DEFAULT_REDIR_SECOND = "welcome page"; //unsure about the values
-const std::string DEFAULT_CGI_PATH = "config/cgi/cgi.py"; //unsure about the values
+const std::string RESPONSE_HEADER 			= "HTTP/1.1 200 OK\nContent-Type: html\nContent-Length: ";
+const std::string DEFAULT_PATH 				= "config/clion_test.conf";
+const std::string DEFAULT_INDEX_PAGE 		= "html/index.html";
+const std::string DEFAULT_ERROR_PAGES_DIR 	= "config/default_error_pages";
+const std::string DEFAULT_REDIR_FIRST 		= "config";
+const std::string DEFAULT_REDIR_SECOND 		= "welcome page"; //unsure about the values
+const std::string DEFAULT_CGI_PATH 			= "config/cgi/cgi.py"; //unsure about the values
+const std::string END_OF_REQUEST			= "\r\n\r\n";
 
-const std::string RESPONSE_HEADER = "HTTP/1.1 200 OK\nContent-Type: html\nContent-Length: ";
 
 //COVERING UINT32_MAX MACRO FOR ARCH LINUX
 #ifndef UINT32_MAX

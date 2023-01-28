@@ -33,7 +33,7 @@ private:
 	int 						accept_requests();
 	int 						resolve_requests();
 	int							accumulate_request(int &client_fd);
-	int 						check_request(std::string &request, pollfd &pfd);
+	bool 						check_for_request_end(std::string &request, pollfd &pfd);
 	int 						check_connection(pollfd& pfd);
 	void						delete_invalid_fds();
 
