@@ -137,7 +137,7 @@ enum server_system_call_errors {
 	ACCESS_DENIED,
 };
 
-//ERROR CODES
+//RESPONSE CODES
 enum response_codes {
 		//INFORMATIONAL RESPONSE
 		CONTINUE 						= 100,

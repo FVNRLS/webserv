@@ -31,12 +31,11 @@ private:
 	int 				check_max_client_body_size();
 	std::string			extract_requested_path();
 	std::string 		get_full_location_path(std::string &file_path);
-	int 				create_response(std::string &file_path, std::ifstream &file);
-	int 				create_response_body(std::string &file_path, std::ifstream &file);
+	void 				create_response(std::string &file_path, std::ifstream &file);
+	void 				create_response_body(std::string &file_path, std::ifstream &file);
 	int 				open_file(std::string &file_path, std::ifstream &file);
 
 		//ERROR MANAGEMENT
-	int					system_call_error(int error, const Socket &socket);
 	int					create_error_code_response(int error);
 
 public:

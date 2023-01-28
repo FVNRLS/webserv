@@ -58,8 +58,6 @@ std::string ResponseGenerator::generate_response() {
 		return (_response);
 	}
 	create_response(file_path, file);
-//	if (create_response(file_path, file) == EXIT_FAILURE)
-//		return (EMPTY_STRING);
 	return (_response);
 }
 
@@ -103,29 +101,27 @@ std::string ResponseGenerator::get_full_location_path(std::string &file_path) {
 	return (file_path);
 }
 
-//TODO: resolve recursion!
-int ResponseGenerator::create_response(std::string &file_path, std::ifstream &file) {
+void ResponseGenerator::create_response(std::string &file_path, std::ifstream &file) {
 	std::stringstream 	body_len;
 
-	if (create_response_body(file_path, file) == EXIT_FAILURE)
-		return (EXIT_FAILURE);
+	create_response_body(file_path, file);
 	body_len << _body.length();
 	_response = RESPONSE_HEADER + body_len.str() + "\n\n" + _body;
 	file.close();
-	return (EXIT_SUCCESS);
 }
 
-int ResponseGenerator::create_response_body(std::string &file_path, std::ifstream &file) {
+void ResponseGenerator::create_response_body(std::string &file_path, std::ifstream &file) {
 	if (access(file_path.c_str(), F_OK) < 0) {
-		create_error_code_response(PAGE_NOT_FOUND);
-		return (EXIT_FAILURE);
+		if (create_error_code_response(PAGE_NOT_FOUND) == EXIT_FAILURE)
+			_body.append("SERVER ERROR: ERROR PAGE UNAVAILABLE!");
+		return;
 	}
 	if (open_file(file_path, file) == EXIT_FAILURE) {
-		create_error_code_response(FORBIDDEN);
-		return (EXIT_FAILURE);
+		if (create_error_code_response(FORBIDDEN) == EXIT_FAILURE)
+			_body.append("SERVER ERROR: ERROR PAGE UNAVAILABLE!");
+		return;
 	}
 	_body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-	return (EXIT_SUCCESS);
 }
 
 int ResponseGenerator::open_file(std::string &file_path, std::ifstream &file) {
@@ -137,29 +133,23 @@ int ResponseGenerator::open_file(std::string &file_path, std::ifstream &file) {
 
 
 //ERROR MANAGEMENT
-int ResponseGenerator::system_call_error(int error, const Socket &socket) {
-	switch(error) {
-		default:
-			std::cerr << "Server: Unknown Error" << std::endl;
-	}
-	return (EXIT_FAILURE);
-}
-
 int	ResponseGenerator::create_error_code_response(int error) {
-	std::ifstream 		file;
-	std::stringstream	error_code;
-	std::string 		error_file;
-	std::string 		error_page_path;
-	std::string 		body;
-	std::stringstream 	body_len;
-	std::string 		response;
+	std::ifstream file;
+	std::stringstream error_code;
+	std::string error_file;
+	std::string error_page_path;
+	std::string body;
+	std::stringstream body_len;
+	std::string response;
 
 	error_code << error;
 	error_file = error_code.str() + ".html";
 	error_page_path = _socket.get_config().get_error_pages_dir() + error_file;
 
-	if (create_response(error_page_path, file) == EXIT_FAILURE)
+	if (access(error_page_path.c_str(), F_OK) < 0)
 		return (EXIT_FAILURE);
+	if (open_file(error_page_path, file) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+	_body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	return (EXIT_SUCCESS);
 }
-
