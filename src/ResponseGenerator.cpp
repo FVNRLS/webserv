@@ -24,6 +24,7 @@ ResponseGenerator	&ResponseGenerator::operator=(const ResponseGenerator &src) {
 		return (*this);
 	_pfd = src._pfd;
 	_response = src._response;
+	_body = src._body;
 	return (*this);
 }
 
@@ -31,46 +32,52 @@ ResponseGenerator::~ResponseGenerator() {}
 
 
 //MEMBER FUNCTIONS
-
 std::string ResponseGenerator::generate_response() {
-	std::string 		response;
-	long long 			max_client_body_size;
-	const char 			*file_path;
+	std::string 		file_path;
 	std::ifstream 		file;
-	std::string 		body;
-	std::string 		requested_path;
-	std::stringstream 	body_len;
 
 //	requested_path = get_requested_path(request);
 
-	max_client_body_size = _socket.get_config().get_max_client_body_size();
-	if (static_cast<long long>(_request.length()) > max_client_body_size)
+	if (check_max_client_body_size() == EXIT_FAILURE)
 		return (generate_error_code_response(BAD_REQUEST));
 
-	file_path = DEFAULT_INDEX_PAGE.c_str();
-	//file_path = ("/Users/rmazurit/Documents/42_Projects/webserv/config/error_pages/400.html"); //just for quick testing of pages
-	//	std::cout << file_path << std::endl;
+	file_path = _socket.get_config().get_index();
+	if (get_response_body(file_path, file) == EXIT_FAILURE)
+		return (EMPTY_STRING);
 
-	if (access(file_path, F_OK) < 0) {
-		system_call_error(PAGE_NOT_FOUND, _socket);
-		return (""); //todo: add error.html
-	}
-	file.open(file_path);
-	if (!file.is_open() || file.fail()) {
-		system_call_error(ACCESS_DENIED, _socket);
-		return (""); //todo: add error.html
-	}
-	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-	body_len << body.length();
-	response = RESPONSE_HEADER + body_len.str() + "\n\n" + body;
-
+	_response = RESPONSE_HEADER + _body_len.str() + "\n\n" + _body;
 	file.close();
 
-	return ("response");
+	return (_response);
+}
+
+int	ResponseGenerator::check_max_client_body_size() {
+	long long 			max_client_body_size;
+
+	max_client_body_size = _socket.get_config().get_max_client_body_size();
+	if (static_cast<long long>(_request.length()) > max_client_body_size)
+		return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
+}
+
+int ResponseGenerator::get_response_body(std::string &file_path, std::ifstream &file) {
+	if (open_file(file_path, file) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+	_body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	_body_len << _body.length();
+	return (EXIT_SUCCESS);
+}
+
+int ResponseGenerator::open_file(std::string &file_path, std::ifstream &file) {
+	if (access(file_path.c_str(), F_OK) < 0)
+		return (system_call_error(ACCESS_DENIED, _socket));
+	file.open(file_path);
+	if (!file.is_open() || file.fail())
+		return (system_call_error(ACCESS_DENIED, _socket));
+	return (EXIT_SUCCESS);
 }
 
 std::string	ResponseGenerator::get_requested_path() {
-
 
 	return ("");
 }
@@ -100,15 +107,9 @@ std::string	ResponseGenerator::generate_error_code_response(int error) {
 	error_code << error;
 	error_file = error_code.str() + ".html";
 	error_page_path = _socket.get_config().get_error_pages_dir() + error_file;
-	if (access(error_page_path.c_str(), F_OK) < 0) {
-		system_call_error(ACCESS_DENIED, _socket);
-		return ("");
-	}
-	file.open(error_page_path);
-	if (!file.is_open() || file.fail()) {
-		system_call_error(ACCESS_DENIED, _socket);
-		return ("");
-	}
+
+	if (open_file(error_page_path, file) == EXIT_FAILURE)
+		return (EMPTY_STRING);
 
 	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	body_len << body.length();
