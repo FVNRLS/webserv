@@ -77,6 +77,7 @@ int Server::resolve_requests() {
 	std::string 		content_length;
 	std::string 		request;
 	std::string 		response;
+	std::map<int, request_handler>::iterator	it;
 
 
 	for (size_t i = _sockets.size(); i < _pfds.size(); i++) {
@@ -91,14 +92,9 @@ int Server::resolve_requests() {
 		if (_pfds[i].revents == POLLOUT) {
 			std::cout << request << std::endl;
 
-			std::map<int, request_handler>::iterator	it;
 			it = _requests.find(_pfds[i].fd);
-			request_handler copy;
 
-			copy.buf = (*it).second.buf;
-			copy.socket = (*it).second.socket;
-
-			ResponseGenerator	resp_gen(_pfds[i], copy);
+			ResponseGenerator	resp_gen(_pfds[i], (*it).second.socket, (*it).second.buf);
 			response = resp_gen.generate_response();
 			send(_pfds[i].fd, response.c_str(), response.length(), 0);
 			close(_pfds[i].fd);

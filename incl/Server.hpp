@@ -12,8 +12,8 @@
 
 #pragma once
 
-#include "ResponseGenerator.hpp"
 #include "CLI.hpp"
+#include "ResponseGenerator.hpp"
 
 struct request_handler {
 	Socket		socket;

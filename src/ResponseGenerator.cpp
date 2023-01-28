@@ -13,19 +13,16 @@
 #include "ResponseGenerator.hpp"
 
 //BASIC CLASS SETUP
-ResponseGenerator::ResponseGenerator(pollfd &pfd, request_handler &args) : _pfd(pfd) {
-	_socket = args.socket;
-	_request = args.buf;
-}
+ResponseGenerator::ResponseGenerator(pollfd &pfd, const Socket &socket , std::string &request)
+	: _pfd(pfd), _socket(socket), _request(request) {}
 
-ResponseGenerator::ResponseGenerator(const ResponseGenerator &src) {
-	*this = src; }
+ResponseGenerator::ResponseGenerator(const ResponseGenerator &src) :
+	_socket(src._socket), _request(src._request) { *this = src; }
 
 ResponseGenerator	&ResponseGenerator::operator=(const ResponseGenerator &src) {
 	if (this == &src)
 		return (*this);
-	_request = src._request;
-	_socket = src._socket;
+	_pfd = src._pfd;
 	_response = src._response;
 	return (*this);
 }

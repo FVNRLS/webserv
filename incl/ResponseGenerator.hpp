@@ -12,21 +12,21 @@
 
 #pragma once
 
-#include "Server.hpp"
+#include "Socket.hpp"
 
 class ResponseGenerator {
 
 private:
-	pollfd		_pfd;
-	Socket		_socket;
-	std::string _request;
-	std::string	_response;
+	pollfd			_pfd;
+	const Socket	&_socket;
+	std::string 	&_request;
+	std::string		_response;
 
 
-	std::string			get_requested_path();
+	std::string		get_requested_path();
 
 public:
-	ResponseGenerator(pollfd &pfd, request_handler &args);
+	ResponseGenerator(pollfd &pfd, const Socket &socket, std::string &buf);
 	ResponseGenerator(const ResponseGenerator &src);
 	ResponseGenerator &operator=(const ResponseGenerator &src);
 	~ResponseGenerator();
