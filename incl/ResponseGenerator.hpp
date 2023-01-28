@@ -22,20 +22,20 @@ private:
 	std::string 		&_request;
 
 	std::string			_response;
-	std::string 		_requested_path;
 	std::string 		_body;
-	std::stringstream 	_body_len;
+	std::string 		_requested_path;
 
 
 	//MEMBER FUNCTIONS
 	int 				check_max_client_body_size();
 	std::string			get_requested_path();
-	int 				get_response_body(std::string &file_path, std::ifstream &file);
+	int 				create_response(std::string &file_path, std::ifstream &file);
+	int 				create_response_body(std::string &file_path, std::ifstream &file);
 	int 				open_file(std::string &file_path, std::ifstream &file);
 
 		//ERROR MANAGEMENT
 	int					system_call_error(int error, const Socket &socket);
-	std::string			generate_error_code_response(int error);
+	int					create_error_code_response(int error);
 
 public:
 	ResponseGenerator(pollfd &pfd, const Socket &socket, std::string &request);
