@@ -56,8 +56,6 @@ enum chars {
 	TAB					= '\t'
 };
 
-
-
 //NUMERIC CONSTANTS
 enum num_constants {
 	MAX_PORT_NUM			= 65535,
@@ -73,13 +71,14 @@ const std::string EQUAL_SIGN 				=	"=";
 const std::string EMPTY_STRING;
 
 //DEFAULTS
-const std::string RESPONSE_HEADER 			= "HTTP/1.1 200 OK\nContent-Type: html\nContent-Length: ";
+const std::string RESPONSE_HEADER 			= "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: ";
 const std::string DEFAULT_PATH 				= "config/clion_test.conf";
 const std::string DEFAULT_INDEX_PAGE 		= "html/index.html";
 const std::string DEFAULT_ERROR_PAGES_DIR 	= "config/default_error_pages";
 const std::string DEFAULT_REDIR_FIRST 		= "config";
 const std::string DEFAULT_REDIR_SECOND 		= "welcome page"; //unsure about the values
 const std::string DEFAULT_CGI_PATH 			= "config/cgi/cgi.py"; //unsure about the values
+const std::string DEFAULT_PAGE_ERROR		= "SERVER ERROR: ERROR PAGE UNAVAILABLE!"; //if error page can not be opened
 const std::string END_OF_REQUEST			= "\r\n\r\n";
 
 

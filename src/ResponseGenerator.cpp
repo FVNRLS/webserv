@@ -20,7 +20,6 @@ ResponseGenerator::ResponseGenerator(pollfd &pfd, const Socket &socket, std::str
 	_valid_locs.push_back(socket.get_config().get_index());
 	_valid_locs.push_back(socket.get_config().get_root());
 	for (int i = 0; i < socket.get_config().get_locations().size(); i++) {
-		_valid_locs.push_back(socket.get_config().get_locations()[i].prefix);
 		_valid_locs.push_back(socket.get_config().get_locations()[i].root);
 		_valid_locs.push_back(socket.get_config().get_locations()[i].cgi_path);
 	}
@@ -42,6 +41,7 @@ ResponseGenerator	&ResponseGenerator::operator=(const ResponseGenerator &src) {
 ResponseGenerator::~ResponseGenerator() {}
 
 
+//TODO: encode html with picture nd find right type!
 //MEMBER FUNCTIONS
 std::string ResponseGenerator::generate_response() {
 	std::string 		file_path;
@@ -92,11 +92,15 @@ std::string	ResponseGenerator::extract_requested_path() {
 }
 
 std::string ResponseGenerator::get_full_location_path(std::string &file_path) {
-	if (file_path == "/")
+	if (file_path == "/") {
 		file_path = _socket.get_config().get_index();
+		return (file_path);
+	}
 	for (int i = 0; i < _valid_locs.size(); i++) {
-		if (std::equal(file_path.rbegin(), file_path.rend(), _valid_locs[i].rbegin()))
+		if (std::equal(file_path.rbegin(), file_path.rend(), _valid_locs[i].rbegin())) {
 			file_path = _valid_locs[i];
+			break;
+		}
 	}
 	return (file_path);
 }
@@ -113,12 +117,12 @@ void ResponseGenerator::create_response(std::string &file_path, std::ifstream &f
 void ResponseGenerator::create_response_body(std::string &file_path, std::ifstream &file) {
 	if (access(file_path.c_str(), F_OK) < 0) {
 		if (create_error_code_response(PAGE_NOT_FOUND) == EXIT_FAILURE)
-			_body.append("SERVER ERROR: ERROR PAGE UNAVAILABLE!");
+			_body.append(DEFAULT_PAGE_ERROR);
 		return;
 	}
 	if (open_file(file_path, file) == EXIT_FAILURE) {
 		if (create_error_code_response(FORBIDDEN) == EXIT_FAILURE)
-			_body.append("SERVER ERROR: ERROR PAGE UNAVAILABLE!");
+			_body.append(DEFAULT_PAGE_ERROR);
 		return;
 	}
 	_body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
