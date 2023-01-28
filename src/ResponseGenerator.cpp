@@ -35,6 +35,7 @@ ResponseGenerator	&ResponseGenerator::operator=(const ResponseGenerator &src) {
 	_pfd = src._pfd;
 	_response = src._response;
 	_body = src._body;
+	_method = src._method;
 	return (*this);
 }
 
@@ -86,6 +87,7 @@ std::string	ResponseGenerator::extract_requested_path() {
 	tokens = split(first_request_line, SPACE);
 	if (tokens.empty())
 		return (EMPTY_STRING);
+	_method = tokens[0];
 	requested_path = tokens[1];
 	full_path = get_full_location_path(requested_path);
 	return (full_path);
@@ -101,6 +103,7 @@ std::string ResponseGenerator::get_full_location_path(std::string &file_path) {
 	return (file_path);
 }
 
+//TODO: resolve recursion!
 int ResponseGenerator::create_response(std::string &file_path, std::ifstream &file) {
 	std::stringstream 	body_len;
 

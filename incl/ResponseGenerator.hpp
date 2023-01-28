@@ -24,6 +24,8 @@ private:
 	std::vector<std::string>	_valid_locs;
 	std::string					_response;
 	std::string 				_body;
+	std::string 				_method;
+
 
 	//MEMBER FUNCTIONS
 	int 				check_max_client_body_size();
