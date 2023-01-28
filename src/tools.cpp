@@ -65,3 +65,4 @@ void silence_sigint() {
 	action.sa_flags = 0;
 	sigaction(SIGINT, &action, NULL);
 }
+

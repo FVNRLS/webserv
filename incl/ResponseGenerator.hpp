@@ -25,11 +25,15 @@ private:
 
 	std::string		get_requested_path();
 
+	//ERROR MANAGEMENT
+	int				system_call_error(int error, const Socket &socket);
+	std::string		generate_error_code_response(int error);
+
 public:
-	ResponseGenerator(pollfd &pfd, const Socket &socket, std::string &buf);
-	ResponseGenerator(const ResponseGenerator &src);
+	ResponseGenerator(pollfd &pfd, const Socket &socket, std::string &request);
+	ResponseGenerator(std::vector<Socket> &sockets, const ResponseGenerator &src);
 	ResponseGenerator &operator=(const ResponseGenerator &src);
 	~ResponseGenerator();
 
-	std::string 		generate_response();
+	std::string 	generate_response();
 };

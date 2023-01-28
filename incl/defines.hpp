@@ -132,6 +132,7 @@ enum server_system_call_errors {
 	POLL_ERROR,
 	ACCEPT_ERROR,
 	RECV_ERROR,
+	SEND_ERROR,
 	ACCESS_DENIED,
 };
 
@@ -152,7 +153,6 @@ enum cli_flags {
 enum server_constants {
 	TIMEOUT	 	= 5000, //in milliseconds
 };
-
 
 
 // GET / HTTP/1.1

@@ -91,12 +91,13 @@ int Server::resolve_requests() {
 		}
 		if (_pfds[i].revents == POLLOUT) {
 			std::cout << request << std::endl;
-
 			it = _requests.find(_pfds[i].fd);
-
-			ResponseGenerator	resp_gen(_pfds[i], (*it).second.socket, (*it).second.buf);
+			ResponseGenerator resp_gen(_pfds[i], (*it).second.socket, (*it).second.buf);
 			response = resp_gen.generate_response();
-			send(_pfds[i].fd, response.c_str(), response.length(), 0);
+			if (!response.empty()) {
+				if (send(_pfds[i].fd, response.c_str(), response.length(), 0) == EXIT_FAILURE)
+					return (EXIT_FAILURE);
+			}
 			close(_pfds[i].fd);
 		}
 	}
@@ -110,13 +111,10 @@ int	Server::check_request(std::string &request, pollfd &pfd) {
 	request = (_requests.find(pfd.fd))->second.buf;
 	it = _requests.find(pfd.fd);
 	max_client_body_size = (*it).second.socket.get_config().get_max_client_body_size();
-	if (static_cast<long long>(request.length()) > max_client_body_size) {
-		if (server_error(BAD_REQUEST, pfd.fd, (*it).second.socket) == EXIT_FAILURE)
-			return (EXIT_FAILURE);
-		close(pfd.fd);
-	}
-	else if (request.find("\r\n\r\n") != std::string::npos)
+	if (static_cast<long long>((request.length()) > max_client_body_size)
+		|| (request.find("\r\n\r\n") != std::string::npos))
 		pfd.revents = POLLOUT;
+	return (EXIT_SUCCESS);
 }
 
 int Server::check_connection(pollfd &pfd) {
@@ -152,9 +150,6 @@ void	Server::delete_invalid_fds() {
 			it++;
 	}
 }
-
-
-
 
 
 
@@ -302,40 +297,15 @@ int Server::system_call_error(int error, const Socket &socket) {
 		case RECV_ERROR:
 			std::cerr << "Error: Failed to receive request" << std::endl;
 			break;
+		case SEND_ERROR:
+			std::cerr << "Error: Failed To Send a Response On Port " << socket.get_port() << std::endl;
+			break;
 		case ACCESS_DENIED:
 			std::cerr << "Error: Access Denied!" << std::endl;
 			break;
-
-
 		default:
 			std::cerr << "Server: unknown error" << std::endl;
 	}
 	return (EXIT_FAILURE);
-}
-
-int Server::server_error(int error, int &pfd, const Socket &socket) {
-	std::ifstream 		file;
-	std::stringstream	error_code;
-	std::string 		error_file;
-	std::string 		error_page_path;
-	std::string 		body;
-	std::stringstream 	body_len;
-	std::string 		response;
-
-	error_code << error;
-	error_file = error_code.str() + ".html";
-	error_page_path = socket.get_config().get_error_pages_dir() + error_file;
-	if (access(error_page_path.c_str(), F_OK) < 0)
-		return (system_call_error(ACCESS_DENIED, socket));
-	file.open(error_page_path);
-	if (!file.is_open() || file.fail())
-		return (system_call_error(ACCESS_DENIED, socket));
-
-	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-	body_len << body.length();
-	response = RESPONSE_HEADER + body_len.str() + "\n\n" + body;
-	send(pfd, response.c_str(), response.length(), 0);
-	file.close();
-	return (EXIT_SUCCESS);
 }
 
