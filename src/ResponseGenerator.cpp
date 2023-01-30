@@ -13,8 +13,8 @@
 #include "ResponseGenerator.hpp"
 
 //BASIC CLASS SETUP
-ResponseGenerator::ResponseGenerator(pollfd &pfd, const Socket &socket, std::string &request) :
-		_pfd(pfd), _socket(socket), _request(request) {
+ResponseGenerator::ResponseGenerator(const Socket &socket, std::string &request) :
+		_socket(socket), _request(request) {
 
 	//VECTOR OF VALID LOCATIONS FOR PATH REQUEST
 	_valid_locs.push_back(socket.get_config().get_index());
@@ -31,9 +31,7 @@ ResponseGenerator::ResponseGenerator(const ResponseGenerator &src) :
 ResponseGenerator	&ResponseGenerator::operator=(const ResponseGenerator &src) {
 	if (this == &src)
 		return (*this);
-	_pfd = src._pfd;
 	_response = src._response;
-	_body = src._body;
 	_method = src._method;
 	return (*this);
 }
@@ -43,16 +41,20 @@ ResponseGenerator::~ResponseGenerator() {}
 
 //MEMBER FUNCTIONS
 std::string ResponseGenerator::generate_response() {
-	std::string 		file_path;
+	std::string 				file_path;
+	std::vector<std::string>	tokens;
+	int 						exit_code;
 
 	if (check_max_client_body_size() == EXIT_FAILURE)
 		return (create_error_code_response(BAD_REQUEST));
 
-	file_path = extract_requested_path();
-	if (file_path.empty())
-		return (create_error_code_response(METHOD_NOT_ALLOWED));
-	create_response(file_path);
-	return (_response);
+	tokenize_first_line(tokens);
+	if (tokens.size() < 3)
+		return (create_error_code_response(BAD_REQUEST));
+	exit_code = select_method(tokens);
+	if (exit_code == EXIT_SUCCESS)
+		return (_response);
+	return (create_error_code_response(exit_code));
 }
 
 int	ResponseGenerator::check_max_client_body_size() {
@@ -64,38 +66,38 @@ int	ResponseGenerator::check_max_client_body_size() {
 	return (EXIT_SUCCESS);
 }
 
-std::string	ResponseGenerator::extract_requested_path() {
-	std::vector<std::string>	tokens;
+std::vector<std::string>	ResponseGenerator::tokenize_first_line(std::vector<std::string> &tokens) {
 	std::string 				first_request_line;
 	size_t 						nl_pos;
-	std::string 				requested_path;
-	std::string 				full_path;
 
 	nl_pos = _request.find(NEWLINE);
 	if (nl_pos != std::string::npos) {
 		first_request_line =  _request.substr(0, nl_pos);
 	}
-
 	tokens = split(first_request_line, SPACE);
-	if (tokens.empty())
-		return (EMPTY_STRING);
-	_method = tokens[0];
-	if (check_allowed_methods() == EXIT_FAILURE)
-		return (EMPTY_STRING);
-	requested_path = tokens[1];
-	full_path = get_full_location_path(requested_path);
-	return (full_path);
+	return (tokens);
 }
 
-int ResponseGenerator::check_allowed_methods() {
-	const std::vector<std::string>	&allowed_methods = _socket.get_config().get_methods();
-	std::vector<std::string>::const_iterator it;
+int ResponseGenerator::select_method(const std::vector<std::string> &tokens) {
+	std::string 								requested_path;
+	const std::vector<std::string>				&allowed_methods = _socket.get_config().get_methods();
+	std::vector<std::string>::const_iterator	it;
+	std::string 								full_path;
+
+	_method = tokens[0];
+	requested_path = tokens[1];
+	full_path = get_full_location_path(requested_path);
 
 	it = std::find(allowed_methods.begin(), allowed_methods.end(), _method);
 	if (it == allowed_methods.end())
 		return (EXIT_FAILURE);
-	return (EXIT_SUCCESS);
-};
+	if (*it == "GET") {
+		GETRequest	parser(_response);
+		return (parser.create_response(full_path));
+	}
+	//todo: complete with post and delete!
+	return (EXIT_FAILURE);
+}
 
 std::string ResponseGenerator::get_full_location_path(std::string &file_path) {
 	if (file_path == "/") {
@@ -109,39 +111,6 @@ std::string ResponseGenerator::get_full_location_path(std::string &file_path) {
 		}
 	}
 	return (file_path);
-}
-
-void ResponseGenerator::create_response(std::string &file_path) {
-	std::stringstream 	body_len;
-
-	if (create_response_body(file_path) == EXIT_FAILURE)
-		return;
-	body_len << _body.length();
-	_response = RESPONSE_HEADER + body_len.str() + "\n\n" + _body;
-}
-
-
-int ResponseGenerator::create_response_body(std::string &file_path) {
-	std::ifstream 		file;
-
-	if (access(file_path.c_str(), F_OK) < 0) {
-		create_error_code_response(PAGE_NOT_FOUND);
-		return (EXIT_FAILURE);
-	}
-	if (open_file(file_path, file) == EXIT_FAILURE) {
-		create_error_code_response(FORBIDDEN);
-		return (EXIT_FAILURE);
-	}
-	_body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-	file.close();
-	return (EXIT_SUCCESS);
-}
-
-int ResponseGenerator::open_file(const std::string &file_path, std::ifstream &file) {
-	file.open(file_path);
-	if (!file.is_open() || file.fail())
-		return (EXIT_FAILURE);
-	return (EXIT_SUCCESS);
 }
 
 
@@ -164,9 +133,9 @@ std::string ResponseGenerator::create_error_code_response(int error) {
 		file.close();
 		return (_response);
 	}
-	_body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-	body_len << _body.length();
-	_response = RESPONSE_HEADER + body_len.str() + "\n\n" + _body;
+	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	body_len << body.length();
+	_response = RESPONSE_HEADER + body_len.str() + "\n\n" + body;
 	file.close();
 	return (_response);
 }

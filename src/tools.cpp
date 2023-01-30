@@ -66,3 +66,9 @@ void silence_sigint() {
 	sigaction(SIGINT, &action, NULL);
 }
 
+int open_file(const std::string &file_path, std::ifstream &file) {
+	file.open(file_path);
+	if (!file.is_open() || file.fail())
+		return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
+}

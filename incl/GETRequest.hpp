@@ -1,20 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tools.hpp                                          :+:      :+:    :+:   */
+/*   GETRequest.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rmazurit <rmazurit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/06 18:51:52 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/06 18:51:52 by rmazurit         ###   ########.fr       */
+/*   Created: 2023/01/30 16:46:33 by rmazurit          #+#    #+#             */
+/*   Updated: 2023/01/30 16:46:33 by rmazurit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "defines.hpp"
+#include "Socket.hpp"
 
-std::string 				trim(std::string &s);
-std::vector<std::string>	split(std::string &s, char sep);
-void 						silence_sigint();
-int 						open_file(const std::string &file_path, std::ifstream &file);
+class GETRequest {
+
+private:
+	std::string		&_response;
+	std::string 	_body;
+
+	int 			create_response_body(std::string &file_path);
+
+public:
+	GETRequest(std::string &response);
+	~GETRequest();
+
+	int 			create_response(std::string &file_path);
+};

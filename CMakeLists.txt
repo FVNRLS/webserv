@@ -28,7 +28,12 @@ add_executable(webserver
         src/ResponseGenerator.cpp
         incl/ResponseGenerator.hpp
 
+        incl/GETRequest.hpp
+        src/GETRequest.cpp
+
         #TOOLS
         src/tools.cpp
-        incl/tools.hpp)
+        incl/tools.hpp
+
+        )
 

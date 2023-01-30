@@ -93,7 +93,7 @@ int Server::resolve_requests() {
 		if (_pfds[i].revents == POLLOUT) {
 			std::cout << request << std::endl;
 			it = _requests.find(_pfds[i].fd);
-			ResponseGenerator resp_gen(_pfds[i], (*it).second.socket, (*it).second.buf);
+			ResponseGenerator resp_gen((*it).second.socket, (*it).second.buf);
 			response = resp_gen.generate_response();
 			if (!response.empty()) {
 				if (send(_pfds[i].fd, response.c_str(), response.length(), 0) == EXIT_FAILURE) //todo: check if chunked!

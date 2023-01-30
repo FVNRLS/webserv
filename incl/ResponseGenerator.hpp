@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "Socket.hpp"
+#include "GETRequest.hpp"
 
 class ResponseGenerator {
 
@@ -23,23 +23,20 @@ private:
 
 	std::vector<std::string>	_valid_locs;
 	std::string					_response;
-	std::string 				_body;
 	std::string 				_method;
 
 	//MEMBER FUNCTIONS
-	int 				check_max_client_body_size();
-	std::string			extract_requested_path();
-	int 				check_allowed_methods();
-	std::string 		get_full_location_path(std::string &file_path);
-	void 				create_response(std::string &file_path);
-	int 				create_response_body(std::string &file_path);
-	int 				open_file(const std::string &file_path, std::ifstream &file);
+	int 						check_max_client_body_size();
+	std::vector<std::string>	tokenize_first_line(std::vector<std::string> &tokens);
+	int 						select_method(const std::vector<std::string> &tokens);
+	std::string 		        get_full_location_path(std::string &file_path);
+
 
 	//ERROR MANAGEMENT
 	std::string 		create_error_code_response(int error);
 
 public:
-	ResponseGenerator(pollfd &pfd, const Socket &socket, std::string &request);
+	ResponseGenerator(const Socket &socket, std::string &request);
 	ResponseGenerator(const ResponseGenerator &src);
 	ResponseGenerator &operator=(const ResponseGenerator &src);
 	~ResponseGenerator();
