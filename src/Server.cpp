@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/22 17:44:52 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/01/30 14:05:52 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,8 +111,8 @@ bool	Server::check_for_request_end(std::string &request, pollfd &pfd) {
 
 	request = (_requests.find(pfd.fd))->second.buf;
 	it = _requests.find(pfd.fd);
-	max_client_body_size = (*it).second.socket.get_config().get_max_client_body_size(); //todo: double check - stupid!
-	if (static_cast<long long>((request.length()) > max_client_body_size) || (request.find(END_OF_REQUEST) != std::string::npos))
+	max_client_body_size = (*it).second.socket.get_config().get_max_client_body_size();
+	if ((static_cast<long long>(request.length()) > max_client_body_size) || (request.find(END_OF_REQUEST) != std::string::npos))
 		return (true);
 	return (false);
 }
