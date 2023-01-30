@@ -56,7 +56,8 @@ std::string ResponseGenerator::generate_response() {
 
 	file_path = extract_requested_path();
 	if (file_path.empty()) {
-		create_error_code_response(PAGE_NOT_FOUND);
+		create_error_code_response(METHOD_NOT_ALLOWED);
+
 		return (_response);
 	}
 	create_response(file_path, file);
@@ -88,10 +89,22 @@ std::string	ResponseGenerator::extract_requested_path() {
 	if (tokens.empty())
 		return (EMPTY_STRING);
 	_method = tokens[0];
+	if (check_allowed_methods() == EXIT_FAILURE)
+		return (EMPTY_STRING);
 	requested_path = tokens[1];
 	full_path = get_full_location_path(requested_path);
 	return (full_path);
 }
+
+int ResponseGenerator::check_allowed_methods() {
+	const std::vector<std::string>	&allowed_methods = _socket.get_config().get_methods();
+	std::vector<std::string>::const_iterator it;
+
+	it = std::find(allowed_methods.begin(), allowed_methods.end(), _method);
+	if (it == allowed_methods.end())
+		return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
+};
 
 std::string ResponseGenerator::get_full_location_path(std::string &file_path) {
 	if (file_path == "/") {
@@ -115,6 +128,7 @@ void ResponseGenerator::create_response(std::string &file_path, std::ifstream &f
 	_response = RESPONSE_HEADER + body_len.str() + "\n\n" + _body;
 	file.close();
 }
+
 
 void ResponseGenerator::create_response_body(std::string &file_path, std::ifstream &file) {
 	if (access(file_path.c_str(), F_OK) < 0) {

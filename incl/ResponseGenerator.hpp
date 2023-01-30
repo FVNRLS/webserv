@@ -29,6 +29,7 @@ private:
 	//MEMBER FUNCTIONS
 	int 				check_max_client_body_size();
 	std::string			extract_requested_path();
+	int 				check_allowed_methods();
 	std::string 		get_full_location_path(std::string &file_path);
 	void 				create_response(std::string &file_path, std::ifstream &file);
 	void 				create_response_body(std::string &file_path, std::ifstream &file);

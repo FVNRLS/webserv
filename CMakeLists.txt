@@ -9,7 +9,6 @@ add_executable(webserver
         incl/defines.hpp
 
         src/main.cpp
-        incl/main.hpp
 
         src/Config.cpp
         incl/Config.hpp
