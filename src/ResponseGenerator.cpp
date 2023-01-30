@@ -41,14 +41,16 @@ ResponseGenerator	&ResponseGenerator::operator=(const ResponseGenerator &src) {
 ResponseGenerator::~ResponseGenerator() {}
 
 
-//TODO: encode html with picture nd find right type!
 //MEMBER FUNCTIONS
 std::string ResponseGenerator::generate_response() {
 	std::string 		file_path;
 	std::ifstream 		file;
+	std::stringstream	body_len;
 
 	if (check_max_client_body_size() == EXIT_FAILURE) {
 		create_error_code_response(BAD_REQUEST);
+		body_len << _body.length();
+		_response = RESPONSE_HEADER + body_len.str() + "\n\n" + _body;
 		return (_response);
 	}
 
@@ -157,3 +159,6 @@ int	ResponseGenerator::create_error_code_response(int error) {
 	_body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	return (EXIT_SUCCESS);
 }
+
+
+//TODO: FOR LATER > encode html with picture nd find right type!

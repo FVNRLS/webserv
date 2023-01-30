@@ -26,7 +26,6 @@ private:
 	std::string 				_body;
 	std::string 				_method;
 
-
 	//MEMBER FUNCTIONS
 	int 				check_max_client_body_size();
 	std::string			extract_requested_path();
@@ -35,7 +34,7 @@ private:
 	void 				create_response_body(std::string &file_path, std::ifstream &file);
 	int 				open_file(std::string &file_path, std::ifstream &file);
 
-		//ERROR MANAGEMENT
+	//ERROR MANAGEMENT
 	int					create_error_code_response(int error);
 
 public:

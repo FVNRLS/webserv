@@ -96,7 +96,7 @@ int Server::resolve_requests() {
 			ResponseGenerator resp_gen(_pfds[i], (*it).second.socket, (*it).second.buf);
 			response = resp_gen.generate_response();
 			if (!response.empty()) {
-				if (send(_pfds[i].fd, response.c_str(), response.length(), 0) == EXIT_FAILURE)
+				if (send(_pfds[i].fd, response.c_str(), response.length(), 0) == EXIT_FAILURE) //todo: check if chunked!
 					return (EXIT_FAILURE);
 			}
 			close(_pfds[i].fd);
@@ -107,12 +107,12 @@ int Server::resolve_requests() {
 
 bool	Server::check_for_request_end(std::string &request, pollfd &pfd) {
 	std::map<int, request_handler>::iterator	it;
-	size_t 										max_client_body_size;
+	long long 									max_client_body_size;
 
 	request = (_requests.find(pfd.fd))->second.buf;
 	it = _requests.find(pfd.fd);
 	max_client_body_size = (*it).second.socket.get_config().get_max_client_body_size(); //todo: double check - stupid!
-	if ((request.length() > max_client_body_size) || (request.find(END_OF_REQUEST) != std::string::npos))
+	if (static_cast<long long>((request.length()) > max_client_body_size) || (request.find(END_OF_REQUEST) != std::string::npos))
 		return (true);
 	return (false);
 }
