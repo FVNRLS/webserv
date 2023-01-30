@@ -44,23 +44,14 @@ ResponseGenerator::~ResponseGenerator() {}
 //MEMBER FUNCTIONS
 std::string ResponseGenerator::generate_response() {
 	std::string 		file_path;
-	std::ifstream 		file;
-	std::stringstream	body_len;
 
-	if (check_max_client_body_size() == EXIT_FAILURE) {
-		create_error_code_response(BAD_REQUEST);
-		body_len << _body.length();
-		_response = RESPONSE_HEADER + body_len.str() + "\n\n" + _body;
-		return (_response);
-	}
+	if (check_max_client_body_size() == EXIT_FAILURE)
+		return (create_error_code_response(BAD_REQUEST));
 
 	file_path = extract_requested_path();
-	if (file_path.empty()) {
-		create_error_code_response(METHOD_NOT_ALLOWED);
-
-		return (_response);
-	}
-	create_response(file_path, file);
+	if (file_path.empty())
+		return (create_error_code_response(METHOD_NOT_ALLOWED));
+	create_response(file_path);
 	return (_response);
 }
 
@@ -120,31 +111,33 @@ std::string ResponseGenerator::get_full_location_path(std::string &file_path) {
 	return (file_path);
 }
 
-void ResponseGenerator::create_response(std::string &file_path, std::ifstream &file) {
+void ResponseGenerator::create_response(std::string &file_path) {
 	std::stringstream 	body_len;
 
-	create_response_body(file_path, file);
+	if (create_response_body(file_path) == EXIT_FAILURE)
+		return;
 	body_len << _body.length();
 	_response = RESPONSE_HEADER + body_len.str() + "\n\n" + _body;
-	file.close();
 }
 
 
-void ResponseGenerator::create_response_body(std::string &file_path, std::ifstream &file) {
+int ResponseGenerator::create_response_body(std::string &file_path) {
+	std::ifstream 		file;
+
 	if (access(file_path.c_str(), F_OK) < 0) {
-		if (create_error_code_response(PAGE_NOT_FOUND) == EXIT_FAILURE)
-			_body.append(DEFAULT_PAGE_ERROR);
-		return;
+		create_error_code_response(PAGE_NOT_FOUND);
+		return (EXIT_FAILURE);
 	}
 	if (open_file(file_path, file) == EXIT_FAILURE) {
-		if (create_error_code_response(FORBIDDEN) == EXIT_FAILURE)
-			_body.append(DEFAULT_PAGE_ERROR);
-		return;
+		create_error_code_response(FORBIDDEN);
+		return (EXIT_FAILURE);
 	}
 	_body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	file.close();
+	return (EXIT_SUCCESS);
 }
 
-int ResponseGenerator::open_file(std::string &file_path, std::ifstream &file) {
+int ResponseGenerator::open_file(const std::string &file_path, std::ifstream &file) {
 	file.open(file_path);
 	if (!file.is_open() || file.fail())
 		return (EXIT_FAILURE);
@@ -153,25 +146,29 @@ int ResponseGenerator::open_file(std::string &file_path, std::ifstream &file) {
 
 
 //ERROR MANAGEMENT
-int	ResponseGenerator::create_error_code_response(int error) {
-	std::ifstream file;
-	std::stringstream error_code;
-	std::string error_file;
-	std::string error_page_path;
-	std::string body;
-	std::stringstream body_len;
-	std::string response;
+std::string ResponseGenerator::create_error_code_response(int error) {
+	std::ifstream 			file;
+	std::stringstream 		error_code;
+	std::string 			error_file;
+	std::string 			error_page_path;
+	std::string 			body;
+	std::stringstream 		body_len;
+	std::string 			response;
 
 	error_code << error;
 	error_file = error_code.str() + ".html";
 	error_page_path = _socket.get_config().get_error_pages_dir() + error_file;
 
-	if (access(error_page_path.c_str(), F_OK) < 0)
-		return (EXIT_FAILURE);
-	if (open_file(error_page_path, file) == EXIT_FAILURE)
-		return (EXIT_FAILURE);
+	if (access(error_page_path.c_str(), F_OK) < 0 || open_file(error_page_path, file) == EXIT_FAILURE) {
+		_response = DEFAULT_PAGE_ERROR;
+		file.close();
+		return (_response);
+	}
 	_body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-	return (EXIT_SUCCESS);
+	body_len << _body.length();
+	_response = RESPONSE_HEADER + body_len.str() + "\n\n" + _body;
+	file.close();
+	return (_response);
 }
 
 

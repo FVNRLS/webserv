@@ -31,12 +31,12 @@ private:
 	std::string			extract_requested_path();
 	int 				check_allowed_methods();
 	std::string 		get_full_location_path(std::string &file_path);
-	void 				create_response(std::string &file_path, std::ifstream &file);
-	void 				create_response_body(std::string &file_path, std::ifstream &file);
-	int 				open_file(std::string &file_path, std::ifstream &file);
+	void 				create_response(std::string &file_path);
+	int 				create_response_body(std::string &file_path);
+	int 				open_file(const std::string &file_path, std::ifstream &file);
 
 	//ERROR MANAGEMENT
-	int					create_error_code_response(int error);
+	std::string 		create_error_code_response(int error);
 
 public:
 	ResponseGenerator(pollfd &pfd, const Socket &socket, std::string &request);
