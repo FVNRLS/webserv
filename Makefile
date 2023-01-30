@@ -4,7 +4,7 @@ CC = c++
 
 RM = rm -f
 
-FLAGS = -Wall -Wextra -Werror -std=c++98
+FLAGS = -Wall -Wextra -Werror -g -std=c++98
 
 SRC =	./src/main.cpp \
 		./src/Config.cpp \

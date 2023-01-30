@@ -72,7 +72,7 @@ const std::string EMPTY_STRING;
 
 //DEFAULT STRING CONSTANTS
 const std::string RESPONSE_HEADER 			= "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: ";
-const std::string DEFAULT_PATH 				= "config/clion_test.conf";
+const std::string DEFAULT_CONF_PATH 		= "config/clion_test.conf";
 const std::string DEFAULT_INDEX_PAGE 		= "html/index.html";
 const std::string DEFAULT_ERROR_PAGES_DIR 	= "config/default_error_pages";
 const std::string DEFAULT_REDIR_FIRST 		= "config";

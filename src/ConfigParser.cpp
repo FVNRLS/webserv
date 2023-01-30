@@ -13,9 +13,9 @@
 #include "ConfigParser.hpp"
 
 //BASIC CLASS SETUP
-ConfigParser::ConfigParser(std::vector<Config> &servers, char *path) : _config_file(DEFAULT_PATH), _serv_mode(false),
-_line_num(1), _pos(0), _conf_pos(0), _serv_cnt(0), _serv_def_start(0), _serv_def_end(0),
-_i_serv(-1), _i_loc(-1), _configs(&servers) {
+ConfigParser::ConfigParser(std::vector<Config> &servers, char *path) : _config_file(DEFAULT_CONF_PATH), _serv_mode(false),
+																	   _line_num(1), _pos(0), _conf_pos(0), _serv_cnt(0), _serv_def_start(0), _serv_def_end(0),
+																	   _i_serv(-1), _i_loc(-1), _configs(&servers) {
 	if (path != NULL)
 		_config_file = path;
 
