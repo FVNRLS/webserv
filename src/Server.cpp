@@ -107,12 +107,12 @@ int Server::resolve_requests() {
 
 bool	Server::check_for_request_end(std::string &request, pollfd &pfd) {
 	std::map<int, request_handler>::iterator	it;
-	long long 									max_client_body_size;
+	size_t 										max_client_body_size;
 
 	request = (_requests.find(pfd.fd))->second.buf;
 	it = _requests.find(pfd.fd);
 	max_client_body_size = (*it).second.socket.get_config().get_max_client_body_size(); //todo: double check - stupid!
-	if (static_cast<long long>((request.length()) > max_client_body_size) || (request.find(END_OF_REQUEST) != std::string::npos))
+	if ((request.length() > max_client_body_size) || (request.find(END_OF_REQUEST) != std::string::npos))
 		return (true);
 	return (false);
 }

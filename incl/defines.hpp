@@ -64,13 +64,13 @@ enum num_constants {
 	MAX_CONNECTIONS			= 10,
 };
 
-//STRINGS
+//STRINGS SEPARATORS
 const std::string STR_CLOSED_CURLY_BRACE	=	"}";
 const std::string STR_SEMICOLON 			=	";";
 const std::string EQUAL_SIGN 				=	"=";
 const std::string EMPTY_STRING;
 
-//DEFAULTS
+//DEFAULT STRING CONSTANTS
 const std::string RESPONSE_HEADER 			= "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: ";
 const std::string DEFAULT_PATH 				= "config/clion_test.conf";
 const std::string DEFAULT_INDEX_PAGE 		= "html/index.html";

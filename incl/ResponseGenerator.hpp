@@ -40,7 +40,7 @@ private:
 
 public:
 	ResponseGenerator(pollfd &pfd, const Socket &socket, std::string &request);
-	ResponseGenerator(std::vector<Socket> &sockets, const ResponseGenerator &src);
+	ResponseGenerator(const ResponseGenerator &src);
 	ResponseGenerator &operator=(const ResponseGenerator &src);
 	~ResponseGenerator();
 

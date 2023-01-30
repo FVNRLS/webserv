@@ -19,13 +19,13 @@ ResponseGenerator::ResponseGenerator(pollfd &pfd, const Socket &socket, std::str
 	//VECTOR OF VALID LOCATIONS FOR PATH REQUEST
 	_valid_locs.push_back(socket.get_config().get_index());
 	_valid_locs.push_back(socket.get_config().get_root());
-	for (int i = 0; i < socket.get_config().get_locations().size(); i++) {
+	for (size_t i = 0; i < socket.get_config().get_locations().size(); i++) {
 		_valid_locs.push_back(socket.get_config().get_locations()[i].root);
 		_valid_locs.push_back(socket.get_config().get_locations()[i].cgi_path);
 	}
 }
 
-ResponseGenerator::ResponseGenerator(std::vector<Socket> &sockets, const ResponseGenerator &src) :
+ResponseGenerator::ResponseGenerator(const ResponseGenerator &src) :
 		_socket(src._socket), _request(src._request) { *this = src; }
 
 ResponseGenerator	&ResponseGenerator::operator=(const ResponseGenerator &src) {
@@ -96,7 +96,7 @@ std::string ResponseGenerator::get_full_location_path(std::string &file_path) {
 		file_path = _socket.get_config().get_index();
 		return (file_path);
 	}
-	for (int i = 0; i < _valid_locs.size(); i++) {
+	for (size_t i = 0; i < _valid_locs.size(); i++) {
 		if (std::equal(file_path.rbegin(), file_path.rend(), _valid_locs[i].rbegin())) {
 			file_path = _valid_locs[i];
 			break;
