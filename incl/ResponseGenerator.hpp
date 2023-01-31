@@ -27,7 +27,7 @@ private:
 	int 						check_max_client_body_size();
 	std::vector<std::string>	tokenize_first_line(std::vector<std::string> &tokens);
 	int 						select_method(const std::vector<std::string> &tokens);
-	std::string 		        get_full_location_path(std::string &file_path);
+	std::vector<std::string> 	get_allowed_methods(std::string &file_path);
 
 	//ERROR MANAGEMENT
 	std::string 		create_error_code_response(int error);

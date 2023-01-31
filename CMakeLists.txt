@@ -31,6 +31,9 @@ add_executable(webserver
         incl/GETRequest.hpp
         src/GETRequest.cpp
 
+        src/POSTRequest.cpp
+        incl/POSTRequest.hpp
+
         #TOOLS
         src/tools.cpp
         incl/tools.hpp

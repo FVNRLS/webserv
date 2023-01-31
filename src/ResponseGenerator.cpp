@@ -71,26 +71,31 @@ std::vector<std::string>	ResponseGenerator::tokenize_first_line(std::vector<std:
 
 int ResponseGenerator::select_method(const std::vector<std::string> &tokens) {
 	std::string 								requested_path;
-	const std::vector<std::string>				&allowed_methods = _socket.get_config().get_methods();
 	std::vector<std::string>::const_iterator	it;
-	std::string 								full_path;
+	std::vector<std::string>					allowed_methods;
 
 	_method = tokens[0];
 	requested_path = tokens[1];
-	full_path = get_full_location_path(requested_path);
+	allowed_methods = get_allowed_methods(requested_path);
 
 	it = std::find(allowed_methods.begin(), allowed_methods.end(), _method);
 	if (it == allowed_methods.end())
-		return (EXIT_FAILURE);
+		return (METHOD_NOT_ALLOWED);
 	if (*it == "GET") {
 		GETRequest	parser(_response);
-		return (parser.create_response(full_path));
+
+		return (parser.create_response(requested_path));
+	}
+	else if (*it == "POST") {
+		POSTRequest	parser(_response);
+
+
 	}
 	//todo: complete with post and delete!
 	return (EXIT_FAILURE);
 }
 
-std::string ResponseGenerator::get_full_location_path(std::string &file_path) {
+std::vector<std::string> ResponseGenerator::get_allowed_methods(std::string &file_path) {
 	std::vector<std::string> tokens;
 
 	tokens = split(file_path, '/');
@@ -111,11 +116,12 @@ std::string ResponseGenerator::get_full_location_path(std::string &file_path) {
 									_socket.get_config().get_locations()[i].index;
 					else
 						file_path = _socket.get_config().get_locations()[i].root + tokens[1];
+					return (_socket.get_config().get_locations()[i].methods);
 				}
 			}
 			break;
 	}
-	return (file_path);
+	return (_socket.get_config().get_methods());
 }
 
 //ERROR MANAGEMENT
