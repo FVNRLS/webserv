@@ -18,7 +18,12 @@
 struct request_handler { //todo: delete item from map
 	Socket							socket;
 	std::string 					buf;
+	std::string 					method;
+	std::string 					file_path;
+	bool 							_body_received;
+	bool 							_head_received;
 };
+
 
 class Server {
 
@@ -28,12 +33,16 @@ private:
 	CLI								_cli;
 	std::map<int, request_handler>	_requests;
 
+
 	//CORE FUNCTIONS
 	int							check_cli();
 	int 						accept_requests();
 	int 						resolve_requests();
-	int							accumulate_request(int &client_fd);
-	bool 						check_for_request_end(std::string &request, pollfd &pfd);
+	int							accumulate_request(std::map<int, request_handler>::iterator	request);
+	bool 						request_end(std::map<int, request_handler>::iterator	request);
+	int 						handle_request_header(std::map<int, request_handler>::iterator	request);
+	std::vector<std::string> 	tokenize(std::string& request);
+	std::vector<std::string> 	get_allowed_methods(std::map<int, request_handler>::iterator	request);
 	int 						check_connection(pollfd& pfd);
 	void						delete_invalid_fds();
 

@@ -13,6 +13,8 @@ SRC =	./src/main.cpp \
 		./src/Server.cpp \
 		./src/CLI.cpp \
 		./src/ResponseGenerator.cpp \
+		./src/GETRequest.cpp \
+		./src/POSTRequest.cpp \
 		./src/tools.cpp \
 
 

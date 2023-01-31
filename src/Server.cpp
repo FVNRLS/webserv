@@ -73,10 +73,9 @@ int Server::accept_requests() {
 }
 
 int Server::resolve_requests() {
-	std::string 		content_length;
-	std::string 		request;
-	std::string 		response;
-	std::map<int, request_handler>::iterator	it;
+	std::string 								content_length;
+	std::string 								response;
+	std::map<int, request_handler>::iterator	request;
 
 
 	for (size_t i = _sockets.size(); i < _pfds.size(); i++) {
@@ -84,16 +83,20 @@ int Server::resolve_requests() {
 			continue;
 		//REQUEST
 		if (_pfds[i].revents & POLLIN) {
-			if (accumulate_request(_pfds[i].fd) == EXIT_FAILURE)
+			request = _requests.find(_pfds[i].fd);
+			if (accumulate_request(request) == EXIT_FAILURE)
 				return (EXIT_FAILURE);
-			if (check_for_request_end(request, _pfds[i]) == true)
+			if (request_end(request)) {
+				if (handle_request_header(request) == METHOD_NOT_ALLOWED)
+					return (EXIT_FAILURE);
+			}
+			if (request->second.method == "GET" || request->second._body_received)
 				_pfds[i].revents = POLLOUT;
 		}
 		//RESPONSE
 		if (_pfds[i].revents == POLLOUT) {
-			std::cout << request << std::endl;
-			it = _requests.find(_pfds[i].fd);
-			ResponseGenerator resp_gen((*it).second.socket, (*it).second.buf);
+			std::cout << request->second.buf << std::endl;
+			ResponseGenerator resp_gen(request->second.socket, request->second.buf);
 			response = resp_gen.generate_response();
 			if (!response.empty()) {
 				if (send(_pfds[i].fd, response.c_str(), response.length(), 0) == EXIT_FAILURE) //todo: check if chunked!
@@ -105,14 +108,12 @@ int Server::resolve_requests() {
 	return (EXIT_SUCCESS);
 }
 
-bool	Server::check_for_request_end(std::string &request, pollfd &pfd) {
-	std::map<int, request_handler>::iterator	it;
-	long long 									max_client_body_size;
+bool	Server::request_end(std::map<int, request_handler>::iterator	request) {
+	long long 	max_client_body_size;
 
-	request = (_requests.find(pfd.fd))->second.buf;
-	it = _requests.find(pfd.fd);
-	max_client_body_size = (*it).second.socket.get_config().get_max_client_body_size();
-	if ((static_cast<long long>(request.length()) > max_client_body_size) || (request.find(END_OF_REQUEST) != std::string::npos))
+	max_client_body_size = request->second.socket.get_config().get_max_client_body_size();
+	if ((static_cast<long long>(request->second.buf.length()) > max_client_body_size)
+		|| (request->second.buf.find(END_OF_REQUEST) != std::string::npos))
 		return (true);
 	return (false);
 }
@@ -121,22 +122,80 @@ int Server::check_connection(pollfd &pfd) {
 	if (pfd.revents & POLLERR || pfd.revents & POLLHUP || pfd.revents & POLLNVAL) {
 		shutdown(pfd.fd, SHUT_RDWR);
 		close(pfd.fd);
+		_requests.erase(_requests.find(pfd.fd));
 		pfd.fd = -1;
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
 }
 
-int	Server::accumulate_request(int &client_fd) {
-	char 										buffer[100];
-	std::map<int, request_handler>::iterator	it;
+int Server::handle_request_header(std::map<int, request_handler>::iterator	it) {
+	std::vector<std::string> tokens = tokenize(it->second.buf);
+	if (tokens.size() < 3)
+		return BAD_REQUEST;
+	it->second.method = tokens[0];
+	it->second.file_path = tokens[1];
+
+	std::vector<std::string> allowed_methods = get_allowed_methods(it);
+	for (std::vector<std::string>::iterator itr = allowed_methods.begin(); itr != allowed_methods.end(); ++itr) {
+		if (*itr == it->second.method)
+			return EXIT_SUCCESS;
+	}
+	return METHOD_NOT_ALLOWED;
+}
+
+std::vector<std::string> Server::tokenize(std::string& request) {
+	std::string 				first_request_line;
+	size_t 						nl_pos;
+	std::vector<std::string>	tokens;
+
+	nl_pos = request.find(NEWLINE);
+	if (nl_pos != std::string::npos) {
+		first_request_line =  request.substr(0, nl_pos);
+	}
+	tokens = split(first_request_line, SPACE);
+	return (tokens);
+}
+
+std::vector<std::string> Server::get_allowed_methods(std::map<int, request_handler>::iterator it) {//std::map<int, request_handler>::iterator it) {
+	std::vector<std::string> locations;
+
+	locations = split(it->second.file_path, '/');
+	switch (locations.size()) {
+		case 0:
+			it->second.file_path = it->second.socket.get_config().get_root() + it->second.socket.get_config().get_index();
+			break;
+		case 1:
+			if (it->second.file_path.size() >= 5 && it->second.file_path.compare(it->second.file_path.size() - 5, 5, ".html") == 0) {
+				it->second.file_path = it->second.socket.get_config().get_root() + locations[0];
+				break;
+			}
+		case 2:
+			for (size_t i = 0; i <it->second.socket.get_config().get_locations().size(); i++) {
+				if (it->second.socket.get_config().get_locations()[i].prefix.compare(1, locations[0].size(), locations[0]) == 0) {
+					if (locations.size() == 1)
+						it->second.file_path = it->second.socket.get_config().get_locations()[i].root +
+											   it->second.socket.get_config().get_locations()[i].index;
+					else
+						it->second.file_path = it->second.socket.get_config().get_locations()[i].root + locations[1];
+					return (it->second.socket.get_config().get_locations()[i].methods);
+				}
+			}
+			break;
+	}
+	return (it->second.socket.get_config().get_methods());
+}
+
+int	Server::accumulate_request(std::map<int, request_handler>::iterator	request) {
+	char 										buffer[2000];
 	long 										bytes;
 
-	bytes = recv(client_fd, buffer, sizeof(buffer), MSG_DONTWAIT);
+	bytes = recv(request->first, buffer, sizeof(buffer), MSG_DONTWAIT);
 	if (bytes < 0)
 		return (system_call_error(RECV_ERROR));
-	it = _requests.find(client_fd);
-	(*it).second.buf += std::string(buffer, bytes);
+	if (bytes == 0)
+		request->second._body_received = true;
+	request->second.buf += std::string(buffer, bytes);
 	return (EXIT_SUCCESS);
 }
 

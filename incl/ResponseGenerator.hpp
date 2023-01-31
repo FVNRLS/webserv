@@ -13,6 +13,7 @@
 #pragma once
 
 #include "GETRequest.hpp"
+#include "POSTRequest.hpp"
 
 class ResponseGenerator {
 
