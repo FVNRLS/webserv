@@ -17,11 +17,9 @@
 class ResponseGenerator {
 
 private:
-	pollfd						_pfd;
 	const Socket				&_socket;
 	std::string 				&_request;
 
-	std::vector<std::string>	_valid_locs;
 	std::string					_response;
 	std::string 				_method;
 
@@ -30,7 +28,6 @@ private:
 	std::vector<std::string>	tokenize_first_line(std::vector<std::string> &tokens);
 	int 						select_method(const std::vector<std::string> &tokens);
 	std::string 		        get_full_location_path(std::string &file_path);
-
 
 	//ERROR MANAGEMENT
 	std::string 		create_error_code_response(int error);

@@ -12,11 +12,13 @@
 
 #include "GETRequest.hpp"
 
+//BASIC CLASS SETUP
 GETRequest::GETRequest(std::string &response) :  _response(response) {}
 
 GETRequest::~GETRequest() {}
 
 
+//MEMBER FUNCTIONS
 int GETRequest::create_response(std::string &file_path) {
 	std::stringstream 	body_len;
 	int 				exit_code;
@@ -31,7 +33,7 @@ int GETRequest::create_response(std::string &file_path) {
 
 
 int GETRequest::create_response_body(std::string &file_path) {
-	std::ifstream 		file;
+	std::ifstream	file;
 
 	if (access(file_path.c_str(), F_OK) < 0)
 		return PAGE_NOT_FOUND;

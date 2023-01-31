@@ -804,7 +804,7 @@ void 	ConfigParser::check_loc_root() {
 
 	root = &_serv[_i_serv]._locations[_i_loc].root;
 	if (root->empty())
-		*root = _serv[_i_serv]._locations[_i_loc].prefix;
+		*root = _serv[_i_serv]._root;
 }
 
 void 	ConfigParser::check_cgi_path() {

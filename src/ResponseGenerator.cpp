@@ -14,16 +14,7 @@
 
 //BASIC CLASS SETUP
 ResponseGenerator::ResponseGenerator(const Socket &socket, std::string &request) :
-		_socket(socket), _request(request) {
-
-	//VECTOR OF VALID LOCATIONS FOR PATH REQUEST
-	_valid_locs.push_back(socket.get_config().get_index());
-	_valid_locs.push_back(socket.get_config().get_root());
-	for (size_t i = 0; i < socket.get_config().get_locations().size(); i++) {
-		_valid_locs.push_back(socket.get_config().get_locations()[i].root);
-		_valid_locs.push_back(socket.get_config().get_locations()[i].cgi_path);
-	}
-}
+		_socket(socket), _request(request) {}
 
 ResponseGenerator::ResponseGenerator(const ResponseGenerator &src) :
 		_socket(src._socket), _request(src._request) { *this = src; }
@@ -100,19 +91,32 @@ int ResponseGenerator::select_method(const std::vector<std::string> &tokens) {
 }
 
 std::string ResponseGenerator::get_full_location_path(std::string &file_path) {
-	if (file_path == "/") {
-		file_path = _socket.get_config().get_index();
-		return (file_path);
-	}
-	for (size_t i = 0; i < _valid_locs.size(); i++) {
-		if (std::equal(file_path.rbegin(), file_path.rend(), _valid_locs[i].rbegin())) {
-			file_path = _valid_locs[i];
+	std::vector<std::string> tokens;
+
+	tokens = split(file_path, '/');
+	switch (tokens.size()) {
+		case 0:
+			file_path = _socket.get_config().get_root() + _socket.get_config().get_index();
 			break;
-		}
+		case 1:
+			if (file_path.size() >= 5 && file_path.compare(file_path.size() - 5, 5, ".html") == 0) {
+				file_path = _socket.get_config().get_root() + tokens[0];
+				break;
+			}
+		case 2:
+			for (size_t i = 0; i <_socket.get_config().get_locations().size(); i++) {
+				if (_socket.get_config().get_locations()[i].prefix.compare(1, tokens[0].size(), tokens[0]) == 0) {
+					if (tokens.size() == 1)
+						file_path = _socket.get_config().get_locations()[i].root +
+									_socket.get_config().get_locations()[i].index;
+					else
+						file_path = _socket.get_config().get_locations()[i].root + tokens[1];
+				}
+			}
+			break;
 	}
 	return (file_path);
 }
-
 
 //ERROR MANAGEMENT
 std::string ResponseGenerator::create_error_code_response(int error) {
