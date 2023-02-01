@@ -31,7 +31,7 @@ private:
 	int							check_cli();
 	int 						accept_requests();
 	int 						resolve_requests();
-	int							accumulate_head(std::map<int, request_handler>::iterator	request);
+	int							accumulate(std::map<int, request_handler>::iterator	request);
 	void 						set_request_end_flags(std::map<int, request_handler>::iterator	request);
 	int 						handle_request_header(std::map<int, request_handler>::iterator	request);
 	size_t						get_body_length(request_handler &request);

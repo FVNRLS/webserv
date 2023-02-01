@@ -84,7 +84,7 @@ int Server::resolve_requests() {
 		//REQUEST
 		if (_pfds[i].revents & POLLIN) {
 			request = _requests.find(_pfds[i].fd);
-			if (accumulate_head(request) == EXIT_FAILURE)
+			if (accumulate(request) == EXIT_FAILURE)
 				return (EXIT_FAILURE);
 			if (request->second.head_received) {
 				request->second.status = handle_request_header(request);
@@ -122,7 +122,7 @@ int Server::check_connection(pollfd &pfd) {
 	return EXIT_SUCCESS;
 }
 
-int	Server::accumulate_head(std::map<int, request_handler>::iterator	request) {
+int	Server::accumulate(std::map<int, request_handler>::iterator	request) {
 	char 										buffer[2000];
 	long 										bytes;
 

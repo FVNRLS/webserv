@@ -31,8 +31,8 @@ std::string ResponseGenerator::generate_response() {
 	else if (_request.method == "POST") {
 		POSTRequest post(_request);
 		_request.status = post.create_response();
-		if (_request.status == OK) {
-			_request.file_path = "simple_form.html";
+		if (_request.status == EXIT_SUCCESS) {
+			_request.file_path = "../html/simple_form.html";
 			GETRequest get;
 			_request.status = get.create_response(_request.file_path, _response);
 		}
@@ -66,13 +66,11 @@ std::string ResponseGenerator::create_error_code_response(int error) {
 
 	if (access(error_page_path.c_str(), F_OK) < 0 || open_file(error_page_path, file) == EXIT_FAILURE) {
 		_response = DEFAULT_PAGE_ERROR;
-		file.close();
 		return (_response);
 	}
 	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	body_len << body.length();
 	_response = RESPONSE_HEADER + body_len.str() + "\n\n" + body;
-	file.close();
 	return (_response);
 }
 
