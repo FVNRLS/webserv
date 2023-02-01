@@ -37,7 +37,9 @@ std::string ResponseGenerator::generate_response() {
 	return (_response);
 }
 
-
+std::string ResponseGenerator::get_request_body() {
+	return (EMPTY_STRING);
+}
 
 //ERROR MANAGEMENT
 std::string ResponseGenerator::create_error_code_response(int error) {

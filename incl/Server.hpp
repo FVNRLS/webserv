@@ -34,6 +34,7 @@ private:
 	int							accumulate_head(std::map<int, request_handler>::iterator	request);
 	void 						set_request_end_flags(std::map<int, request_handler>::iterator	request);
 	int 						handle_request_header(std::map<int, request_handler>::iterator	request);
+	size_t						get_body_length(request_handler &request);
 	std::vector<std::string> 	tokenize(std::string& request);
 	std::vector<std::string> 	get_allowed_methods(std::map<int, request_handler>::iterator	request);
 	int 						check_connection(pollfd& pfd);

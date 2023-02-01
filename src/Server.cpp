@@ -142,30 +142,39 @@ void	Server::set_request_end_flags(std::map<int, request_handler>::iterator	requ
 		request->second.status = BAD_REQUEST;
 		return;
 	}
-	switch (count_occurrences(request->second.buf, END_OF_REQUEST)) {
-		case 1:
-			request->second.head_received = true;
-			break;
-		case 2:
-			request->second.head_received = true;
-			request->second.body_received = true;
-			break;
+	request->second.head_length = request->second.buf.find(END_OF_REQUEST);
+	if (request->second.head_length != std::string::npos) {
+		request->second.head_length += std::strlen(END_OF_REQUEST.c_str());
+		request->second.head_received = true;
 	}
 }
 
-int Server::handle_request_header(std::map<int, request_handler>::iterator	it) {
-	std::vector<std::string> tokens = tokenize(it->second.buf);
+int Server::handle_request_header(std::map<int, request_handler>::iterator	request) {
+	std::vector<std::string> tokens = tokenize(request->second.buf);
 	if (tokens.size() < 3)
 		return BAD_REQUEST;
-	it->second.method = tokens[0];
-	it->second.file_path = tokens[1];
+	request->second.method = tokens[0];
+	request->second.file_path = tokens[1];
 
-	std::vector<std::string> allowed_methods = get_allowed_methods(it);
-	for (std::vector<std::string>::iterator itr = allowed_methods.begin(); itr != allowed_methods.end(); ++itr) {
-		if (*itr == it->second.method)
+	std::vector<std::string> allowed_methods = get_allowed_methods(request);
+	for (std::vector<std::string>::iterator it = allowed_methods.begin(); it != allowed_methods.end(); ++it) {
+		if (*it == request->second.method) {
+			request->second.body_length = get_body_length(request->second);
+			if(request->second.buf.size() >= request->second.head_length + request->second.body_length)
+				request->second.body_received = true;
 			return EXIT_SUCCESS;
+		}
 	}
 	return METHOD_NOT_ALLOWED;
+}
+
+size_t Server::get_body_length(request_handler &request) {
+	if (request.method == "GET")
+		return (0);
+
+	size_t pos = request.buf.find("Content-Length: ");
+	size_t length = static_cast<size_t> (std::atoll(request.buf.data() + pos + std::strlen("Content-Length: ")));
+	return length;
 }
 
 std::vector<std::string> Server::tokenize(std::string& request) {

@@ -23,6 +23,8 @@ struct request_handler { //todo: delete item from map
 	bool 							body_received;
 	bool 							head_received;
 	int 							status;
+	size_t 							body_length;
+	size_t 							head_length;
 };
 
 class ResponseGenerator {
@@ -30,6 +32,9 @@ class ResponseGenerator {
 private:
 	request_handler&			_request;
 	std::string 				_response;
+	std::string 				_request_body;
+
+	std::string 				get_request_body();
 
 
 	//ERROR MANAGEMENT
