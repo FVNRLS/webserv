@@ -13,13 +13,13 @@
 #include "GETRequest.hpp"
 
 //BASIC CLASS SETUP
-GETRequest::GETRequest(std::string &response) :  _response(response) {}
+GETRequest::GETRequest() {}
 
 GETRequest::~GETRequest() {}
 
 
 //MEMBER FUNCTIONS
-int GETRequest::create_response(std::string &file_path) {
+int GETRequest::create_response(const std::string &file_path, std::string &_response) {
 	std::stringstream 	body_len;
 	int 				exit_code;
 
@@ -32,7 +32,7 @@ int GETRequest::create_response(std::string &file_path) {
 }
 
 
-int GETRequest::create_response_body(std::string &file_path) {
+int GETRequest::create_response_body(const std::string &file_path) {
 	std::ifstream	file;
 
 	if (access(file_path.c_str(), F_OK) < 0)

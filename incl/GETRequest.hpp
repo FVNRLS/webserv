@@ -17,14 +17,13 @@
 class GETRequest {
 
 private:
-	std::string		&_response;
-	std::string 	_body;
+	std::string	_body;
 
-	int 			create_response_body(std::string &file_path);
+	int 		create_response_body(const std::string &file_path);
 
 public:
-	GETRequest(std::string &response);
+	GETRequest();
 	~GETRequest();
 
-	int 			create_response(std::string &file_path);
+	int 		create_response(const std::string &file_path, std::string &_response);
 };

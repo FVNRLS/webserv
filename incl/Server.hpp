@@ -15,14 +15,6 @@
 #include "CLI.hpp"
 #include "ResponseGenerator.hpp"
 
-struct request_handler { //todo: delete item from map
-	Socket							socket;
-	std::string 					buf;
-	std::string 					method;
-	std::string 					file_path;
-	bool 							body_received;
-	bool 							head_received;
-};
 
 
 class Server {

@@ -87,17 +87,16 @@ int Server::resolve_requests() {
 			if (accumulate_head(request) == EXIT_FAILURE)
 				return (EXIT_FAILURE);
 			if (request->second.head_received) {
-				if (handle_request_header(request) == METHOD_NOT_ALLOWED)
-					return (EXIT_FAILURE);
+				request->second.status = handle_request_header(request);
 			}
-			if (request->second.method == "GET" || request->second.body_received)
+			if (request->second.status || request->second.method == "GET" || request->second.body_received)
 				_pfds[i].events = POLLOUT; //todo: check.....
 		}
 		//RESPONSE
 		else if (_pfds[i].revents & POLLOUT) {
 			request = _requests.find(_pfds[i].fd);
 			std::cout << request->second.buf << std::endl;
-			ResponseGenerator resp_gen(request->second.socket, request->second.buf);
+			ResponseGenerator resp_gen(request->second);
 			response = resp_gen.generate_response();
 			if (!response.empty()) {
 				if (send(_pfds[i].fd, response.c_str(), response.length(), 0) == EXIT_FAILURE) //todo: check if chunked!
@@ -139,9 +138,10 @@ void	Server::set_request_end_flags(std::map<int, request_handler>::iterator	requ
 	long long 	max_client_body_size;
 
 	max_client_body_size = request->second.socket.get_config().get_max_client_body_size();
-	if ((static_cast<long long>(request->second.buf.length()) > max_client_body_size))
-		return ;
-
+	if ((static_cast<long long>(request->second.buf.length()) > max_client_body_size)) {
+		request->second.status = BAD_REQUEST;
+		return;
+	}
 	switch (count_occurrences(request->second.buf, END_OF_REQUEST)) {
 		case 1:
 			request->second.head_received = true;

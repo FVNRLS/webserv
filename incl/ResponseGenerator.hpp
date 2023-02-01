@@ -14,31 +14,30 @@
 
 #include "GETRequest.hpp"
 #include "POSTRequest.hpp"
-#include "Server.hpp"
+
+struct request_handler { //todo: delete item from map
+	Socket							socket;
+	std::string 					buf;
+	std::string 					method;
+	std::string 					file_path;
+	bool 							body_received;
+	bool 							head_received;
+	int 							status;
+};
 
 class ResponseGenerator {
 
 private:
-	const Socket				&_socket;
-	std::string 				&_request;
+	request_handler&			_request;
+	std::string 				_response;
 
-	std::string					_response;
-	std::string 				_method;
-//	request_handler				_requestHandler;
-
-	//MEMBER FUNCTIONS
-	int 						check_max_client_body_size();
-	std::vector<std::string>	tokenize_first_line(std::vector<std::string> &tokens);
-	int 						select_method(const std::vector<std::string> &tokens);
-	std::vector<std::string> 	get_allowed_methods(std::string &file_path);
 
 	//ERROR MANAGEMENT
 	std::string 		create_error_code_response(int error);
 
 public:
-	ResponseGenerator(const Socket &socket, std::string &request);
-	ResponseGenerator(const ResponseGenerator &src);
-	ResponseGenerator &operator=(const ResponseGenerator &src);
+	ResponseGenerator(request_handler &request);
+	ResponseGenerator(ResponseGenerator &src);
 	~ResponseGenerator();
 
 	std::string 		generate_response();
