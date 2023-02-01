@@ -28,18 +28,19 @@ struct request_handler { //todo: delete item from map
 class Server {
 
 private:
-	const std::vector<Socket>		&_sockets;
-	std::vector<pollfd>				_pfds;
-	CLI								_cli;
-	std::map<int, request_handler>	_requests;
+	const std::vector<Socket>					&_sockets;
+	std::vector<pollfd>							_pfds;
+	CLI											_cli;
+	std::map<int, request_handler>				_requests;
+
 
 
 	//CORE FUNCTIONS
 	int							check_cli();
 	int 						accept_requests();
 	int 						resolve_requests();
-	int							accumulate_request(std::map<int, request_handler>::iterator	request);
-	bool 						request_end(std::map<int, request_handler>::iterator	request);
+	int							accumulate_head(std::map<int, request_handler>::iterator	request);
+	void 						set_request_end_flags(std::map<int, request_handler>::iterator	request);
 	int 						handle_request_header(std::map<int, request_handler>::iterator	request);
 	std::vector<std::string> 	tokenize(std::string& request);
 	std::vector<std::string> 	get_allowed_methods(std::map<int, request_handler>::iterator	request);

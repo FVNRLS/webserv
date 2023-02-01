@@ -18,3 +18,4 @@ std::string 				trim(std::string &s);
 std::vector<std::string>	split(std::string &s, char sep);
 void 						silence_sigint();
 int 						open_file(const std::string &file_path, std::ifstream &file);
+int 						count_occurrences(const std::string &haystack, const std::string &needle);

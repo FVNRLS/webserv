@@ -37,7 +37,7 @@ int Server::run() {
 		if (resolve_requests() == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 		delete_invalid_fds();
-//		std::cout << "NUM FD'S:		" << _pfds.size() << std::endl; //todo: check on high loaded server!
+//		std::cout << "NUM FD'S:		" << _pfds.size() << std::endl;
 	}
 }
 
@@ -84,17 +84,18 @@ int Server::resolve_requests() {
 		//REQUEST
 		if (_pfds[i].revents & POLLIN) {
 			request = _requests.find(_pfds[i].fd);
-			if (accumulate_request(request) == EXIT_FAILURE)
+			if (accumulate_head(request) == EXIT_FAILURE)
 				return (EXIT_FAILURE);
-			if (request_end(request)) {
+			if (request->second.head_received) {
 				if (handle_request_header(request) == METHOD_NOT_ALLOWED)
 					return (EXIT_FAILURE);
 			}
 			if (request->second.method == "GET" || request->second.body_received)
-				_pfds[i].revents = POLLOUT;
+				_pfds[i].events = POLLOUT; //todo: check.....
 		}
 		//RESPONSE
-		if (_pfds[i].revents == POLLOUT) {
+		else if (_pfds[i].revents & POLLOUT) {
+			request = _requests.find(_pfds[i].fd);
 			std::cout << request->second.buf << std::endl;
 			ResponseGenerator resp_gen(request->second.socket, request->second.buf);
 			response = resp_gen.generate_response();
@@ -108,19 +109,10 @@ int Server::resolve_requests() {
 	return (EXIT_SUCCESS);
 }
 
-bool	Server::request_end(std::map<int, request_handler>::iterator	request) {
-	long long 	max_client_body_size;
-
-	max_client_body_size = request->second.socket.get_config().get_max_client_body_size();
-	if ((static_cast<long long>(request->second.buf.length()) > max_client_body_size)
-		|| (request->second.buf.find(END_OF_REQUEST) != std::string::npos))
-		return (true);
-	return (false);
-}
-
 int Server::check_connection(pollfd &pfd) {
 	if (pfd.revents & POLLERR || pfd.revents & POLLHUP || pfd.revents & POLLNVAL) {
 		std::map<int, request_handler>::iterator it = _requests.find(pfd.fd);
+
 		if (it != _requests.end())
 			_requests.erase(it);
 		shutdown(pfd.fd, SHUT_RDWR);
@@ -129,6 +121,36 @@ int Server::check_connection(pollfd &pfd) {
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
+}
+
+int	Server::accumulate_head(std::map<int, request_handler>::iterator	request) {
+	char 										buffer[2000];
+	long 										bytes;
+
+	bytes = recv(request->first, buffer, sizeof(buffer), MSG_DONTWAIT);
+	if (bytes < 0)
+		return (system_call_error(RECV_ERROR));
+	request->second.buf += std::string(buffer, bytes);
+	set_request_end_flags(request);
+	return (EXIT_SUCCESS);
+}
+
+void	Server::set_request_end_flags(std::map<int, request_handler>::iterator	request) {
+	long long 	max_client_body_size;
+
+	max_client_body_size = request->second.socket.get_config().get_max_client_body_size();
+	if ((static_cast<long long>(request->second.buf.length()) > max_client_body_size))
+		return ;
+
+	switch (count_occurrences(request->second.buf, END_OF_REQUEST)) {
+		case 1:
+			request->second.head_received = true;
+			break;
+		case 2:
+			request->second.head_received = true;
+			request->second.body_received = true;
+			break;
+	}
 }
 
 int Server::handle_request_header(std::map<int, request_handler>::iterator	it) {
@@ -188,21 +210,9 @@ std::vector<std::string> Server::get_allowed_methods(std::map<int, request_handl
 	return (it->second.socket.get_config().get_methods());
 }
 
-int	Server::accumulate_request(std::map<int, request_handler>::iterator	request) {
-	char 										buffer[2000];
-	long 										bytes;
-
-	bytes = recv(request->first, buffer, sizeof(buffer), MSG_DONTWAIT);
-	if (bytes < 0)
-		return (system_call_error(RECV_ERROR));
-	if (bytes == 0)
-		request->second.body_received = true;
-	request->second.buf += std::string(buffer, bytes);
-	return (EXIT_SUCCESS);
-}
 
 void	Server::delete_invalid_fds() {
-	std::vector<pollfd>::iterator it = _pfds.begin();
+	std::vector<pollfd>::iterator it = _pfds.begin() + _sockets.size();
 
 	while (it != _pfds.end()) {
 		if (it->fd == -1)
@@ -211,6 +221,8 @@ void	Server::delete_invalid_fds() {
 			it++;
 	}
 }
+
+
 
 
 

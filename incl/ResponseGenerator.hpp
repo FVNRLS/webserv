@@ -14,6 +14,7 @@
 
 #include "GETRequest.hpp"
 #include "POSTRequest.hpp"
+#include "Server.hpp"
 
 class ResponseGenerator {
 
@@ -23,6 +24,7 @@ private:
 
 	std::string					_response;
 	std::string 				_method;
+//	request_handler				_requestHandler;
 
 	//MEMBER FUNCTIONS
 	int 						check_max_client_body_size();
