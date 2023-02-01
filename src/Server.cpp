@@ -90,7 +90,7 @@ int Server::resolve_requests() {
 				if (handle_request_header(request) == METHOD_NOT_ALLOWED)
 					return (EXIT_FAILURE);
 			}
-			if (request->second.method == "GET" || request->second._body_received)
+			if (request->second.method == "GET" || request->second.body_received)
 				_pfds[i].revents = POLLOUT;
 		}
 		//RESPONSE
@@ -120,9 +120,11 @@ bool	Server::request_end(std::map<int, request_handler>::iterator	request) {
 
 int Server::check_connection(pollfd &pfd) {
 	if (pfd.revents & POLLERR || pfd.revents & POLLHUP || pfd.revents & POLLNVAL) {
+		std::map<int, request_handler>::iterator it = _requests.find(pfd.fd);
+		if (it != _requests.end())
+			_requests.erase(it);
 		shutdown(pfd.fd, SHUT_RDWR);
 		close(pfd.fd);
-		_requests.erase(_requests.find(pfd.fd));
 		pfd.fd = -1;
 		return EXIT_FAILURE;
 	}
@@ -194,7 +196,7 @@ int	Server::accumulate_request(std::map<int, request_handler>::iterator	request)
 	if (bytes < 0)
 		return (system_call_error(RECV_ERROR));
 	if (bytes == 0)
-		request->second._body_received = true;
+		request->second.body_received = true;
 	request->second.buf += std::string(buffer, bytes);
 	return (EXIT_SUCCESS);
 }

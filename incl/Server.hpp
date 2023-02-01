@@ -20,8 +20,8 @@ struct request_handler { //todo: delete item from map
 	std::string 					buf;
 	std::string 					method;
 	std::string 					file_path;
-	bool 							_body_received;
-	bool 							_head_received;
+	bool 							body_received;
+	bool 							head_received;
 };
 
 
