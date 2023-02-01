@@ -15,17 +15,7 @@
 #include "GETRequest.hpp"
 #include "POSTRequest.hpp"
 
-struct request_handler { //todo: delete item from map
-	Socket							socket;
-	std::string 					buf;
-	std::string 					method;
-	std::string 					file_path;
-	bool 							body_received;
-	bool 							head_received;
-	int 							status;
-	size_t 							body_length;
-	size_t 							head_length;
-};
+#include "requestHandler.hpp"
 
 class ResponseGenerator {
 

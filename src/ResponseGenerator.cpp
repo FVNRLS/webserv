@@ -29,6 +29,15 @@ std::string ResponseGenerator::generate_response() {
 		_request.status = get.create_response(_request.file_path, _response);
 	}
 	else if (_request.method == "POST") {
+		POSTRequest post(_request);
+		_request.status = post.create_response();
+		if (_request.status == OK) {
+			_request.file_path = "simple_form.html";
+			GETRequest get;
+			_request.status = get.create_response(_request.file_path, _response);
+		}
+		else
+			return (create_error_code_response(_request.status));
 		std::cout << "POST_METHOD CALLED!\n";
 	}
 	else {

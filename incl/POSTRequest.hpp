@@ -4,19 +4,17 @@
 
 #pragma once
 
-#include "Socket.hpp"
+#include "requestHandler.hpp"
 
 class POSTRequest {
 
 private:
-	std::string		&_response;
+	request_handler &_request;
 	std::string 	_body;
 
-
-
 public:
-	POSTRequest(std::string &response);
+	POSTRequest(request_handler &request);
 	~POSTRequest();
 
-//	int 			create_response(std::string &file_path);
+	int 			create_response();
 };
