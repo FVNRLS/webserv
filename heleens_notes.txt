@@ -1,0 +1,1 @@
+if path is not found, e.g. (../html in VS Code) no error page is shown
