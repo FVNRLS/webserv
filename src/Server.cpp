@@ -6,7 +6,7 @@
 /*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/02 09:49:58 by hoomen           ###   ########.fr       */
+/*   Updated: 2023/02/02 10:01:50 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ int Server::accept_requests() {
 int Server::resolve_requests() {
 	std::string 								content_length;
 	std::string 								response;
-	std::map<int, request_handler>::iterator	request;
+	request_handler*						request;
 
 
 	for (size_t i = _sockets.size(); i < _pfds.size(); i++) {
@@ -83,20 +83,20 @@ int Server::resolve_requests() {
 			continue;
 		//REQUEST
 		if (_pfds[i].revents & POLLIN) {
-			request = _requests.find(_pfds[i].fd);
-			if (accumulate(request) == EXIT_FAILURE)
+			request = &_requests.find(_pfds[i].fd)->second;
+			if (accumulate(*request, _pfds[i].fd) == EXIT_FAILURE)
 				return (EXIT_FAILURE);
-			if (request->second.head_received) {
-				request->second.status = handle_request_header(request->second);
+			if (request->head_received) {
+				request->status = handle_request_header(*request);
 			}
-			if (request->second.status || request->second.method == "GET" || request->second.body_received)
+			if (request->status || request->method == "GET" || request->body_received)
 				_pfds[i].events = POLLOUT; //todo: check.....
 		}
 		//RESPONSE
 		else if (_pfds[i].revents & POLLOUT) {
-			request = _requests.find(_pfds[i].fd);
-			std::cout << request->second.buf << std::endl;
-			ResponseGenerator resp_gen(request->second);
+			request = &_requests.find(_pfds[i].fd)->second;
+			std::cout << request->buf << std::endl;
+			ResponseGenerator resp_gen(*request);
 			response = resp_gen.generate_response();
 			if (!response.empty()) {
 				if (send(_pfds[i].fd, response.c_str(), response.length(), 0) == EXIT_FAILURE) //todo: check if chunked!
@@ -122,15 +122,15 @@ int Server::check_connection(pollfd &pfd) {
 	return EXIT_SUCCESS;
 }
 
-int	Server::accumulate(std::map<int, request_handler>::iterator	request) {
+int	Server::accumulate(request_handler& request, int request_fd) {
 	char 										buffer[2000];
 	long 										bytes;
 
-	bytes = recv(request->first, buffer, sizeof(buffer), MSG_DONTWAIT);
+	bytes = recv(request_fd, buffer, sizeof(buffer), MSG_DONTWAIT);
 	if (bytes < 0)
 		return (system_call_error(RECV_ERROR));
-	request->second.buf += std::string(buffer, bytes);
-	set_request_end_flags(request->second);
+	request.buf += std::string(buffer, bytes);
+	set_request_end_flags(request);
 	return (EXIT_SUCCESS);
 }
 
@@ -190,7 +190,7 @@ std::vector<std::string> Server::tokenize(std::string& request) {
 	return (tokens);
 }
 
-std::vector<std::string> Server::get_allowed_methods(request_handler& request) {//std::map<int, request_handler>::iterator it) {
+std::vector<std::string> Server::get_allowed_methods(request_handler& request) {
 	std::vector<std::string> locations;
 
 	locations = split(request.file_path, '/');
