@@ -24,25 +24,30 @@ ResponseGenerator::~ResponseGenerator() {}
 std::string ResponseGenerator::generate_response() {
 	if (_request.status)
 		return (create_error_code_response(_request.status));
-
-	GETRequest get;
-	if (_request.method == "GET") {
-		_request.status = get.create_response(_request.file_path, _response);
+	if (_request.file_path == "/cgi-bin/your-script.cgi") {
+		CGI	cgi;
+		_request.status = cgi.create_response(_request, _response);
 	}
-	else if (_request.method == "POST") {
-		POSTRequest post;
-		_request.status = post.create_response(_request);
-		if (_request.status == EXIT_SUCCESS) {
-			_request.file_path = "../html/simple_form.html";
+	else {
+		GETRequest get;
+		if (_request.method == "GET") {
 			_request.status = get.create_response(_request.file_path, _response);
 		}
+		else if (_request.method == "POST") {
+			POSTRequest post;
+			_request.status = post.create_response(_request);
+			if (_request.status == EXIT_SUCCESS) {
+				_request.file_path = "../html/simple_form.html";
+				_request.status = get.create_response(_request.file_path, _response);
+			}
+		}
+		else if (_request.method == "DELETE") {
+			DELETERequest delete_method;
+			_request.status = delete_method.create_response(_request);
+		}
+		else
+			_request.status = METHOD_NOT_ALLOWED;
 	}
-	else if (_request.method == "DELETE"){
-		DELETERequest delete_method;
-		_request.status = delete_method.create_response(_request);
-	}
-	else
-		_request.status = METHOD_NOT_ALLOWED;
 	if (_request.status)
 		return (create_error_code_response(_request.status));
 	return (_response);

@@ -83,6 +83,8 @@ const std::string END_OF_REQUEST			= "\r\n\r\n";
 const std::string DEFAULT_UPLOAD_DIR        = "../uploads/"; //todo change to work with makefile
 #define DATABASE_PATH "../upload/data.txt" //todo change to work with makefile
 #define OK_PAGE "../html/200.html"
+#define PHP_PATH "/usr/bin/php"
+#define CGI_SCRIPT_PATH "/Users/rmazurit/Documents/42_Projects/webserv/config/cgi/cgi.php"
 
 //COVERING UINT32_MAX MACRO FOR ARCH LINUX
 #ifndef UINT32_MAX

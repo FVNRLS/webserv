@@ -9,6 +9,7 @@ POSTRequest::~POSTRequest() {}
 //MEMBER FUNCTIONS
 int POSTRequest::create_response(const request_handler &request) {
 	std::ofstream file;
+
 	_body = request.buf.substr(request.head_length, request.buf.length());
 	if (_body.find("Content-Disposition: form-data") != std::string::npos)
 		return (upload_file());
@@ -44,4 +45,3 @@ int POSTRequest::upload_file() {
 	file << _body.substr(begin, end - begin);
 	return  EXIT_SUCCESS;
 }
-
