@@ -15,6 +15,7 @@ SRC =	./src/main.cpp \
 		./src/ResponseGenerator.cpp \
 		./src/GETRequest.cpp \
 		./src/POSTRequest.cpp \
+		./src/DELETERequest.cpp \
 		./src/tools.cpp \
 
 

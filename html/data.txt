@@ -6,3 +6,180 @@ Content-Type: text/plain
 if path is not found, e.g. (../html in VS Code) no error page is shown
 ------WebKitFormBoundary91SNXLuWw44En8C3--
 
+------WebKitFormBoundary91SNXLuWw44En8C3
+Content-Disposition: form-data; name="uploaded_file"; filename="heleens_notes.txt"
+Content-Type: text/plain
+
+if path is not found, e.g. (../html in VS Code) no error page is shown
+------WebKitFormBoundary91SNXLuWw44En8C3--
+
+------WebKitFormBoundaryn59RILzCTasKXxAy
+Content-Disposition: form-data; name="uploaded_file"; filename="Makefile"
+Content-Type: application/octet-stream
+
+NAME = webserv
+
+CC = c++
+
+RM = rm -f
+
+FLAGS = -Wall -Wextra -Werror -g -std=c++98
+
+SRC =	./src/main.cpp \
+		./src/Config.cpp \
+		./src/ConfigParser.cpp \
+		./src/Socket.cpp \
+		./src/Server.cpp \
+		./src/CLI.cpp \
+		./src/ResponseGenerator.cpp \
+		./src/GETRequest.cpp \
+		./src/POSTRequest.cpp \
+		./src/tools.cpp \
+
+
+INCL =	./incl/
+
+OBJ = ${SRC:.cpp=.o}
+DEP = ${SRC:.cpp=.d}
+
+.cpp.o:
+	@${CC} ${FLAGS} -I ${INCL} -c $< -o ${<:.cpp=.o}
+
+${NAME}: ${OBJ}
+	@${CC} ${OBJ} -o ${NAME}
+	@rm -rf obj && mkdir obj
+	@mv ${OBJ} obj/
+
+all: ${NAME}
+
+clean:
+	@rm -rf obj
+
+fclean: clean
+	@${RM} ${NAME}
+
+re: fclean all
+
+run: $(NAME)
+	./webserv config/vs_code.conf
+
+.PHONY: all clean fclean re
+------WebKitFormBoundaryn59RILzCTasKXxAy--
+
+comment=hi
+comment=sfdsfd
+------WebKitFormBoundarydADl7LOCUNftZK5m
+Content-Disposition: form-data; name="uploaded_file"; filename="Makefile"
+Content-Type: application/octet-stream
+
+NAME = webserv
+
+CC = c++
+
+RM = rm -f
+
+FLAGS = -Wall -Wextra -Werror -g -std=c++98
+
+SRC =	./src/main.cpp \
+		./src/Config.cpp \
+		./src/ConfigParser.cpp \
+		./src/Socket.cpp \
+		./src/Server.cpp \
+		./src/CLI.cpp \
+		./src/ResponseGenerator.cpp \
+		./src/GETRequest.cpp \
+		./src/POSTRequest.cpp \
+		./src/tools.cpp \
+
+
+INCL =	./incl/
+
+OBJ = ${SRC:.cpp=.o}
+DEP = ${SRC:.cpp=.d}
+
+.cpp.o:
+	@${CC} ${FLAGS} -I ${INCL} -c $< -o ${<:.cpp=.o}
+
+${NAME}: ${OBJ}
+	@${CC} ${OBJ} -o ${NAME}
+	@rm -rf obj && mkdir obj
+	@mv ${OBJ} obj/
+
+all: ${NAME}
+
+clean:
+	@rm -rf obj
+
+fclean: clean
+	@${RM} ${NAME}
+
+re: fclean all
+
+run: $(NAME)
+	./webserv config/vs_code.conf
+
+.PHONY: all clean fclean re
+------WebKitFormBoundarydADl7LOCUNftZK5m--
+
+------WebKitFormBoundary3YB07s5fPnq2KM4J
+Content-Disposition: form-data; name="uploaded_file"; filename="Makefile"
+Content-Type: application/octet-stream
+
+NAME = webserv
+
+CC = c++
+
+RM = rm -f
+
+FLAGS = -Wall -Wextra -Werror -g -std=c++98
+
+SRC =	./src/main.cpp \
+		./src/Config.cpp \
+		./src/ConfigParser.cpp \
+		./src/Socket.cpp \
+		./src/Server.cpp \
+		./src/CLI.cpp \
+		./src/ResponseGenerator.cpp \
+		./src/GETRequest.cpp \
+		./src/POSTRequest.cpp \
+		./src/tools.cpp \
+
+
+INCL =	./incl/
+
+OBJ = ${SRC:.cpp=.o}
+DEP = ${SRC:.cpp=.d}
+
+.cpp.o:
+	@${CC} ${FLAGS} -I ${INCL} -c $< -o ${<:.cpp=.o}
+
+${NAME}: ${OBJ}
+	@${CC} ${OBJ} -o ${NAME}
+	@rm -rf obj && mkdir obj
+	@mv ${OBJ} obj/
+
+all: ${NAME}
+
+clean:
+	@rm -rf obj
+
+fclean: clean
+	@${RM} ${NAME}
+
+re: fclean all
+
+run: $(NAME)
+	./webserv config/vs_code.conf
+
+.PHONY: all clean fclean re
+------WebKitFormBoundary3YB07s5fPnq2KM4J--
+
+------WebKitFormBoundaryP7u7lM3KSCaj5pvV
+Content-Disposition: form-data; name="uploaded_file"; filename="example.txt"
+Content-Type: text/plain
+
+HELLO!
+------WebKitFormBoundaryP7u7lM3KSCaj5pvV--
+
+comment=jaja
+comment=jajajaaj

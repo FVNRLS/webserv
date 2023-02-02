@@ -10,6 +10,8 @@ class POSTRequest {
 
 private:
 	std::string 	_body;
+	std::string 	_filepath;
+	int 			upload_file();
 
 public:
 	POSTRequest();
