@@ -34,24 +34,15 @@ std::string ResponseGenerator::generate_response() {
 		_request.status = post.create_response(_request);
 		if (_request.status == EXIT_SUCCESS) {
 			_request.file_path = "../html/simple_form.html";
-
 			_request.status = get.create_response(_request.file_path, _response);
 		}
-		else
-			return (create_error_code_response(_request.status));
-		std::cout << "POST_METHOD CALLED!\n";
 	}
-	else {
+	else if (_request.method == "DELETE"){
 		DELETERequest delete_method;
 		_request.status = delete_method.create_response(_request);
-		if (_request.status == EXIT_SUCCESS) {
-			_request.file_path = "../html/simple_form.html";
-			_request.status = get.create_response(_request.file_path, _response);
-		}
-		else
-			return (create_error_code_response(_request.status));
-		std::cout << "DELETE_METHOD CALLED!\n";
 	}
+	else
+		_request.status = METHOD_NOT_ALLOWED;
 	if (_request.status)
 		return (create_error_code_response(_request.status));
 	return (_response);

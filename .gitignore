@@ -6,3 +6,4 @@ webserv
 a.out
 .DS_Store
 .vscode/**
+uploads/**
