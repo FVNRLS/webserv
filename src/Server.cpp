@@ -6,7 +6,7 @@
 /*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/02 09:45:14 by hoomen           ###   ########.fr       */
+/*   Updated: 2023/02/02 09:49:58 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ int Server::resolve_requests() {
 			if (accumulate(request) == EXIT_FAILURE)
 				return (EXIT_FAILURE);
 			if (request->second.head_received) {
-				request->second.status = handle_request_header(request);
+				request->second.status = handle_request_header(request->second);
 			}
 			if (request->second.status || request->second.method == "GET" || request->second.body_received)
 				_pfds[i].events = POLLOUT; //todo: check.....
@@ -149,19 +149,19 @@ void	Server::set_request_end_flags(request_handler&	request) {
 	}
 }
 
-int Server::handle_request_header(std::map<int, request_handler>::iterator	request) {
-	std::vector<std::string> tokens = tokenize(request->second.buf);
+int Server::handle_request_header(request_handler& request) {
+	std::vector<std::string> tokens = tokenize(request.buf);
 	if (tokens.size() < 3)
 		return BAD_REQUEST;
-	request->second.method = tokens[0];
-	request->second.file_path = tokens[1];
+	request.method = tokens[0];
+	request.file_path = tokens[1];
 
 	std::vector<std::string> allowed_methods = get_allowed_methods(request);
 	for (std::vector<std::string>::iterator it = allowed_methods.begin(); it != allowed_methods.end(); ++it) {
-		if (*it == request->second.method) {
-			request->second.body_length = get_body_length(request->second);
-			if(request->second.buf.size() >= request->second.head_length + request->second.body_length)
-				request->second.body_received = true;
+		if (*it == request.method) {
+			request.body_length = get_body_length(request);
+			if(request.buf.size() >= request.head_length + request.body_length)
+				request.body_received = true;
 			return EXIT_SUCCESS;
 		}
 	}
@@ -190,33 +190,33 @@ std::vector<std::string> Server::tokenize(std::string& request) {
 	return (tokens);
 }
 
-std::vector<std::string> Server::get_allowed_methods(std::map<int, request_handler>::iterator it) {//std::map<int, request_handler>::iterator it) {
+std::vector<std::string> Server::get_allowed_methods(request_handler& request) {//std::map<int, request_handler>::iterator it) {
 	std::vector<std::string> locations;
 
-	locations = split(it->second.file_path, '/');
+	locations = split(request.file_path, '/');
 	switch (locations.size()) {
 		case 0:
-			it->second.file_path = it->second.socket.get_config().get_root() + it->second.socket.get_config().get_index();
+			request.file_path = request.socket.get_config().get_root() + request.socket.get_config().get_index();
 			break;
 		case 1:
-			if (it->second.file_path.size() >= 5 && it->second.file_path.compare(it->second.file_path.size() - 5, 5, ".html") == 0) {
-				it->second.file_path = it->second.socket.get_config().get_root() + locations[0];
+			if (request.file_path.size() >= 5 && request.file_path.compare(request.file_path.size() - 5, 5, ".html") == 0) {
+				request.file_path = request.socket.get_config().get_root() + locations[0];
 				break;
 			}
 		case 2:
-			for (size_t i = 0; i <it->second.socket.get_config().get_locations().size(); i++) {
-				if (it->second.socket.get_config().get_locations()[i].prefix.compare(1, locations[0].size(), locations[0]) == 0) {
+			for (size_t i = 0; i <request.socket.get_config().get_locations().size(); i++) {
+				if (request.socket.get_config().get_locations()[i].prefix.compare(1, locations[0].size(), locations[0]) == 0) {
 					if (locations.size() == 1)
-						it->second.file_path = it->second.socket.get_config().get_locations()[i].root +
-											   it->second.socket.get_config().get_locations()[i].index;
+						request.file_path = request.socket.get_config().get_locations()[i].root +
+											   request.socket.get_config().get_locations()[i].index;
 					else
-						it->second.file_path = it->second.socket.get_config().get_locations()[i].root + locations[1];
-					return (it->second.socket.get_config().get_locations()[i].methods);
+						request.file_path = request.socket.get_config().get_locations()[i].root + locations[1];
+					return (request.socket.get_config().get_locations()[i].methods);
 				}
 			}
 			break;
 	}
-	return (it->second.socket.get_config().get_methods());
+	return (request.socket.get_config().get_methods());
 }
 
 

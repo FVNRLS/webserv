@@ -6,7 +6,7 @@
 /*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:52 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/02 09:44:39 by hoomen           ###   ########.fr       */
+/*   Updated: 2023/02/02 09:49:08 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,11 @@ private:
 	int 						accept_requests();
 	int 						resolve_requests();
 	int							accumulate(std::map<int, request_handler>::iterator	request);
-	void 						set_request_end_flags(request_handler&	request);
-	int 						handle_request_header(std::map<int, request_handler>::iterator	request);
+	void 						set_request_end_flags(request_handler& request);
+	int 						handle_request_header(request_handler& request);
 	size_t						get_body_length(request_handler &request);
 	std::vector<std::string> 	tokenize(std::string& request);
-	std::vector<std::string> 	get_allowed_methods(std::map<int, request_handler>::iterator	request);
+	std::vector<std::string> 	get_allowed_methods(request_handler& request);
 	int 						check_connection(pollfd& pfd);
 	void						delete_invalid_fds();
 
