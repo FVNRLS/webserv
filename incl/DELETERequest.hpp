@@ -16,7 +16,7 @@
 
 class DELETERequest {
 private:
-	std::string		_filename;
+
 public:
 	DELETERequest();
 	~DELETERequest();

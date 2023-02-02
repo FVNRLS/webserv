@@ -15,9 +15,7 @@
 #include "GETRequest.hpp"
 #include "POSTRequest.hpp"
 #include "DELETERequest.hpp"
-
-
-#include "requestHandler.hpp"
+#include "CGI.hpp"
 
 class ResponseGenerator {
 
