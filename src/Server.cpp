@@ -6,7 +6,7 @@
 /*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/02 10:01:50 by hoomen           ###   ########.fr       */
+/*   Updated: 2023/02/02 10:29:20 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,39 +72,48 @@ int Server::accept_requests() {
 	return (EXIT_SUCCESS);
 }
 
+
 int Server::resolve_requests() {
 	std::string 								content_length;
-	std::string 								response;
-	request_handler*						request;
-
 
 	for (size_t i = _sockets.size(); i < _pfds.size(); i++) {
 		if (check_connection(_pfds[i]) == EXIT_FAILURE)
 			continue;
-		//REQUEST
-		if (_pfds[i].revents & POLLIN) {
-			request = &_requests.find(_pfds[i].fd)->second;
-			if (accumulate(*request, _pfds[i].fd) == EXIT_FAILURE)
-				return (EXIT_FAILURE);
-			if (request->head_received) {
-				request->status = handle_request_header(*request);
-			}
-			if (request->status || request->method == "GET" || request->body_received)
-				_pfds[i].events = POLLOUT; //todo: check.....
-		}
-		//RESPONSE
-		else if (_pfds[i].revents & POLLOUT) {
-			request = &_requests.find(_pfds[i].fd)->second;
-			std::cout << request->buf << std::endl;
-			ResponseGenerator resp_gen(*request);
-			response = resp_gen.generate_response();
-			if (!response.empty()) {
-				if (send(_pfds[i].fd, response.c_str(), response.length(), 0) == EXIT_FAILURE) //todo: check if chunked!
-					return (EXIT_FAILURE);
-			}
-			close(_pfds[i].fd);
-		}
+		if (_pfds[i].revents & POLLIN)
+			return (handle_pollin(_pfds[i]));
+		else if (_pfds[i].revents & POLLOUT)
+			return (handle_pollout(_pfds[i]));
 	}
+	return (EXIT_SUCCESS);
+}
+
+int Server::handle_pollin(pollfd& pfd) {
+	request_handler*						request;
+
+	request = &_requests.find(pfd.fd)->second;
+	if (accumulate(*request, pfd.fd) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+	if (request->head_received) {
+		request->status = handle_request_header(*request);
+	}
+	if (request->status || request->method == "GET" || request->body_received)
+		pfd.events = POLLOUT; //todo: check.....
+	return EXIT_SUCCESS;
+}
+
+int Server::handle_pollout(pollfd& pfd) {
+	request_handler*	request;
+	std::string 			response;
+
+	request = &_requests.find(pfd.fd)->second;
+	std::cout << request->buf << std::endl;
+	ResponseGenerator resp_gen(*request);
+	response = resp_gen.generate_response();
+	if (!response.empty()) {
+		if (send(pfd.fd, response.c_str(), response.length(), 0) == EXIT_FAILURE) //todo: check if chunked!
+			return (EXIT_FAILURE);
+	}
+	close(pfd.fd);
 	return (EXIT_SUCCESS);
 }
 
@@ -150,7 +159,7 @@ void	Server::set_request_end_flags(request_handler&	request) {
 }
 
 int Server::handle_request_header(request_handler& request) {
-	std::vector<std::string> tokens = tokenize(request.buf);
+	std::vector<std::string> tokens = tokenize_first_line(request.buf);
 	if (tokens.size() < 3)
 		return BAD_REQUEST;
 	request.method = tokens[0];
@@ -177,7 +186,7 @@ size_t Server::get_body_length(request_handler &request) {
 	return length;
 }
 
-std::vector<std::string> Server::tokenize(std::string& request) {
+std::vector<std::string> Server::tokenize_first_line(std::string& request) {
 	std::string 				first_request_line;
 	size_t 						nl_pos;
 	std::vector<std::string>	tokens;

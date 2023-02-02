@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ConfigParser.hpp                                   :+:      :+:    :+:   */
+/*   defines.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rmazurit <rmazurit@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 13:28:14 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/05 13:28:14 by rmazurit         ###   ########.fr       */
+/*   Updated: 2023/02/02 10:38:56 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ const std::string EMPTY_STRING;
 const std::string RESPONSE_HEADER 			= "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: ";
 const std::string DEFAULT_CONF_PATH 		= "config/clion_test.conf";
 const std::string DEFAULT_INDEX_PAGE 		= "html/index.html";
-const std::string DEFAULT_ERROR_PAGES_DIR 	= "config/default_error_pages";
+const std::string DEFAULT_ERROR_PAGES_DIR 	= "html/error_pages";
 const std::string DEFAULT_REDIR_FIRST 		= "config";
 const std::string DEFAULT_REDIR_SECOND 		= "welcome page"; //unsure about the values
 const std::string DEFAULT_CGI_PATH 			= "config/cgi/cgi.py"; //unsure about the values
