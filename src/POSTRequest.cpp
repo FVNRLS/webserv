@@ -6,7 +6,6 @@ POSTRequest::POSTRequest() {}
 
 POSTRequest::~POSTRequest() {}
 
-
 //MEMBER FUNCTIONS
 int POSTRequest::create_response(const request_handler &request) {
 	std::ofstream file;
@@ -28,8 +27,11 @@ int POSTRequest::create_response(const request_handler &request) {
 int POSTRequest::upload_file() {
 	std::ofstream file;
 	size_t begin = _body.find("filename=\"") + std::strlen("filename=\"");
+	if (begin == std::string::npos)
+		return BAD_REQUEST;
+	begin += std::strlen("filename=\"");
 	size_t end = _body.find("\"", begin);
-	if (begin == std::string::npos || end == std::string::npos)
+	if (end == std::string::npos)
 		return BAD_REQUEST;
 	_filepath = DEFAULT_UPLOAD_DIR + _body.substr(begin, end - begin);
 	file.open(_filepath, std::ios::out | std::ios::trunc);
