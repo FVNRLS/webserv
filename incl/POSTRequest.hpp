@@ -9,12 +9,11 @@
 class POSTRequest {
 
 private:
-	request_handler &_request;
 	std::string 	_body;
 
 public:
-	POSTRequest(request_handler &request);
+	POSTRequest();
 	~POSTRequest();
 
-	int 			create_response();
+	int 			create_response(const request_handler &request);
 };

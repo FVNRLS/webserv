@@ -2,15 +2,15 @@
 #include "POSTRequest.hpp"
 
 //BASIC CLASS SETUP
-POSTRequest::POSTRequest(request_handler &request) : _request(request) {}
+POSTRequest::POSTRequest() {}
 
 POSTRequest::~POSTRequest() {}
 
 
 //MEMBER FUNCTIONS
-int POSTRequest::create_response() {
+int POSTRequest::create_response(const request_handler &request) {
 	std::ofstream file;
-	_body = _request.buf.substr(_request.head_length, _request.buf.length());
+	_body = request.buf.substr(request.head_length, request.buf.length());
 
 	if (_body == "delete_all") {
 		file.open(DATABASE_PATH, std::ios::out | std::ios::trunc);

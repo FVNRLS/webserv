@@ -1,38 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   RequestHandler.hpp                                 :+:      :+:    :+:   */
+/*   GETRequest.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rmazurit <rmazurit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/26 12:22:00 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/26 12:22:00 by rmazurit         ###   ########.fr       */
+/*   Created: 2023/01/30 16:46:33 by rmazurit          #+#    #+#             */
+/*   Updated: 2023/01/30 16:46:33 by rmazurit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "GETRequest.hpp"
-#include "POSTRequest.hpp"
-#include "DELETERequest.hpp"
-
-
 #include "requestHandler.hpp"
 
-class ResponseGenerator {
-
+class DELETERequest {
 private:
-	request_handler&			_request;
-	std::string 				_response;
-	std::string 				_request_body;
-
-	//ERROR MANAGEMENT
-	std::string 		create_error_code_response(int error);
-
+	std::string		_filename;
 public:
-	ResponseGenerator(request_handler &request);
-	ResponseGenerator(ResponseGenerator &src);
-	~ResponseGenerator();
+	DELETERequest();
+	~DELETERequest();
 
-	std::string 		generate_response();
+	int 		create_response(const request_handler &request);
 };

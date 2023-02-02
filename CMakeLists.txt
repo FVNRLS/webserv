@@ -38,5 +38,5 @@ add_executable(webserver
         src/tools.cpp
         incl/tools.hpp
 
-        incl/requestHandler.hpp)
+        incl/requestHandler.hpp src/DELETERequest.cpp incl/DELETERequest.hpp)
 

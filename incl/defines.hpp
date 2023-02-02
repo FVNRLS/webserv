@@ -80,6 +80,7 @@ const std::string DEFAULT_REDIR_SECOND 		= "welcome page"; //unsure about the va
 const std::string DEFAULT_CGI_PATH 			= "config/cgi/cgi.py"; //unsure about the values
 const std::string DEFAULT_PAGE_ERROR		= "SERVER ERROR: ERROR PAGE UNAVAILABLE!"; //if error page can not be opened
 const std::string END_OF_REQUEST			= "\r\n\r\n";
+const std::string DEFAULT_UPLOAD_DIR        = "../uploads"; //todo change to work with makefile
 #define DATABASE_PATH "../html/data.txt" //todo change to work with makefile
 
 
