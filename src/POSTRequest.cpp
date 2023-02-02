@@ -42,4 +42,3 @@ int POSTRequest::upload_file() {
 	file << _body.substr(begin, end - begin);
 	return  EXIT_SUCCESS;
 }
-
