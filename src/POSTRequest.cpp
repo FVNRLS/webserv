@@ -39,6 +39,7 @@ int POSTRequest::upload_file() {
 	end = _body.find("\r\n", begin);
 	if (begin == std::string::npos || end == std::string::npos)
 		return BAD_REQUEST;
-	file << _body.substr(begin, end - begin) << '\n';
+	file << _body.substr(begin, end - begin);
 	return  EXIT_SUCCESS;
 }
+
