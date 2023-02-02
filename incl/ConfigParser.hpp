@@ -82,6 +82,7 @@ private:
 	int 	check_ip_address();
 	int 	check_ports();
 	int 	check_root();
+	void 	check_default_error_pages_dir();
 	int 	check_loc_config();
 	int 	check_loc_index();
 	void 	check_loc_root();

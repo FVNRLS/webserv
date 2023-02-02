@@ -43,11 +43,9 @@ std::string ResponseGenerator::generate_response() {
 	else {
 		std::cout << "DELETE_METHOD CALLED!\n";
 	}
+	if (_request.status)
+		return (create_error_code_response(_request.status));
 	return (_response);
-}
-
-std::string ResponseGenerator::get_request_body() {
-	return (EMPTY_STRING);
 }
 
 //ERROR MANAGEMENT
@@ -58,14 +56,14 @@ std::string ResponseGenerator::create_error_code_response(int error) {
 	std::string 			error_page_path;
 	std::string 			body;
 	std::stringstream 		body_len;
-	std::string 			response;
 
 	error_code << error;
 	error_file = error_code.str() + ".html";
 	error_page_path = _request.socket.get_config().get_error_pages_dir() + error_file;
 
 	if (access(error_page_path.c_str(), F_OK) < 0 || open_file(error_page_path, file) == EXIT_FAILURE) {
-		_response = DEFAULT_PAGE_ERROR;
+		body_len << DEFAULT_PAGE_ERROR.length();
+		_response = RESPONSE_HEADER + body_len.str() + "\n\n" + DEFAULT_PAGE_ERROR;
 		return (_response);
 	}
 	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
