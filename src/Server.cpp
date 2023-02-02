@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/30 14:05:52 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/02 09:45:14 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,22 +130,22 @@ int	Server::accumulate(std::map<int, request_handler>::iterator	request) {
 	if (bytes < 0)
 		return (system_call_error(RECV_ERROR));
 	request->second.buf += std::string(buffer, bytes);
-	set_request_end_flags(request);
+	set_request_end_flags(request->second);
 	return (EXIT_SUCCESS);
 }
 
-void	Server::set_request_end_flags(std::map<int, request_handler>::iterator	request) {
+void	Server::set_request_end_flags(request_handler&	request) {
 	long long 	max_client_body_size;
 
-	max_client_body_size = request->second.socket.get_config().get_max_client_body_size();
-	if ((static_cast<long long>(request->second.buf.length()) > max_client_body_size)) {
-		request->second.status = BAD_REQUEST;
+	max_client_body_size = request.socket.get_config().get_max_client_body_size();
+	if ((static_cast<long long>(request.buf.length()) > max_client_body_size)) {
+		request.status = BAD_REQUEST;
 		return;
 	}
-	request->second.head_length = request->second.buf.find(END_OF_REQUEST);
-	if (request->second.head_length != std::string::npos) {
-		request->second.head_length += std::strlen(END_OF_REQUEST.c_str());
-		request->second.head_received = true;
+	request.head_length = request.buf.find(END_OF_REQUEST);
+	if (request.head_length != std::string::npos) {
+		request.head_length += std::strlen(END_OF_REQUEST.c_str());
+		request.head_received = true;
 	}
 }
 

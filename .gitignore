@@ -5,3 +5,5 @@ cmake-build-debug/**
 webserv
 a.out
 .DS_Store
+.vscode/**
+heleens_notes.txt

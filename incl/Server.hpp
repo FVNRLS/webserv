@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rmazurit <rmazurit@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:52 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/12 13:36:52 by rmazurit         ###   ########.fr       */
+/*   Updated: 2023/02/02 09:44:39 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ private:
 	int 						accept_requests();
 	int 						resolve_requests();
 	int							accumulate(std::map<int, request_handler>::iterator	request);
-	void 						set_request_end_flags(std::map<int, request_handler>::iterator	request);
+	void 						set_request_end_flags(request_handler&	request);
 	int 						handle_request_header(std::map<int, request_handler>::iterator	request);
 	size_t						get_body_length(request_handler &request);
 	std::vector<std::string> 	tokenize(std::string& request);
