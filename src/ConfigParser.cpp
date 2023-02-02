@@ -728,6 +728,7 @@ int ConfigParser::check_serv_config() {
 		return (EXIT_FAILURE);
 	if (check_root() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
+	check_default_error_pages_dir();
 	return (EXIT_SUCCESS);
 }
 
@@ -776,6 +777,15 @@ int ConfigParser::check_root() {
 		return (parsing_error_param(NO_ROOT, _config_file, _serv[_i_serv]._name));
 	return (EXIT_SUCCESS);
 }
+
+void	ConfigParser::check_default_error_pages_dir() {
+	std::string	*err_pag_dir;
+
+	err_pag_dir = &_serv[_i_serv]._error_pages_dir;
+	if (err_pag_dir->empty())
+		*err_pag_dir = DEFAULT_ERROR_PAGES_DIR;
+}
+
 
 int ConfigParser::check_loc_config() {
 	size_t		num_locs;

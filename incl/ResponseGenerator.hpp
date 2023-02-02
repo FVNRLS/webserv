@@ -24,9 +24,6 @@ private:
 	std::string 				_response;
 	std::string 				_request_body;
 
-	std::string 				get_request_body();
-
-
 	//ERROR MANAGEMENT
 	std::string 		create_error_code_response(int error);
 
