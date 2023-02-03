@@ -16,7 +16,7 @@ private:
 
 
 	void				create_env();
-	void				set_script_path();
+	int 				set_script_path();
 	int 				set_interpreter_path();
 	std::string			http_user_agent();
 	std::string 		remote_addr();

@@ -24,7 +24,8 @@ int CGI::create_response(const request_handler &request, std::string &response) 
 		close(fd[0]);
 		return INTERNAL_SERVER_ERROR;
 	}
-	write_response(fd[0], response);
+	if (write_response(fd[0], response) != EXIT_SUCCESS)
+		return	(error_catched("Reading from pipe failed!"));
 	if (response.empty())
 		return (error_catched("EMPTY RESPONSE!"));
 	return EXIT_SUCCESS;
@@ -62,18 +63,22 @@ int	CGI::parent_process() {
 	return EXIT_SUCCESS;
 }
 
-void CGI::write_response(int fd, std::string &response) {
+int CGI::write_response(int fd, std::string &response) {
 	char			buffer[1000];
 	long long 		bytes = 1;
-	std::stringstream 		body_len;
 
 	while (bytes > 0) {
 		bytes = read(fd, buffer, sizeof(buffer));
-		response += std::string(buffer, bytes);
+		if (bytes < 0) {
+			close(fd);
+			return EXIT_FAILURE;
+		}
+		else
+			response += std::string(buffer, bytes);
 	}
 	close(fd);
-	body_len << response.length();
-	response = RESPONSE_HEADER + body_len.str() + "\n\n" + response;
+	response = RESPONSE_HEADER + toString<size_t>(response.length()) + "\n\n" + response;
+	return	EXIT_SUCCESS;
 }
 
 int	CGI::error_catched(const char* message) {

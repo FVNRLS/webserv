@@ -8,13 +8,12 @@ POSTRequest::~POSTRequest() {}
 
 
 int POSTRequest::create_response(std::string &response) {
-
 	_body = _request.buf.substr(_request.head_length, _request.buf.length());
 	create_env();
 	if (set_interpreter_path() == EXIT_FAILURE)
 		return	INTERNAL_SERVER_ERROR;
-	if (set_script_path() == EXIT_FAILURE)
-		return	FORBIDDEN;
+//	if (set_script_path() == EXIT_FAILURE)
+//		return	FORBIDDEN;
 	return (_cgi.create_response(_request, response));
 }
 
@@ -49,9 +48,9 @@ std::string POSTRequest::remote_addr() {
 	struct sockaddr *socket_address = reinterpret_cast<struct sockaddr *>(&socket_in_address);
 	socklen_t address_len = sizeof(*socket_address);
 	int remote_addr = getpeername(_request.socket.get_pollfd().fd, socket_address, &address_len);
+
 	if (remote_addr == -1)
 		return "";
-
 	char str[INET_ADDRSTRLEN];
 	return inet_ntop(AF_INET, &socket_in_address, str, INET_ADDRSTRLEN);
 }

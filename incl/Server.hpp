@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
+/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:52 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/02 10:27:32 by hoomen           ###   ########.fr       */
+/*   Updated: 2023/02/03 18:41:21 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,8 @@ private:
 	int 						handle_request_header(request_handler& request);
 	size_t						get_body_length(request_handler &request);
 	std::vector<std::string> 	tokenize_first_line(std::string& request);
-	std::vector<std::string> 	get_allowed_methods(request_handler& request);
+	std::vector<std::string> 	get_methods(request_handler& request);
+	std::vector<std::string>	get_methods_in_location(request_handler& request, std::vector<std::string>& locations);
 	int 						check_connection(pollfd& pfd);
 	void						delete_invalid_fds();
 

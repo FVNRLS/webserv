@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
+/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/02 10:29:20 by hoomen           ###   ########.fr       */
+/*   Updated: 2023/02/03 18:42:23 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,6 @@ int Server::accept_requests() {
 
 
 int Server::resolve_requests() {
-	std::string 								content_length;
-
 	for (size_t i = _sockets.size(); i < _pfds.size(); i++) {
 		if (check_connection(_pfds[i]) == EXIT_FAILURE)
 			continue;
@@ -97,7 +95,7 @@ int Server::handle_pollin(pollfd& pfd) {
 		request->status = handle_request_header(*request);
 	}
 	if (request->status || request->method == "GET" || request->body_received)
-		pfd.events = POLLOUT; //todo: check.....
+		pfd.events = POLLOUT;
 	return EXIT_SUCCESS;
 }
 
@@ -144,9 +142,8 @@ int	Server::accumulate(request_handler& request, int request_fd) {
 }
 
 void	Server::set_request_end_flags(request_handler&	request) {
-	long long 	max_client_body_size;
-
-	max_client_body_size = request.socket.get_config().get_max_client_body_size();
+	long long	max_client_body_size = request.socket.get_config().get_max_client_body_size();
+	
 	if ((static_cast<long long>(request.buf.length()) > max_client_body_size)) {
 		request.status = BAD_REQUEST;
 		return;
@@ -165,7 +162,7 @@ int Server::handle_request_header(request_handler& request) {
 	request.method = tokens[0];
 	request.file_path = tokens[1];
 
-	std::vector<std::string> allowed_methods = get_allowed_methods(request);
+	std::vector<std::string> allowed_methods = get_methods(request);
 	for (std::vector<std::string>::iterator it = allowed_methods.begin(); it != allowed_methods.end(); ++it) {
 		if (*it == request.method) {
 			request.body_length = get_body_length(request);
@@ -199,7 +196,7 @@ std::vector<std::string> Server::tokenize_first_line(std::string& request) {
 	return (tokens);
 }
 
-std::vector<std::string> Server::get_allowed_methods(request_handler& request) {
+std::vector<std::string> Server::get_methods(request_handler& request) {
 	std::vector<std::string> locations;
 
 	locations = split(request.file_path, '/');
@@ -212,22 +209,25 @@ std::vector<std::string> Server::get_allowed_methods(request_handler& request) {
 				request.file_path = request.socket.get_config().get_root() + locations[0];
 				break;
 			}
-		case 2:
-			for (size_t i = 0; i <request.socket.get_config().get_locations().size(); i++) {
-				if (request.socket.get_config().get_locations()[i].prefix.compare(1, locations[0].size(), locations[0]) == 0) {
-					if (locations.size() == 1)
-						request.file_path = request.socket.get_config().get_locations()[i].root +
-											   request.socket.get_config().get_locations()[i].index;
-					else
-						request.file_path = request.socket.get_config().get_locations()[i].root + locations[1];
-					return (request.socket.get_config().get_locations()[i].methods);
-				}
-			}
-			break;
+		default:
+			return (methods_in_location(request, locations));
 	}
 	return (request.socket.get_config().get_methods());
 }
 
+std::vector<std::string>	Server::get_methods_in_location(request_handler& request, std::vector<std::string>& locations) {
+	for (size_t i = 0; i < request.socket.get_config().get_locations().size(); i++) {
+		if (request.socket.get_config().get_locations()[i].prefix.compare(1, locations[0].size(), locations[0]) == 0) {
+			if (locations.size() == 1)
+				request.file_path = request.socket.get_config().get_locations()[i].root +
+									   request.socket.get_config().get_locations()[i].index;
+			else
+				request.file_path = request.socket.get_config().get_locations()[i].root + locations[1];
+			return (request.socket.get_config().get_locations()[i].methods);
+		}
+	}
+	return (request.socket.get_config().get_methods());
+}
 
 void	Server::delete_invalid_fds() {
 	std::vector<pollfd>::iterator it = _pfds.begin() + _sockets.size();

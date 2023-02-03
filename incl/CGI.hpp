@@ -8,7 +8,7 @@ private:
 	int			error_catched(const char* message);
 	void		child_process(int *fd, const request_handler &request);
 	int			parent_process();
-	void 		write_response(int fd, std::string &response);
+	int 		write_response(int fd, std::string &response);
 	
 public:
 	CGI();

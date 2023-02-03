@@ -34,9 +34,16 @@ add_executable(webserver
         src/POSTRequest.cpp
         incl/POSTRequest.hpp
 
+        incl/requestHandler.hpp
+
+        src/DELETERequest.cpp
+        incl/DELETERequest.hpp
+
+        src/CGI.cpp
+        incl/CGI.hpp
+
         #TOOLS
         src/tools.cpp
         incl/tools.hpp
-
-        incl/requestHandler.hpp src/DELETERequest.cpp incl/DELETERequest.hpp src/CGI.cpp incl/CGI.hpp)
+        )
 
