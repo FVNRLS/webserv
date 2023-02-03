@@ -7,15 +7,15 @@ POSTRequest::POSTRequest(request_handler &request) : _request(request) {}
 POSTRequest::~POSTRequest() {}
 
 
-int POSTRequest::create_response() {
+int POSTRequest::create_response(std::string &response) {
 
 	_body = _request.buf.substr(_request.head_length, _request.buf.length());
 	create_env();
 	if (set_interpreter_path() == EXIT_FAILURE)
 		return	INTERNAL_SERVER_ERROR;
 	if (set_script_path() == EXIT_FAILURE)
-		return	INTERNAL_SERVER_ERROR;
-	
+		return	FORBIDDEN;
+	return (_cgi.create_response(_request, response));
 }
 
 void	POSTRequest::create_env() {
@@ -47,8 +47,8 @@ std::string POSTRequest::http_user_agent() {
 std::string POSTRequest::remote_addr() {
 	struct sockaddr_in	socket_in_address = _request.socket.get_serv_addr();
 	struct sockaddr *socket_address = reinterpret_cast<struct sockaddr *>(&socket_in_address);
-	socklen_t addrlen = sizeof(*socket_address);
-	int remote_addr = getpeername(_request.socket.get_pollfd().fd, socket_address, &addrlen);
+	socklen_t address_len = sizeof(*socket_address);
+	int remote_addr = getpeername(_request.socket.get_pollfd().fd, socket_address, &address_len);
 	if (remote_addr == -1)
 		return "";
 
@@ -58,25 +58,20 @@ std::string POSTRequest::remote_addr() {
 
 int	POSTRequest::set_interpreter_path() {
 	std::size_t dot_pos;
-	std::string extensions[3] = {".py", ".php", ".perl"}
-	std::string interpreters[3] = {"/usr/bin/python", "/usr/bin/php","/usr/bin/perl"}
+	std::string extensions[3] = {".py", ".php", ".perl"};
+	std::string interpreters[3] = {"/usr/bin/python", "/usr/bin/php","/usr/bin/perl"};
 
-	dot_pos = _request.filepath.find_last_of('.');
-	if (_request.filepath.empty() || dot_pos == std::string::npos)
+	dot_pos = _request.file_path.find_last_of('.');
+	if (_request.file_path.empty() || dot_pos == std::string::npos)
 		return EXIT_FAILURE;
 	std::string extension = _request.file_path.substr(dot_pos, _request.file_path.size() - dot_pos);
 	for (size_t i = 0; i < 3; i++) {
-		if (extension = extensions[i]) {
+		if (extension == extensions[i]) {
 			_request.interpreter = interpreters[i];
 			return EXIT_SUCCESS;
 		}
-	}	
+	}
 	return EXIT_FAILURE;	
-}
-
-int	POSTRequest::set_script_path() {
-	_request.file_path
-	return EXIT_FAILURE;
 }
 
 // //MEMBER FUNCTIONS

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   RequestHandler.hpp                                 :+:      :+:    :+:   */
+/*   ResponseGenerator.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rmazurit <rmazurit@student.42.fr>          +#+  +:+       +#+        */
+/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 12:22:00 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/26 12:22:00 by rmazurit         ###   ########.fr       */
+/*   Updated: 2023/02/03 16:51:12 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 #include "GETRequest.hpp"
 #include "POSTRequest.hpp"
 #include "DELETERequest.hpp"
-#include "CGI.hpp"
 
 class ResponseGenerator {
 
