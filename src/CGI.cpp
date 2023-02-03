@@ -22,7 +22,7 @@ int CGI::create_response(const request_handler &request, std::string &response) 
 	close(fd[1]);
 	if (parent_process() != EXIT_SUCCESS){
 		close(fd[0]);
-		return FORBIDDEN;
+		return INTERNAL_SERVER_ERROR;
 	}
 	write_response(fd[0], response);
 	if (response.empty())
@@ -35,9 +35,17 @@ void	CGI::child_process(int *fd, const request_handler &request) {
 	dup2(fd[STDOUT_FILENO], STDOUT_FILENO);
 	close(fd[1]);
 
-	char** argv = create_arguments();
-	char** envp = create_environment();
-	if (execve(PHP_PATH, argv, envp) == -1)
+	char* environment[request.env.size() + 1];
+	for (size_t i = 0; i < request.env.size(); i++)
+		environment[i] = const_cast<char*>(request.env[i].c_str());
+	environment[request.env.size()] = NULL;
+
+	char *arguments[3];
+	arguments[0] = const_cast<char*>(request.interpreter.c_str());
+	arguments[1] = const_cast<char*>(request.file_path.c_str());
+	arguments[2] = NULL;
+
+	if (execve(PHP_PATH, arguments, environment) == -1)
 		exit(EXIT_FAILURE);
 }
 
@@ -68,29 +76,7 @@ void CGI::write_response(int fd, std::string &response) {
 	response = RESPONSE_HEADER + body_len.str() + "\n\n" + response;
 }
 
-char**		CGI::create_environment() {
-	char**	env = (char**)malloc(2);
-
-	env[0] = getenv("PATH");
-	std::cerr << "ENV ===> " << env[0] << '\n';
-	env[1] = NULL;
-	return env;
-}
-
-char**		CGI::create_arguments() {
-	char **argv = (char**)malloc(3);
-
-	argv[0] = PHP_PATH;
-	std::cerr << "ARGV ===> " << argv[0] << '\n';
-	argv[1] = CGI_SCRIPT_PATH;
-	std::cerr << "ARGV ===> " << argv[1] << '\n';
-	argv[2] = NULL;
-	return argv;
-}
-
-
-
 int	CGI::error_catched(const char* message) {
 	std::cerr << message << '\n';
-	return FORBIDDEN;
+	return INTERNAL_SERVER_ERROR;
 }

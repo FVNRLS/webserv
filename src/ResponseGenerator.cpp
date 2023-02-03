@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ResponseGenerator.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rmazurit <rmazurit@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 12:20:38 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/30 11:35:32 by rmazurit         ###   ########.fr       */
+/*   Updated: 2023/02/03 15:10:33 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,8 @@ std::string ResponseGenerator::generate_response() {
 			_request.status = get.create_response(_request.file_path, _response);
 		}
 		else if (_request.method == "POST") {
-			POSTRequest post;
-			_request.status = post.create_response(_request);
+			POSTRequest post(_request);
+			_request.status = post.create_response();
 			if (_request.status == EXIT_SUCCESS) {
 				_request.file_path = "../html/simple_form.html";
 				_request.status = get.create_response(_request.file_path, _response);

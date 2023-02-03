@@ -12,4 +12,6 @@ struct request_handler { //todo: delete item from map
 	int 							status;
 	size_t 							body_length;
 	size_t 							head_length;
+	std::vector<std::string>		env;
+	std::string						interpreter;
 };

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   split.cpp                                          :+:      :+:    :+:   */
+/*   tools.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rmazurit <rmazurit@student.42.fr>          +#+  +:+       +#+        */
+/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/09 11:44:45 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/09 11:44:45 by rmazurit         ###   ########.fr       */
+/*   Updated: 2023/02/03 14:03:48 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,6 @@ std::string trim(std::string &s) {
 	back_pos = s.find_last_not_of(TAB);
 	if (front_pos != back_pos)
 		s = s.substr(front_pos, back_pos + 1);
-
-
 	return (s);
 }
 
