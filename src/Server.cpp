@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/03 18:42:23 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/04 15:56:52 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,9 +86,8 @@ int Server::resolve_requests() {
 }
 
 int Server::handle_pollin(pollfd& pfd) {
-	request_handler*						request;
-
-	request = &_requests.find(pfd.fd)->second;
+	request_handler* request = &_requests.find(pfd.fd)->second;
+	
 	if (accumulate(*request, pfd.fd) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	if (request->head_received) {
@@ -101,7 +100,7 @@ int Server::handle_pollin(pollfd& pfd) {
 
 int Server::handle_pollout(pollfd& pfd) {
 	request_handler*	request;
-	std::string 			response;
+	std::string 		response;
 
 	request = &_requests.find(pfd.fd)->second;
 	std::cout << request->buf << std::endl;
@@ -162,21 +161,88 @@ int Server::handle_request_header(request_handler& request) {
 	request.method = tokens[0];
 	request.file_path = tokens[1];
 
-	std::vector<std::string> allowed_methods = get_methods(request);
-	for (std::vector<std::string>::iterator it = allowed_methods.begin(); it != allowed_methods.end(); ++it) {
-		if (*it == request.method) {
-			request.body_length = get_body_length(request);
-			if(request.buf.size() >= request.head_length + request.body_length)
-				request.body_received = true;
-			return EXIT_SUCCESS;
+	return check_requested_url(request);
+}
+
+int	Server::check_requested_url(request_handler& request) {
+	std::vector<std::string> locations = split(request.file_path, '/');
+
+	switch (locations.size()) {
+		case 0:
+			return check_main_configs(request, locations);
+		case 1:
+			if(locations[0].find(".html") != std::string::npos)
+				return check_main_configs(request, locations);
+		default:
+			return check_location_config(request, locations);
+	}
+	return request.status;
+}
+
+int	Server::check_main_configs(request_handler& request, std::vector<std::string>& locations) {
+	if (check_method(request.socket.get_config().get_methods(), request.method) == EXIT_FAILURE)
+		return METHOD_NOT_ALLOWED;
+	request.file_path = get_server_filepath(request, locations);
+	request.body_length = get_body_length(request);
+	if(request.buf.size() >= request.head_length + request.body_length)
+		request.body_received = true;
+	return EXIT_SUCCESS;
+}
+
+int Server::check_location_config(request_handler& request, std::vector<std::string>& locations) {
+	location loc = get_location_config(request, locations);
+
+	if (request.status)
+		return request.status;
+	if (check_method(loc.methods, request.method) == EXIT_FAILURE)
+		return METHOD_NOT_ALLOWED;
+	request.file_path = get_location_filepath(loc, locations);
+	request.body_length = get_body_length(request);
+	if(request.buf.size() >= request.head_length + request.body_length)
+		request.body_received = true;
+	return EXIT_SUCCESS;
+}
+
+location	Server::get_location_config(request_handler request, std::vector<std::string>& locations) {
+	size_t		i;
+
+	for (i = 0; i < request.socket.get_config().get_locations().size(); i++) {
+		if (request.socket.get_config().get_locations()[i].prefix.compare(1, locations[0].size(), locations[0]) == 0) {
+			return request.socket.get_config().get_locations()[i];
 		}
 	}
-	return METHOD_NOT_ALLOWED;
+	if (i >= request.socket.get_config().get_locations().size())
+		request.status = PAGE_NOT_FOUND;
+	return location();
 }
+
+int	Server::check_method(std::vector<std::string> &methods, std::string &method) {
+	for (size_t	i = 0; i < methods.size(); i++) {
+		if	(methods[i] == method)
+			return EXIT_SUCCESS;
+	}
+	return EXIT_FAILURE;
+}
+
+std::string	Server::get_server_filepath(request_handler& request, std::vector<std::string> &locations) {
+	if (locations.empty())
+		return (request.socket.get_config().get_root() + request.socket.get_config().get_index());
+	return (request.socket.get_config().get_root() + locations[0]);
+}
+
+std::string	Server::get_location_filepath(location& loc, std::vector<std::string> &locations) {
+	if (locations.size() == 1)
+		return (loc.root + loc.index);
+
+	if (locations.back().find("html") != std::string::npos)
+		return (loc.root + locations.back());
+	return (loc.cgi_path + locations.back());
+}
+
 
 size_t Server::get_body_length(request_handler &request) {
 	if (request.method == "GET")
-		return (0);
+		return 0;
 
 	size_t pos = request.buf.find("Content-Length: ");
 	size_t length = static_cast<size_t> (std::atoll(request.buf.data() + pos + std::strlen("Content-Length: ")));
@@ -193,40 +259,7 @@ std::vector<std::string> Server::tokenize_first_line(std::string& request) {
 		first_request_line =  request.substr(0, nl_pos);
 	}
 	tokens = split(first_request_line, SPACE);
-	return (tokens);
-}
-
-std::vector<std::string> Server::get_methods(request_handler& request) {
-	std::vector<std::string> locations;
-
-	locations = split(request.file_path, '/');
-	switch (locations.size()) {
-		case 0:
-			request.file_path = request.socket.get_config().get_root() + request.socket.get_config().get_index();
-			break;
-		case 1:
-			if (request.file_path.size() >= 5 && request.file_path.compare(request.file_path.size() - 5, 5, ".html") == 0) {
-				request.file_path = request.socket.get_config().get_root() + locations[0];
-				break;
-			}
-		default:
-			return (methods_in_location(request, locations));
-	}
-	return (request.socket.get_config().get_methods());
-}
-
-std::vector<std::string>	Server::get_methods_in_location(request_handler& request, std::vector<std::string>& locations) {
-	for (size_t i = 0; i < request.socket.get_config().get_locations().size(); i++) {
-		if (request.socket.get_config().get_locations()[i].prefix.compare(1, locations[0].size(), locations[0]) == 0) {
-			if (locations.size() == 1)
-				request.file_path = request.socket.get_config().get_locations()[i].root +
-									   request.socket.get_config().get_locations()[i].index;
-			else
-				request.file_path = request.socket.get_config().get_locations()[i].root + locations[1];
-			return (request.socket.get_config().get_locations()[i].methods);
-		}
-	}
-	return (request.socket.get_config().get_methods());
+	return tokens;
 }
 
 void	Server::delete_invalid_fds() {
