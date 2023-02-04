@@ -38,9 +38,14 @@ private:
 	int 						handle_request_header(request_handler& request);
 	size_t						get_body_length(request_handler &request);
 	std::vector<std::string> 	tokenize_first_line(std::string& request);
-	std::vector<std::string> 	get_methods(request_handler& request);
-	std::vector<std::string>	get_methods_in_location(request_handler& request, std::vector<std::string>& locations);
-	int 						check_connection(pollfd& pfd);
+    int                         check_requested_url(request_handler& request);
+    int	                        check_main_configs(request_handler& request, std::vector<std::string>& locations);
+    int                         check_location_config(request_handler& request, std::vector<std::string>& locations);
+    location	                get_location_config(request_handler &request, std::vector<std::string>& locations);
+    int                         check_method(const std::vector<std::string> &methods, std::string &method);
+    std::string	                get_server_filepath(request_handler& request, std::vector<std::string> &locations);
+    std::string	                get_location_filepath(location& loc, std::vector<std::string> &locations);
+    int 						check_connection(pollfd& pfd);
 	void						delete_invalid_fds();
 
 

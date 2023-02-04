@@ -85,7 +85,7 @@ int Server::resolve_requests() {
 	return (EXIT_SUCCESS);
 }
 
-int Server::handle_pollin(pollfd& pfd) {
+int Server::handle_pollin(pollfd &pfd) {
 	request_handler* request = &_requests.find(pfd.fd)->second;
 	
 	if (accumulate(*request, pfd.fd) == EXIT_FAILURE)
@@ -98,7 +98,7 @@ int Server::handle_pollin(pollfd& pfd) {
 	return EXIT_SUCCESS;
 }
 
-int Server::handle_pollout(pollfd& pfd) {
+int Server::handle_pollout(pollfd &pfd) {
 	request_handler*	request;
 	std::string 		response;
 
@@ -128,7 +128,7 @@ int Server::check_connection(pollfd &pfd) {
 	return EXIT_SUCCESS;
 }
 
-int	Server::accumulate(request_handler& request, int request_fd) {
+int	Server::accumulate(request_handler &request, int request_fd) {
 	char 										buffer[2000];
 	long 										bytes;
 
@@ -140,7 +140,7 @@ int	Server::accumulate(request_handler& request, int request_fd) {
 	return (EXIT_SUCCESS);
 }
 
-void	Server::set_request_end_flags(request_handler&	request) {
+void	Server::set_request_end_flags(request_handler &request) {
 	long long	max_client_body_size = request.socket.get_config().get_max_client_body_size();
 	
 	if ((static_cast<long long>(request.buf.length()) > max_client_body_size)) {
@@ -154,7 +154,7 @@ void	Server::set_request_end_flags(request_handler&	request) {
 	}
 }
 
-int Server::handle_request_header(request_handler& request) {
+int Server::handle_request_header(request_handler &request) {
 	std::vector<std::string> tokens = tokenize_first_line(request.buf);
 	if (tokens.size() < 3)
 		return BAD_REQUEST;
@@ -164,7 +164,7 @@ int Server::handle_request_header(request_handler& request) {
 	return check_requested_url(request);
 }
 
-int	Server::check_requested_url(request_handler& request) {
+int	Server::check_requested_url(request_handler &request) {
 	std::vector<std::string> locations = split(request.file_path, '/');
 
 	switch (locations.size()) {
@@ -179,7 +179,7 @@ int	Server::check_requested_url(request_handler& request) {
 	return request.status;
 }
 
-int	Server::check_main_configs(request_handler& request, std::vector<std::string>& locations) {
+int	Server::check_main_configs(request_handler &request, std::vector<std::string> &locations) {
 	if (check_method(request.socket.get_config().get_methods(), request.method) == EXIT_FAILURE)
 		return METHOD_NOT_ALLOWED;
 	request.file_path = get_server_filepath(request, locations);
@@ -189,7 +189,7 @@ int	Server::check_main_configs(request_handler& request, std::vector<std::string
 	return EXIT_SUCCESS;
 }
 
-int Server::check_location_config(request_handler& request, std::vector<std::string>& locations) {
+int Server::check_location_config(request_handler &request, std::vector<std::string> &locations) {
 	location loc = get_location_config(request, locations);
 
 	if (request.status)
@@ -203,7 +203,7 @@ int Server::check_location_config(request_handler& request, std::vector<std::str
 	return EXIT_SUCCESS;
 }
 
-location	Server::get_location_config(request_handler request, std::vector<std::string>& locations) {
+location	Server::get_location_config(request_handler &request, std::vector<std::string> &locations) {
 	size_t		i;
 
 	for (i = 0; i < request.socket.get_config().get_locations().size(); i++) {
@@ -216,7 +216,7 @@ location	Server::get_location_config(request_handler request, std::vector<std::s
 	return location();
 }
 
-int	Server::check_method(std::vector<std::string> &methods, std::string &method) {
+int	Server::check_method(const std::vector<std::string> &methods, std::string &method) {
 	for (size_t	i = 0; i < methods.size(); i++) {
 		if	(methods[i] == method)
 			return EXIT_SUCCESS;
@@ -224,13 +224,13 @@ int	Server::check_method(std::vector<std::string> &methods, std::string &method)
 	return EXIT_FAILURE;
 }
 
-std::string	Server::get_server_filepath(request_handler& request, std::vector<std::string> &locations) {
+std::string	Server::get_server_filepath(request_handler &request, std::vector<std::string> &locations) {
 	if (locations.empty())
 		return (request.socket.get_config().get_root() + request.socket.get_config().get_index());
 	return (request.socket.get_config().get_root() + locations[0]);
 }
 
-std::string	Server::get_location_filepath(location& loc, std::vector<std::string> &locations) {
+std::string	Server::get_location_filepath(location &loc, std::vector<std::string> &locations) {
 	if (locations.size() == 1)
 		return (loc.root + loc.index);
 
@@ -249,7 +249,7 @@ size_t Server::get_body_length(request_handler &request) {
 	return length;
 }
 
-std::vector<std::string> Server::tokenize_first_line(std::string& request) {
+std::vector<std::string> Server::tokenize_first_line(std::string &request) {
 	std::string 				first_request_line;
 	size_t 						nl_pos;
 	std::vector<std::string>	tokens;
