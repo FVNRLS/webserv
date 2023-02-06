@@ -46,7 +46,7 @@ void	CGI::child_process(int *fd, const request_handler &request) {
 	arguments[1] = const_cast<char*>(request.file_path.c_str());
 	arguments[2] = NULL;
 
-	if (execve(PHP_PATH, arguments, environment) == -1)
+	if (execve(arguments[0], arguments, environment) == -1)
 		exit(EXIT_FAILURE);
 }
 

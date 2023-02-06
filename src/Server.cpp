@@ -86,7 +86,7 @@ int Server::resolve_requests() {
 
 int Server::handle_pollin(pollfd &pfd) {
 	request_handler* request = &_requests.find(pfd.fd)->second;
-	
+
 	if (accumulate(*request, pfd.fd) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	if (request->head_received) {
@@ -108,6 +108,7 @@ int Server::handle_pollout(pollfd &pfd) {
 	if (!response.empty()) {
 		if (send(pfd.fd, response.c_str(), response.length(), 0) == EXIT_FAILURE) //todo: check if chunked!
 			return (EXIT_FAILURE);
+        memset(request, 0, sizeof(request_handler));
 	}
 	close(pfd.fd);
 	return (EXIT_SUCCESS);
@@ -209,7 +210,10 @@ int Server::check_location_config(request_handler &request, std::vector<std::str
 }
 
 int Server::check_allowed_scripts(location& loc, request_handler& request) {
-	size_t index = request.file_path.find_last_of('.');
+	if (request.file_path.find(".html") != std::string::npos)
+        return EXIT_SUCCESS;
+
+    size_t index = request.file_path.find_last_of('.');
 	std::string extension = request.file_path.substr(index + 1);
 	for (size_t	i = 0; i < loc.scripts.size(); i++) {
 		if (extension == loc.scripts[i].first) {
@@ -254,7 +258,7 @@ std::string	Server::get_location_filepath(location &loc, std::vector<std::string
 		return (loc.root + locations.back());
 	if (loc.cgi_path == EMPTY_STRING)
 		return EMPTY_STRING;
-	return (loc.cgi_path + locations.back());
+	return (loc.root + loc.cgi_path + locations.back());
 }
 
 

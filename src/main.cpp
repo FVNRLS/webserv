@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 13:12:08 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/23 13:14:29 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/06 16:22:25 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,5 @@ int main(int argc, char **argv) {
 		if (server.run() == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 	}
-
 	return (EXIT_SUCCESS);
 }
