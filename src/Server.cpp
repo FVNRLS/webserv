@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/06 15:05:26 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/06 19:00:55 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,8 +166,10 @@ int Server::handle_request_header(request_handler &request) {
 void	Server::split_query(request_handler& request, std::string& url) {
 	size_t position = url.find('?');
 	request.file_path = url.substr(0, position);
-	if (position != std::string::npos)
+	if (position != std::string::npos) {
 		request.query = url.substr(position + 1);
+		request.body_length = request.query.length();
+	}
 }
 
 int	Server::check_requested_url(request_handler &request) {
@@ -225,15 +227,12 @@ int Server::check_allowed_scripts(location& loc, request_handler& request) {
 }
 
 location	Server::get_location_config(request_handler &request, std::vector<std::string> &locations) {
-	size_t		i;
-
-	for (i = 0; i < request.socket.get_config().get_locations().size(); i++) {
+	for (size_t	i = 0; i < request.socket.get_config().get_locations().size(); i++) {
 		if (request.socket.get_config().get_locations()[i].prefix.compare(1, locations[0].size(), locations[0]) == 0) {
 			return request.socket.get_config().get_locations()[i];
 		}
 	}
-	if (i >= request.socket.get_config().get_locations().size())
-		request.status = PAGE_NOT_FOUND;
+	request.status = PAGE_NOT_FOUND;
 	return location();
 }
 

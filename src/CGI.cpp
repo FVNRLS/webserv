@@ -46,8 +46,16 @@ void	CGI::child_process(int *fd, const request_handler &request) {
 	arguments[1] = const_cast<char*>(request.file_path.c_str());
 	arguments[2] = NULL;
 
+    create_tmp_file(request);
 	if (execve(arguments[0], arguments, environment) == -1)
 		exit(EXIT_FAILURE);
+}
+
+int CGI::create_tmp_file(const request_handler& request) {
+    int tmpfd = fileno(tmpfile());
+
+    write(tmpfd, request.query.c_str(), request.query.length());
+    dup2(tmpfd, STDIN_FILENO);
 }
 
 int	CGI::parent_process() {
@@ -62,6 +70,8 @@ int	CGI::parent_process() {
 		return (error_catched("interrupted by signal!"));
 	return EXIT_SUCCESS;
 }
+
+
 
 int CGI::write_response(int fd, std::string &response) {
 	char			buffer[1000];

@@ -7,7 +7,7 @@ Env::~Env() {}
 
 void	Env::create() {
 	_request.env.push_back("REQUEST_METHOD=" + _request.method);
-	_request.env.push_back("QUERY=" + _request.query);
+	_request.env.push_back("QUERY_STRING=" + _request.query);
 	_request.env.push_back("SCRIPT_NAME=" + _request.file_path);
 	_request.env.push_back("CONTENT_LENGTH=" + toString<size_t>(_request.body_length));
 	_request.env.push_back("REMOTE_ADDR=" + remote_addr());
