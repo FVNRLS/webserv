@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/06 14:18:10 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/06 15:05:26 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ int Server::accept_requests() {
 	socklen_t 			client_len;
 	struct sockaddr 	client_addr = {};
 	pollfd				client_pollfd = {};
-	request_handler		request;
+	request_handler		request = {};
 
 	for (size_t i = 1; i < _sockets.size(); i++) {
 		if (_pfds[i].revents & POLLIN) {
@@ -71,7 +71,6 @@ int Server::accept_requests() {
 	}
 	return (EXIT_SUCCESS);
 }
-
 
 int Server::resolve_requests() {
 	for (size_t i = _sockets.size(); i < _pfds.size(); i++) {
@@ -142,7 +141,7 @@ int	Server::accumulate(request_handler &request, int request_fd) {
 
 void	Server::set_request_end_flags(request_handler &request) {
 	long long	max_client_body_size = request.socket.get_config().get_max_client_body_size();
-	
+
 	if ((static_cast<long long>(request.buf.length()) > max_client_body_size)) {
 		request.status = BAD_REQUEST;
 		return;
