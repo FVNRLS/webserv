@@ -4,24 +4,17 @@
 
 #pragma once
 
-#include "requestHandler.hpp"
+#include "Env.hpp"
 #include "CGI.hpp"
 
 class POSTRequest {
 
 private:
-	CGI					_cgi;
+	CGI								_cgi;
 	request_handler&	_request;
-	std::string 		_body;
+	Env								_environment(_request);
 
-
-	void				create_env();
-	int 				set_script_path();
-	int 				set_interpreter_path();
-	std::string			http_user_agent();
-	std::string 		remote_addr();
-
-
+	int 				    set_interpreter_path();
 public:
 	POSTRequest(request_handler &request);
 	~POSTRequest();

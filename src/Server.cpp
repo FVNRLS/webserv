@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/04 15:56:52 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/06 13:29:28 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,9 +159,15 @@ int Server::handle_request_header(request_handler &request) {
 	if (tokens.size() < 3)
 		return BAD_REQUEST;
 	request.method = tokens[0];
-	request.file_path = tokens[1];
-
+	split_query(request, tokens[1]);
 	return check_requested_url(request);
+}
+
+void	split_query(request_handler& request, std::string& url) {
+	size_t position = url.find('?');
+	request.file_path = url.substr(0, position);
+	if (position != std::string::npos)
+		request.query = url.substr(position + 1);
 }
 
 int	Server::check_requested_url(request_handler &request) {
@@ -200,7 +206,19 @@ int Server::check_location_config(request_handler &request, std::vector<std::str
 	request.body_length = get_body_length(request);
 	if(request.buf.size() >= request.head_length + request.body_length)
 		request.body_received = true;
-	return EXIT_SUCCESS;
+	return check_allowed_scripts(loc, request);
+}
+
+int Server::check_allowed_scripts(location& loc, request_handler& request) {
+	size_t index = request.file_path.find_last_of('.');
+	std::string extension = request.file_path.substr(index + 1);
+	for (size_t	i = 0; i < loc.scripts.size(); i++) {
+		if (extension == loc.scripts[i].first) {
+			request.interpreter = loc.scripts[i].second;
+			return EXIT_SUCCESS;
+		}
+	}
+	return METHOD_NOT_ALLOWED;
 }
 
 location	Server::get_location_config(request_handler &request, std::vector<std::string> &locations) {
@@ -233,9 +251,10 @@ std::string	Server::get_server_filepath(request_handler &request, std::vector<st
 std::string	Server::get_location_filepath(location &loc, std::vector<std::string> &locations) {
 	if (locations.size() == 1)
 		return (loc.root + loc.index);
-
 	if (locations.back().find("html") != std::string::npos)
 		return (loc.root + locations.back());
+	if (loc.cgi_path == EMPTY_STRING)
+		return EMPTY_STRING;
 	return (loc.cgi_path + locations.back());
 }
 
@@ -250,15 +269,14 @@ size_t Server::get_body_length(request_handler &request) {
 }
 
 std::vector<std::string> Server::tokenize_first_line(std::string &request) {
-	std::string 				first_request_line;
-	size_t 						nl_pos;
+	std::string								first_request_line;
 	std::vector<std::string>	tokens;
 
-	nl_pos = request.find(NEWLINE);
-	if (nl_pos != std::string::npos) {
-		first_request_line =  request.substr(0, nl_pos);
+	size_t	new_line_position = request.find(NEWLINE);
+	if (new_line_position != std::string::npos) {
+		first_request_line =  request.substr(0, new_line_position);
+		tokens = split(first_request_line, SPACE);
 	}
-	tokens = split(first_request_line, SPACE);
 	return tokens;
 }
 

@@ -1,0 +1,7 @@
+* scripts for 
+  * post
+  * upload file
+  * get requests
+
+* how to send status codes ?
+
