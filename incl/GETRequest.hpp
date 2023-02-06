@@ -20,10 +20,9 @@ class GETRequest {
 private:
 	request_handler&	_request;
 	CGI					_cgi;
-	Env					_environment(_request);
+	Env					_environment;
 
 	int					create_html_response(std::string &_response);
-	int					create_cgi_response(std::string &_response);
 
 
 public:

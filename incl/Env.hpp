@@ -18,13 +18,12 @@ class Env {
 private:
 	request_handler&					_request;
 
-	int 								set_script_path();
-	std::strin							http_user_agent();
-	std::string							remote_addr();
+	std::string     http_user_agent();
+	std::string     remote_addr();
 
 public:
 	Env(request_handler& request);
 	~Env();
 
-	void								create_env();
+	void								create();
 };

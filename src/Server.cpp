@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/06 13:42:38 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/06 14:18:10 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,7 @@ int Server::handle_request_header(request_handler &request) {
 	return check_requested_url(request);
 }
 
-void	split_query(request_handler& request, std::string& url) {
+void	Server::split_query(request_handler& request, std::string& url) {
 	size_t position = url.find('?');
 	request.file_path = url.substr(0, position);
 	if (position != std::string::npos)

@@ -24,8 +24,8 @@ ResponseGenerator::~ResponseGenerator() {}
 std::string ResponseGenerator::generate_response() {
 	if (_request.status == EXIT_SUCCESS) {
         if (_request.method == "GET") {
-            GETRequest get;
-            _request.status = get.create_response(_request.file_path, _response);
+            GETRequest get(_request);
+            _request.status = get.create_response(_response);
         }
         else if (_request.method == "POST") {
             POSTRequest post(_request);

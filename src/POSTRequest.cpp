@@ -2,7 +2,7 @@
 #include "POSTRequest.hpp"
 
 //BASIC CLASS SETUP
-POSTRequest::POSTRequest(request_handler &request) : _request(request) {}
+POSTRequest::POSTRequest(request_handler &request) : _request(request), _environment(_request) {}
 
 POSTRequest::~POSTRequest() {}
 

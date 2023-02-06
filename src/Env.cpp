@@ -5,7 +5,7 @@ Env::Env(request_handler& request) : _request(request) {
 Env::~Env() {}
 
 
-void	Env::create_env() {
+void	Env::create() {
 	_request.env.push_back("REQUEST_METHOD=" + _request.method);
 	_request.env.push_back("QUERY=" + _request.query);
 	_request.env.push_back("SCRIPT_NAME=" + _request.file_path);

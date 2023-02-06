@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
+/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:52 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/06 11:58:36 by hoomen           ###   ########.fr       */
+/*   Updated: 2023/02/06 14:17:44 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,11 @@ private:
 	int 						handle_request_header(request_handler& request);
 	size_t						get_body_length(request_handler &request);
 	std::vector<std::string> 	tokenize_first_line(std::string& request);
+	void						split_query(request_handler& request, std::string& url);
     int                         check_requested_url(request_handler& request);
     int	                        check_main_configs(request_handler& request, std::vector<std::string>& locations);
     int                         check_location_config(request_handler& request, std::vector<std::string>& locations);
-		int												check_allowed_scripts(location& loc, request_handler& request);
+		int						check_allowed_scripts(location& loc, request_handler& request);
     location	                get_location_config(request_handler &request, std::vector<std::string>& locations);
     int                         check_method(const std::vector<std::string> &methods, std::string &method);
     std::string	                get_server_filepath(request_handler& request, std::vector<std::string> &locations);

@@ -12,7 +12,7 @@ class POSTRequest {
 private:
 	CGI								_cgi;
 	request_handler&				_request;
-	Env								_environment(_request);
+	Env								_environment;
 
 	int 			set_interpreter_path();
 public:

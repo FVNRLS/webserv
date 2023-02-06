@@ -13,7 +13,7 @@
 #include "GETRequest.hpp"
 
 //BASIC CLASS SETUP
-GETRequest::GETRequest(request_handler& request) : _request(request)  {}
+GETRequest::GETRequest(request_handler& request) : _request(request), _environment(request)  {}
 
 GETRequest::~GETRequest() {}
 
@@ -22,7 +22,7 @@ GETRequest::~GETRequest() {}
 int GETRequest::create_response(std::string &response) {
 	if (_request.interpreter.empty())
 		return create_html_response(response);
-	_environment.create_env();
+	_environment.create();
 	return _cgi.create_response(_request, response);
 }
 
