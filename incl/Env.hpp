@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Env.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
+/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/06 13:11:06 by hoomen            #+#    #+#             */
-/*   Updated: 2023/02/06 13:21:53 by hoomen           ###   ########.fr       */
+/*   Updated: 2023/02/06 14:05:28 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,15 @@
 
 class Env {
 private:
-  request_handler&                _request;
+	request_handler&					_request;
 
-	int 				                    set_script_path();
-	std::string			                http_user_agent();
-	std::string 		                remote_addr();
+	int 								set_script_path();
+	std::strin							http_user_agent();
+	std::string							remote_addr();
 
 public:
 	Env(request_handler& request);
 	~Env();
 
-	void                     				create_env();
+	void								create_env();
 };

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
+/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/06 13:29:28 by hoomen           ###   ########.fr       */
+/*   Updated: 2023/02/06 13:42:38 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -269,7 +269,7 @@ size_t Server::get_body_length(request_handler &request) {
 }
 
 std::vector<std::string> Server::tokenize_first_line(std::string &request) {
-	std::string								first_request_line;
+	std::string					first_request_line;
 	std::vector<std::string>	tokens;
 
 	size_t	new_line_position = request.find(NEWLINE);
@@ -290,8 +290,6 @@ void	Server::delete_invalid_fds() {
 			it++;
 	}
 }
-
-
 
 
 

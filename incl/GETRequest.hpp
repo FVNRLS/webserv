@@ -12,18 +12,23 @@
 
 #pragma once
 
-#include "Socket.hpp"
+#include "Env.hpp"
+#include "CGI.hpp"
 
 class GETRequest {
 
 private:
-	std::string	_body;
+	request_handler&	_request;
+	CGI					_cgi;
+	Env					_environment(_request);
 
-	int 		create_response_body(const std::string &file_path);
+	int					create_html_response(std::string &_response);
+	int					create_cgi_response(std::string &_response);
+
 
 public:
-	GETRequest();
+	GETRequest(request_handler& request);
 	~GETRequest();
 
-	int 		create_response(const std::string &file_path, std::string &_response);
+	int 				create_response(std::string &_response);
 };

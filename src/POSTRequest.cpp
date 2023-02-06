@@ -11,5 +11,5 @@ int POSTRequest::create_response(std::string &response) {
 	_request.query = _request.buf.substr(_request.head_length, _request.buf.length());
 	
 	_environment.create();
-	return (_cgi.create_response(_request, response));
+	return _cgi.create_response(_request, response);
 }

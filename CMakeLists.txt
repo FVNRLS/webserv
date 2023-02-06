@@ -42,6 +42,9 @@ add_executable(webserver
         src/CGI.cpp
         incl/CGI.hpp
 
+        src/Env.cpp
+        incl/Env.hpp
+
         #TOOLS
         src/tools.cpp
         incl/tools.hpp
