@@ -11,6 +11,7 @@ except ImportError:
 
 form = cgi.FieldStorage()
 
+
 # A nested FieldStorage instance holds the file
 fileitem = form['file']
 
