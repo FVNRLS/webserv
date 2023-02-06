@@ -17,6 +17,8 @@ SRC =	./src/main.cpp \
 		./src/POSTRequest.cpp \
 		./src/DELETERequest.cpp \
 		./src/tools.cpp \
+		./src/CGI.cpp \
+		./src/Env.cpp \
 
 
 INCL =	./incl/
