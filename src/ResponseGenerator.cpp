@@ -27,16 +27,20 @@ std::string ResponseGenerator::generate_response() {
     if (_request.method == "GET") {
       GETRequest get(_request);
       _request.status = get.create_response(_response_body);
-    } else if (_request.method == "POST") {
+    }
+    else if (_request.method == "POST") {
       POSTRequest post(_request);
       _request.status = post.create_response(_response_body);
-    } else if (_request.method == "DELETE") {
+    }
+    else if (_request.method == "DELETE") {
       DELETERequest delete_method;
       _request.status = delete_method.create_response(_request);
-    } else
+    }
+    else
       _request.status = METHOD_NOT_ALLOWED;
   }
-  if (_request.status) return (create_error_code_response(_request.status));
+  if (_request.status)
+      return create_error_code_response(_request.status);
   return generate_response_header(_request.status) + _response_body;
 }
 

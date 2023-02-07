@@ -2,9 +2,9 @@ import cgi, fileinput, os, sys
 
 try:
 	parsed = cgi.FieldStorage()
-	# message = parsed['name']
+	# # message = parsed['name']
 	fileitem = parsed['name']
-	# Test if the file was uploaded
+	# # Test if the file was uploaded
 	if fileitem.filename:
 		# strip leading path from file name to avoid
 		# directory traversal attacks
@@ -17,9 +17,8 @@ try:
 		else:
 			open(path, 'wb').write(fileitem.file.read())
 			message = 'The file "' + fn + '" was uploaded successfully'
-
 	else:
-		message = 'No file was uploaded'
+	    message = 'No file was uploaded'
 except:
 	message = 'EXCEPTION: No file was uploaded'
 
