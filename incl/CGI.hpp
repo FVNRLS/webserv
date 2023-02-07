@@ -6,11 +6,11 @@ class CGI {
 private:
     int         _response_fd;
 
-	int			error_catched(const char* message);
+	int			error(const char* message);
 	void		child_process(const request_handler &request);
 	int			parent_process();
 	int 		write_response(std::string &response);
-    int         request_to_stdin(const request_handler& request);
+    int         dup_request_to_stdin(const request_handler& request);
 
 public:
 	CGI();

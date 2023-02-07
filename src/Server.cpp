@@ -88,7 +88,7 @@ int Server::handle_pollin(pollfd &pfd) {
 	request_handler* request = &_requests.find(pfd.fd)->second;
 
 	if (accumulate(*request, pfd.fd) == EXIT_FAILURE)
-		return (EXIT_FAILURE);
+		return EXIT_FAILURE;
 	if (request->head_received) {
 		request->status = handle_request_header(*request);
 	}
@@ -107,11 +107,11 @@ int Server::handle_pollout(pollfd &pfd) {
 	response = resp_gen.generate_response();
 	if (!response.empty()) {
 		if (send(pfd.fd, response.c_str(), response.length(), 0) == EXIT_FAILURE) //todo: check if chunked!
-			return (EXIT_FAILURE);
+			return EXIT_FAILURE;
         memset(request, 0, sizeof(request_handler));
 	}
 	close(pfd.fd);
-	return (EXIT_SUCCESS);
+	return EXIT_SUCCESS;
 }
 
 int Server::check_connection(pollfd &pfd) {

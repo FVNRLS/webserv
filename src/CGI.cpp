@@ -8,10 +8,10 @@ CGI::~CGI() {}
 //MEMBER FUNCTIONS
 int CGI::create_response(const request_handler &request, std::string &response) {
     if (_response_fd < 0)
-        return INTERNAL_SERVER_ERROR;
+        return error("tmpfile creation failed!");
 	switch (fork()) {
 		case -1:
-			return (error_catched("fork failed!"));
+			return error("fork failed!");
 		case 0:
 			child_process(request);
 	}
@@ -19,9 +19,9 @@ int CGI::create_response(const request_handler &request, std::string &response) 
 		return INTERNAL_SERVER_ERROR;
 	}
 	if (write_response(response) != EXIT_SUCCESS)
-		return	(error_catched("Reading from pipe failed!"));
+		return error("Reading from pipe failed!");
 	if (response.empty())
-		return (error_catched("EMPTY RESPONSE!"));
+		return error("EMPTY RESPONSE!");
 	return EXIT_SUCCESS;
 }
 
@@ -37,17 +37,17 @@ void	CGI::child_process(const request_handler &request) {
 	arguments[2] = NULL;
 
     dup2(_response_fd, STDOUT_FILENO);
-    if (request_to_stdin(request) == EXIT_FAILURE)
-        exit (EXIT_FAILURE);
+    if (dup_request_to_stdin(request) == EXIT_FAILURE)
+        exit(error("tmpfile creation failed!"));
 	if (execve(arguments[0], arguments, environment) == -1)
-		exit(EXIT_FAILURE);
+		exit(error("execve failed!"));
 }
 
-int CGI::request_to_stdin(const request_handler& request) {
+int CGI::dup_request_to_stdin(const request_handler& request) {
     int fd = fileno(tmpfile());
 
-	if (fd < 0 || write(fd, request.query.c_str(), request.query.length()) == -1)
-        return EXIT_FAILURE;
+	if (fd < 0 || write(fd, request.query.c_str(), request.query.length())  < 0)
+       return EXIT_FAILURE;
     lseek(fd, 0, SEEK_SET);
 	dup2(fd, STDIN_FILENO);
     close(fd);
@@ -60,10 +60,10 @@ int	CGI::parent_process() {
 	waitpid(-1, &status, 0);
 	if (WIFEXITED(status)) {
 		if (WEXITSTATUS(status))
-			return (error_catched("execve failed!"));
+			return (error("execve failed!"));
 	}
 	else if (WIFSIGNALED(status))
-		return (error_catched("interrupted by signal!"));
+		return error("interrupted by signal!");
 	return EXIT_SUCCESS;
 }
 
@@ -85,7 +85,7 @@ int CGI::write_response(std::string &response) {
 	return	EXIT_SUCCESS;
 }
 
-int	CGI::error_catched(const char* message) {
+int	CGI::error(const char* message) {
 	std::cerr << message << '\n';
 	return INTERNAL_SERVER_ERROR;
 }
