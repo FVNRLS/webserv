@@ -52,10 +52,17 @@ void	CGI::child_process(int *fd, const request_handler &request) {
 }
 
 int CGI::create_tmp_file(const request_handler& request) {
-    int tmpfd = fileno(tmpfile());
+	// int tmpfd = fileno(tmpfile());
 
-    write(tmpfd, request.query.c_str(), request.query.length());
-    dup2(tmpfd, STDIN_FILENO);
+	int	tmpfd = open("../tmpfiletest.txt", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    std::cerr << "CREATING TMPFILE\ntmpfd: " << tmpfd << '\n';
+
+    std::cerr << "CREATING TMPFILE\ntmpfd: " << tmpfd << '\n';
+	write(tmpfd, request.query.c_str(), request.query.length());
+    close(tmpfd);
+    tmpfd = open("../tmpfiletest.txt", O_RDONLY);
+	dup2(tmpfd, STDIN_FILENO);
+    close(tmpfd);
 }
 
 int	CGI::parent_process() {
