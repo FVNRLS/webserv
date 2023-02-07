@@ -21,7 +21,6 @@ GETRequest::~GETRequest() {}
 //MEMBER FUNCTIONS
 int GETRequest::create_response(std::string &response) {
 	if (_request.interpreter.empty()) {
-		std::cerr << "NO INTERPRETER!\n";
 		return create_html_response(response);
 	}
 	_environment.create();
@@ -33,7 +32,6 @@ int GETRequest::create_html_response(std::string &response) {
 	std::ifstream	file;
 	std::string		body;
 
-	std::cerr << "REQUEST FILE PATH: " << _request.file_path << '\n';
 	if (access(_request.file_path.c_str(), F_OK) < 0)
 		return PAGE_NOT_FOUND;
 	if (open_file(_request.file_path, file) == EXIT_FAILURE)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ResponseGenerator.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
+/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 12:20:38 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/07 15:31:26 by hoomen           ###   ########.fr       */
+/*   Updated: 2023/02/07 17:09:49 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,12 +62,14 @@ std::string ResponseGenerator::create_error_code_response(int status_code) {
 }
 
 std::string ResponseGenerator::generate_response_header(int status_code) {
-  std::string status_code_str = toString(status_code);
-  std::string body_length = toString(_response_body.length());
-  std::cerr << _reasonPhrases.find(status_code)->second << '\n';
-  return "HTTP/1.1 " + status_code_str + " " + _reasonPhrases.find(status_code)->second +
-         "\nContent-Type: text/html\nContent-Length: " + body_length +
-         END_OF_REQUEST;
+    if (status_code == EXIT_SUCCESS)
+            status_code = OK;
+
+  return  "HTTP/1.1 " + toString(status_code) + " " +
+          _reasonPhrases.find(status_code)->second +
+          "\nContent-Type: text/html\nContent-Length: " +
+          toString(_response_body.length()) +
+          END_OF_REQUEST;
 }
 
 const std::map<int, std::string> ResponseGenerator::_reasonPhrases = make_pairs();
@@ -114,18 +116,5 @@ const std::map<int, std::string> ResponseGenerator::make_pairs() {
   pairs[503] = "Service Unavailable";
   pairs[504] = "Gateway Time-out";
   pairs[505] = "HTTP Version not supported";
-  pairs[301] = "301 Moved Permanently";
-  pairs[400] = "400 Bad Request";
-  pairs[401] = "401 Unauthorized";
-  pairs[403] = "403 Forbidden";
-  pairs[404] = "404 Not Found";
-  pairs[405] = "405 Method Not Allowed";
-  pairs[411] = "411 Length Required";
-  pairs[413] = "413 Payload Too Large";
-  pairs[414] = "414 URI Too Long";
-  pairs[415] = "415 Unsupported Media Type";
-  pairs[500] = "500 Internal Server Error";
-  pairs[505] = "505 HTTP Version Not Supported";
   return pairs;
 };
-// TODO: FOR LATER > encode html with picture nd find right type!
