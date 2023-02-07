@@ -24,8 +24,8 @@ except:
 	message = 'EXCEPTION: No file was uploaded'
 
 
+# todo this is actually already generating a header (Content-Type: .... )
 print("""\
-Content-Type: text/html\r\n\r\n
 <html>
 <body>
    <p>%s</p>
