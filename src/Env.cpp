@@ -11,51 +11,25 @@ void	Env::create() {
 	_request.env.push_back("SCRIPT_NAME=" + _request.file_path);
 	_request.env.push_back("CONTENT_LENGTH=" + toString<size_t>(_request.body_length));
 	_request.env.push_back("REMOTE_ADDR=" + remote_addr());
-	_request.env.push_back("HTTP_USER_AGENT=" + http_user_agent());
+	_request.env.push_back("HTTP_USER_AGENT=" + get_header_value("User-Agent:"));
 	_request.env.push_back("RESPONSE_HEADER=" + RESPONSE_HEADER);
-	_request.env.push_back("CONTENT_TYPE=" + get_content_type());
+	_request.env.push_back("CONTENT_TYPE=" + get_header_value("Content-Type:"));
 }
 
-// std::string Env::get_header_value(const char* key) {
-// 	size_t begin;
-// 	size_t end;
-
-// 	begin = _request.buf.find(key);
-// 	if (begin == std::string::npos)
-// 		return EMPTY_STRING;
-// 	begin += key.len
-// }
-
-std::string Env::get_content_type() {
+std::string Env::get_header_value(std::string key) {
 	size_t begin;
 	size_t end;
 
-	begin = _request.buf.find("Content-Type: ");
+	begin = _request.buf.find(key);
 	if (begin == std::string::npos)
 		return EMPTY_STRING;
-	begin += std::strlen("Content-Type: ");
+	begin += key.length();
 	while (_request.buf[begin] == SPACE)
 		begin++;
 	end = _request.buf.find(NEWLINE, begin);
 	if (end == std::string::npos)
 		return EMPTY_STRING;
 	return _request.buf.substr(begin, end - begin);
-}
-
-std::string Env::http_user_agent() {
-	size_t	begin;
-	size_t	end;
-
-	begin = _request.buf.find("User-Agent:");
-	if (begin == std::string::npos)
-		return EMPTY_STRING;
-	begin += std::strlen("User-Agent:");
-	while (_request.buf[begin] == SPACE)
-		begin++;
-	end = _request.buf.find(NEWLINE, begin);
-	if (end == std::string::npos)
-		return EMPTY_STRING;
-	return	_request.buf.substr(begin, end - begin);
 }
 
 std::string Env::remote_addr() {

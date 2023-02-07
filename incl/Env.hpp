@@ -6,7 +6,7 @@
 /*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/06 13:11:06 by hoomen            #+#    #+#             */
-/*   Updated: 2023/02/07 11:06:40 by hoomen           ###   ########.fr       */
+/*   Updated: 2023/02/07 11:44:20 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,8 @@ class Env {
 private:
 	request_handler&					_request;
 
-	std::string     http_user_agent();
 	std::string     remote_addr();
-	std::string			get_content_type();
-	// std::string			get_header_value(const char* key);
+	std::string			get_header_value(std::string key);
 
 public:
 	Env(request_handler& request);
