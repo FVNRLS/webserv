@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ResponseGenerator.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 12:22:00 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/03 16:51:12 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/07 12:14:12 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,12 @@
 class ResponseGenerator {
 
 private:
-	request_handler&			_request;
-	std::string 				_response;
-	std::string 				_request_body;
+	request_handler&		_request;
+	std::string					_response_body;
 
 	//ERROR MANAGEMENT
-	std::string 		create_error_code_response(int error);
+	std::string 		create_error_code_response(int status_code);
+	std::string			generate_response_header(int status_code);
 
 public:
 	ResponseGenerator(request_handler &request);

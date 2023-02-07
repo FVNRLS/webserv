@@ -90,7 +90,6 @@ int CGI::write_response(int fd, std::string &response) {
 			response += std::string(buffer, bytes);
 	}
 	close(fd);
-	response = RESPONSE_HEADER + toString<size_t>(response.length()) + "\n\n" + response;
 	return	EXIT_SUCCESS;
 }
 
