@@ -63,6 +63,7 @@ int CGI::create_tmp_file(const request_handler& request) {
     tmpfd = open("../tmpfiletest.txt", O_RDONLY);
 	dup2(tmpfd, STDIN_FILENO);
     close(tmpfd);
+	return EXIT_SUCCESS;
 }
 
 int	CGI::parent_process() {
