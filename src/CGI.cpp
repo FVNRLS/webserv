@@ -54,7 +54,9 @@ void	CGI::child_process(int *fd, const request_handler &request) {
 int CGI::create_tmp_file(const request_handler& request) {
 	// int tmpfd = fileno(tmpfile());
 
-	int	tmpfd = open("../tmpfiletest.txt", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	
+
+	int	tmpfd = open("../.tmpfiletest", O_WRONLY | O_CREAT | O_TRUNC, 0666);
     std::cerr << "CREATING TMPFILE\ntmpfd: " << tmpfd << '\n';
 
     std::cerr << "CREATING TMPFILE\ntmpfd: " << tmpfd << '\n';
