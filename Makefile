@@ -1,50 +1,61 @@
-NAME = webserv
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2022/11/26 23:28:55 by hoomen            #+#    #+#              #
+#    Updated: 2023/02/07 10:11:12 by hoomen           ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-CC = c++
+NAME		:=	webserv
 
-RM = rm -f
+CXX			:=	c++
+CXXFLAGS	:=	-Wall -Werror -Wextra -std=c++98
 
-FLAGS = -Wall -Wextra -Werror -g -std=c++98
+DEPFLAGS	=	-MT $@ -MMD -MP -MF $(DDIR)/$*.d
 
-SRC =	./src/main.cpp \
-		./src/Config.cpp \
-		./src/ConfigParser.cpp \
-		./src/Socket.cpp \
-		./src/Server.cpp \
-		./src/CLI.cpp \
-		./src/ResponseGenerator.cpp \
-		./src/GETRequest.cpp \
-		./src/POSTRequest.cpp \
-		./src/DELETERequest.cpp \
-		./src/tools.cpp \
-		./src/CGI.cpp \
-		./src/Env.cpp \
+INCFLAGS = -I incl
+VPATH		= src
+SRC			=	CGI.cpp CLI.cpp Config.cpp ConfigParser.cpp DELETERequest.cpp \
+					Env.cpp GETRequest.cpp main.cpp POSTRequest.cpp ResponseGenerator.cpp \
+					Server.cpp Socket.cpp tools.cpp
+
+ODIR		=	obj
+OBJ			=	$(SRC:%.cpp=$(ODIR)/%.o)
+
+DDIR		=	$(ODIR)/.deps
+DEP			=	$(SRC:%.cpp=$(DDIR)/%.d)
 
 
-INCL =	./incl/
+.PHONY : all clean fclean re run
 
-OBJ = ${SRC:.cpp=.o}
-DEP = ${SRC:.cpp=.d}
+$(NAME) : $(OBJ)
+	$(CXX) $(CXXFLAGS) $(OBJ) -o $@
 
-.cpp.o:
-	@${CC} ${FLAGS} -I ${INCL} -c $< -o ${<:.cpp=.o}
+$(ODIR)/%.o : %.cpp $(DDIR)/%.d | $(ODIR) $(DDIR)
+	$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(INCFLAGS) -c $< -o $@
 
-${NAME}: ${OBJ}
-	@${CC} ${OBJ} -o ${NAME}
-	@rm -rf obj && mkdir obj
-	@mv ${OBJ} obj/
+$(ODIR) :
+	mkdir $@
 
-all: ${NAME}
+$(DDIR) :
+	mkdir $@
 
-clean:
-	@rm -rf obj
+all : $(NAME)
 
-fclean: clean
-	@${RM} ${NAME}
+clean :
+	$(RM) -r $(DDIR) $(ODIR)
 
-re: fclean all
+fclean : clean
+	$(RM) $(NAME)
 
-run: $(NAME)
-	./webserv config/vs_code.conf
+re : fclean all
 
-.PHONY: all clean fclean re
+run : $(NAME)
+	./$(NAME) config/vs_code.conf
+
+$(DEP):
+-include $(DEP)
