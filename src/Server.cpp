@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/06 19:00:55 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/07 17:30:58 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,11 @@ int Server::run() {
 		if (poll(_pfds.data(), _pfds.size(), TIMEOUT) < 0)
 			return (terminate_with_error(system_call_error(POLL_ERROR, _sockets.front())));
 		if (check_cli() == EXIT_FAILURE)
-			return (EXIT_FAILURE);
+			return EXIT_FAILURE;
 		if (accept_requests() == EXIT_FAILURE)
-			return (EXIT_FAILURE);
+			return EXIT_FAILURE;
 		if (resolve_requests() == EXIT_FAILURE)
-			return (EXIT_FAILURE);
+			return EXIT_FAILURE;
 		delete_invalid_fds();
 //		std::cout << "NUM FD'S:		" << _pfds.size() << std::endl;
 	}
@@ -46,7 +46,7 @@ int	Server::check_cli() {
 		if (process_cli_input() == EXIT_FAILURE)
 			return EXIT_FAILURE;
 	}
-	return (EXIT_SUCCESS);
+	return EXIT_SUCCESS;
 }
 
 int Server::accept_requests() {
@@ -62,14 +62,14 @@ int Server::accept_requests() {
 			if (client_pollfd.fd < 0)
 				return (system_call_error(ACCEPT_ERROR, _sockets[i]));
 			if (fcntl(client_pollfd.fd, F_SETFL, O_NONBLOCK) < 0)
-				return (EXIT_FAILURE);
+				return EXIT_FAILURE;
 			client_pollfd.events = POLLIN;
 			_pfds.push_back(client_pollfd);
 			request.socket = _sockets[i];
 			_requests[client_pollfd.fd] = request;
 		}
 	}
-	return (EXIT_SUCCESS);
+	return EXIT_SUCCESS;
 }
 
 int Server::resolve_requests() {
@@ -81,7 +81,7 @@ int Server::resolve_requests() {
 		else if (_pfds[i].revents & POLLOUT)
 			return (handle_pollout(_pfds[i]));
 	}
-	return (EXIT_SUCCESS);
+	return EXIT_SUCCESS;
 }
 
 int Server::handle_pollin(pollfd &pfd) {
@@ -137,7 +137,7 @@ int	Server::accumulate(request_handler &request, int request_fd) {
 		return (system_call_error(RECV_ERROR));
 	request.buf += std::string(buffer, bytes);
 	set_request_end_flags(request);
-	return (EXIT_SUCCESS);
+	return EXIT_SUCCESS;
 }
 
 void	Server::set_request_end_flags(request_handler &request) {
@@ -156,6 +156,7 @@ void	Server::set_request_end_flags(request_handler &request) {
 
 int Server::handle_request_header(request_handler &request) {
 	std::vector<std::string> tokens = tokenize_first_line(request.buf);
+
 	if (tokens.size() < 3)
 		return BAD_REQUEST;
 	request.method = tokens[0];
@@ -166,6 +167,7 @@ int Server::handle_request_header(request_handler &request) {
 void	Server::split_query(request_handler& request, std::string& url) {
 	size_t position = url.find('?');
 	request.file_path = url.substr(0, position);
+
 	if (position != std::string::npos) {
 		request.query = url.substr(position + 1);
 		request.body_length = request.query.length();
@@ -184,7 +186,6 @@ int	Server::check_requested_url(request_handler &request) {
 		default:
 			return check_location_config(request, locations);
 	}
-	return request.status;
 }
 
 int	Server::check_main_configs(request_handler &request, std::vector<std::string> &locations) {
@@ -260,7 +261,6 @@ std::string	Server::get_location_filepath(location &loc, std::vector<std::string
 	return (loc.root + loc.cgi_path + locations.back());
 }
 
-
 size_t Server::get_body_length(request_handler &request) {
 	if (request.method == "GET")
 		return 0;
@@ -271,15 +271,14 @@ size_t Server::get_body_length(request_handler &request) {
 }
 
 std::vector<std::string> Server::tokenize_first_line(std::string &request) {
-	std::string					first_request_line;
-	std::vector<std::string>	tokens;
+	std::string					first_line;
 
 	size_t	new_line_position = request.find(NEWLINE);
 	if (new_line_position != std::string::npos) {
-		first_request_line =  request.substr(0, new_line_position);
-		tokens = split(first_request_line, SPACE);
+		first_line =  request.substr(0, new_line_position);
+		return split(first_line, SPACE);
 	}
-	return tokens;
+	return std::vector<std::string>();
 }
 
 void	Server::delete_invalid_fds() {
@@ -325,11 +324,11 @@ int Server::process_request(const Socket &socket, pollfd &poll_fd) {
 //	socket_is_unique = socket.get_is_unique();
 //	if (socket_is_unique) {
 //		if (resolve_requests(socket, poll_fd) == EXIT_FAILURE)
-//			return (EXIT_FAILURE);
+//			return EXIT_FAILURE;
 //	}
 //	else if (serve_on_virtual_host(socket, poll_fd) < 0)
-//		return (EXIT_FAILURE);
-	return (EXIT_SUCCESS);
+//		return EXIT_FAILURE;
+	return EXIT_SUCCESS;
 }
 
 int Server::serve_on_virtual_host(const Socket &socket, pollfd &poll_fd) {
@@ -363,7 +362,7 @@ int Server::serve_on_virtual_host(const Socket &socket, pollfd &poll_fd) {
 		send(client_socket, response, sizeof(response), 0);
 	}
 	close(client_socket);
-	return (EXIT_SUCCESS);
+	return EXIT_SUCCESS;
 }
 
 std::string Server::extract_domain(std::string &request) {
@@ -407,7 +406,7 @@ void	Server::exit_server() {
 int		Server::terminate_with_error(int) {
 	for (size_t i = 0; i < _sockets.size(); i++)
 		close(_pfds[i].fd);
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
 }
 
 void 	Server::show_connections() {
@@ -448,6 +447,6 @@ int Server::system_call_error(int error, const Socket &socket) {
 		default:
 			std::cerr << "Server: unknown error" << std::endl;
 	}
-	return (EXIT_FAILURE);
+	return EXIT_FAILURE;
 }
 

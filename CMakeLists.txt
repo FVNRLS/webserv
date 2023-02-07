@@ -48,5 +48,5 @@ add_executable(webserver
         #TOOLS
         src/tools.cpp
         incl/tools.hpp
-        )
+        src/Session.cpp incl/Session.hpp)
 
