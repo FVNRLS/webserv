@@ -81,10 +81,7 @@ const std::string DEFAULT_CGI_PATH			= "config/cgi/cgi.py"; //unsure about the v
 const std::string DEFAULT_PAGE_ERROR		= "SERVER ERROR: ERROR PAGE UNAVAILABLE!"; //if error page can not be opened
 const std::string END_OF_REQUEST			= "\r\n\r\n";
 const std::string DEFAULT_UPLOAD_DIR		= "../uploads/"; //todo change to work with makefile
-#define DATABASE_PATH "../upload/data.txt" //todo change to work with makefile
-#define OK_PAGE "../html/200.html"
-#define PHP_PATH "/usr/bin/php"
-#define CGI_SCRIPT_PATH "/Users/rmazurit/Documents/42_Projects/webserv/config/cgi/cgi.php"
+
 
 //COVERING UINT32_MAX MACRO FOR ARCH LINUX
 #ifndef UINT32_MAX
@@ -235,7 +232,3 @@ enum cli_flags {
 enum server_constants {
 	TIMEOUT	 	= 5000, //in milliseconds
 };
-
-
-// GET / HTTP/1.1
-// GET /index.html HTTP/1.1

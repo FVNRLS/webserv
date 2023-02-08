@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/07 18:13:52 by doreshev          #+#    #+#             */
-/*   Updated: 2023/02/08 11:41:51 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/08 15:19:24 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,14 +53,10 @@ int     Session::generate_key() {
     srand(time(0));
 
     int key = rand();
-    while (key == 1 || _cookies.find(key) != _cookies.end())
+    while (key == false || _cookies.find(key) != _cookies.end())
         key = rand();
     return key;
 }
-
-
-
-
 
 std::string    Session::username(const int& key) const {
     std::map<int, User>::const_iterator it = _cookies.find(key);

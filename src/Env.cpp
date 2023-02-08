@@ -14,6 +14,10 @@ void	Env::create() {
 	_request.env.push_back("HTTP_USER_AGENT=" + get_header_value("User-Agent:"));
 	_request.env.push_back("RESPONSE_HEADER=" + RESPONSE_HEADER);
 	_request.env.push_back("CONTENT_TYPE=" + get_header_value("Content-Type:"));
+	if (_request.cookies == true)
+		_request.env.push_back("HTTP_COOKIE=" + toString<int>(_request.cookies));
+	else
+		_request.env.push_back("HTTP_COOKIE=");
 }
 
 std::string Env::get_header_value(std::string key) {
