@@ -1,7 +1,0 @@
-------WebKitFormBoundaryCcBZx2LxJJYI2z5K
-Content-Disposition: form-data; name="name"; filename="text3.txt"
-Content-Type: text/plain
-
-Hello!
-
-------WebKitFormBoundaryCcBZx2LxJJYI2z5K--
