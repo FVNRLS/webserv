@@ -34,15 +34,15 @@ int Session::create(const std::string& username, const std::string& password) {
 }
 
 int    Session::get_key(const std::string& username) const {
-    for (std::map<int, User>::iterator it = _cookies.begin(); it != _cookies.end(); it++) {
-        if (it->second.name == username) {
+    for (std::map<int, User>::const_iterator it = _cookies.begin(); it != _cookies.end(); it++) {
+        if (it->second.name == username)
             return it->first;
     }
     return false;
 }
 
 bool    Session::password_correct(int key, const std::string& password) const {
-    std::map<int, User>::iterator it = _cookies.find(key);
+    std::map<int, User>::const_iterator it = _cookies.find(key);
 
     if (it != _cookies.end() && it->second.pass == password)
         return true;
