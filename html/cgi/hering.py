@@ -9,44 +9,29 @@ import os
 import cgi
 import http.cookies
 
-def main():
-    if os.environ.get("HTTP_COOKIE") is not None:
-        cookie_string = os.environ.get("HTTP_COOKIE")
-        print(cookie_string)
-    else:
-        print('No cookies env')
 
-
-
-    cookie = http.cookies.SimpleCookie(os.environ.get("HTTP_COOKIE"))
-
-    if 'key' in cookie:
-        # Print the HTTP header
-        print("SCRIPT WORKED, COOKIE FOUND")
-        file_path = "html/hering.html"
-    else:
-        # Print the HTTP header
-        print("SCRIPT WORKED, no cookies")
-        file_path = "html/login.html"
-    try:
-        open(file_path)
-    except:
-        print("HTML NOT FOUND, cwd = ")
-        print(os.getcwd())
-        return
-    # Open the file in read mode
-    with open(file_path, 'r') as file:
-    # Read the contents of the file into a variable
-        content = file.read()
-
+cookie = http.cookies.SimpleCookie(os.environ.get("HTTP_COOKIE"))
+if 'key' in cookie:
+    # Print the HTTP header
+    file_path = "html/cgi/src/hering.html"
+else:
+    # Print the HTTP header
+    print("SCRIPT WORKED, no cookies")
+    file_path = "html/login.html"
+try:
+    open(file_path)
+except:
+    print("HTML NOT FOUND, cwd = ")
+    print(os.getcwd())
+    exit()
+# Open the file in read mode
+with open(file_path, 'r') as file:
+# Read the contents of the file into a variable
+    content = file.read()
 # If the requested file was not found, return "other.html"
-    if content is None:
-        content = "COULD NOT READ FROM FILE"
-    print(content)
-
-
-if __name__ == "__main__":
-    main()
+if content is None:
+    content = "COULD NOT READ FROM FILE"
+print(content)
 
 
 

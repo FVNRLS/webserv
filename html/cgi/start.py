@@ -1,5 +1,3 @@
-# if cookie is not present, the script will redirect to another html page where user is prompted to log in
-
 import os
 import cgi
 import http.cookies
@@ -11,7 +9,8 @@ if 'key' in cookie:
     # Print the HTTP header
     file_path = "html/cgi/src/logged.html"
 else:
-    file_path = "html/login.html"
+    # Print the HTTP header
+    file_path = "html/start.html"
 try:
     open(file_path)
 except:
@@ -27,4 +26,3 @@ with open(file_path, 'r') as file:
 if content is None:
     content = "COULD NOT READ FROM FILE"
 print(content)
-
