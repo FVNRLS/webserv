@@ -5,7 +5,8 @@ import cgi
 
 
 def main():
-    file_path = "../html/startpage_logged.html"
+   
+    file_path = "html/logged.html"
     try:
         open(file_path)
     except:

@@ -3,7 +3,7 @@
 
 //BASIC CLASS SETUP
 POSTRequest::POSTRequest(request_handler &request, Session &cookies)
-        : _request(request), _cookie(cookies), _environment(_request) {}
+        : _request(request), _environment(_request), _cookie(cookies) {}
 
 POSTRequest::~POSTRequest() {}
 

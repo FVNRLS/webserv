@@ -12,7 +12,7 @@ import http.cookies
 def main():
     if os.environ.get("HTTP_COOKIE") is not None:
         cookie_string = os.environ.get("HTTP_COOKIE")
-        print(cookie_string);
+        print(cookie_string)
     else:
         print('No cookies env')
 
@@ -23,11 +23,11 @@ def main():
     if 'key' in cookie:
         # Print the HTTP header
         print("SCRIPT WORKED, COOKIE FOUND")
-        file_path = "../html/hering.html"
+        file_path = "html/hering.html"
     else:
         # Print the HTTP header
         print("SCRIPT WORKED, no cookies")
-        file_path = "../html/login.html"
+        file_path = "html/login.html"
     try:
         open(file_path)
     except:
