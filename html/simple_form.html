@@ -47,12 +47,24 @@
 </body>
 </html>
 
- -->
- <html>
+-->
+<html>
     <body>
-       <form enctype = "multipart/form-data" action = "hering/upload.py" method = "post">
-       <p>File: <input type = "file" name = "name" /></p>
-       <p><input type = "submit" value = "Upload" /></p>
-       </form>
+        <form enctype = "multipart/form-data" action = "hering/upload.py" method = "post">
+        <p>File: <input type = "file" name = "name" /></p>
+        <p><input type = "submit" value = "Upload" /></p>
+        </form>
+        </br>
+        <h1>Please log in to meet Hering</h1>
+        <form action="/cgi-bin/your-script.cgi" method="post">
+        <label for="username">Username:</label>
+        <input type="username" id="username" name="password">
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+        <input type="submit" value="Log in">
+        </form>
     </body>
-    </html>
+</html>
+
+
