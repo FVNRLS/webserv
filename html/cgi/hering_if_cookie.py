@@ -14,26 +14,56 @@ def main():
     cookies = http.cookies.SimpleCookie(os.environ.get("HTTP_COOKIE"))
 
     # Check if the cookie is present
-    if "my_cookie" in cookies:
+    if cookies:
         # Print the HTTP header
-        print("Content-Type: text/html")
-        print()
-        # Print the HTML code
-        print("""
-        <html>
-        <body>
-            <img src="image.jpg" alt="My Image">
-        </body>
-        </html>
-        """)
+        print("SCRIPT WORKED, COOKIE FOUND")
+        file_path = "/Users/hoomen/webserv/html/hering.html"
     else:
-        # Print an error message
-        print("Content-Type: text/html")
-        print()
-        print("<html><body><h1>Cookie not found!</h1></body></html>")
+        # Print the HTTP header
+        print("SCRIPT WORKED, no cookies")
+        file_path = "/Users/hoomen/webserv/html/login.html"
+    try:
+        open(file_path)
+    except:
+        print("HTML NOT FOUND, cwd = ")
+        print(os.getcwd())
+        return
+    # Open the file in read mode
+    with open(file_path, 'r') as file:
+    # Read the contents of the file into a variable
+        content = file.read()
+
+# If the requested file was not found, return "other.html"
+    if content is None:
+        content = "COULD NOT READ FROM FILE"
+    print(content)
+
 
 if __name__ == "__main__":
     main()
+
+
+
+# Get the requested page name from the query string
+
+# page_name = os.environ.get("QUERY_STRING", "")
+
+# # Construct the full file path
+# file_path = "pages/{}.html".format(page_name)
+
+# # Read the requested file
+# content = read_file(file_path)
+
+# # If the requested file was not found, return "other.html"
+# if content is None:
+#     file_path = "pages/other.html"
+#     content = read_file(file_path)
+
+# # Return the content as an HTTP response
+# print("Content-Type: text/html")
+# print("")
+# print(content)
+
 
 # TO REDIRECT TO ANOTHER HTML PAGE:
 # give me html code to display another html page

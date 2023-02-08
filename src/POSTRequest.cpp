@@ -30,4 +30,5 @@ int POSTRequest::check_for_cookies() {
 	pass += std::strlen("password=");
 
 	_request.cookies = _cookie.create(_request.query.substr(name, end), _request.query.substr(pass));
+	return EXIT_SUCCESS;
 }
