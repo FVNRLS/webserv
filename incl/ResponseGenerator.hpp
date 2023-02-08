@@ -36,5 +36,5 @@ public:
 	ResponseGenerator(ResponseGenerator &src);
 	~ResponseGenerator();
 
-	std::string			generate_response();
+	std::string			generate_response(Session &cookie);
 };

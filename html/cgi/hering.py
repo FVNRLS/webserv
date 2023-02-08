@@ -10,18 +10,24 @@ import cgi
 import http.cookies
 
 def main():
-    # Get cookie from the environment
-    cookies = http.cookies.SimpleCookie(os.environ.get("HTTP_COOKIE"))
+    if os.environ.get("HTTP_COOKIE") is not None:
+        cookie_string = os.environ.get("HTTP_COOKIE")
+        print(cookie_string);
+    else:
+        print('No cookies env')
 
-    # Check if the cookie is present
-    if cookies:
+
+
+    cookie = http.cookies.SimpleCookie(os.environ.get("HTTP_COOKIE"))
+
+    if 'key' in cookie:
         # Print the HTTP header
         print("SCRIPT WORKED, COOKIE FOUND")
-        file_path = "/Users/hoomen/webserv/html/hering.html"
+        file_path = "../html/hering.html"
     else:
         # Print the HTTP header
         print("SCRIPT WORKED, no cookies")
-        file_path = "/Users/hoomen/webserv/html/login.html"
+        file_path = "../html/login.html"
     try:
         open(file_path)
     except:

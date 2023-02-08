@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/07 17:30:58 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/08 18:17:18 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ int Server::handle_pollout(pollfd &pfd) {
 	request = &_requests.find(pfd.fd)->second;
 	std::cout << request->buf << std::endl;
 	ResponseGenerator resp_gen(*request);
-	response = resp_gen.generate_response();
+	response = resp_gen.generate_response(_cookies);
 	if (!response.empty()) {
 		if (send(pfd.fd, response.c_str(), response.length(), 0) == EXIT_FAILURE) //todo: check if chunked!
 			return EXIT_FAILURE;
@@ -161,6 +161,7 @@ int Server::handle_request_header(request_handler &request) {
 		return BAD_REQUEST;
 	request.method = tokens[0];
 	split_query(request, tokens[1]);
+	check_cookies(request);
 	return check_requested_url(request);
 }
 
@@ -172,6 +173,17 @@ void	Server::split_query(request_handler& request, std::string& url) {
 		request.query = url.substr(position + 1);
 		request.body_length = request.query.length();
 	}
+}
+
+void	Server::check_cookies(request_handler &request) {
+	size_t position = request.buf.find("Cookie: key=");
+
+	if (position == std::string::npos)
+		return;
+	position += std::strlen("Cookie: key=");
+	request.cookies = std::atoi(request.buf.substr(position).c_str());
+	if (!_cookies.exists(request.cookies))
+		request.cookies = false;
 }
 
 int	Server::check_requested_url(request_handler &request) {

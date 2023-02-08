@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:52 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/08 15:18:17 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/08 18:11:37 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ private:
 	std::vector<pollfd>					_pfds;
 	CLI									_cli;
 	std::map<int, request_handler>		_requests;
+    Session                             _cookies;
 
 
 
@@ -37,6 +38,7 @@ private:
 	size_t						get_body_length(request_handler &request);
 	std::vector<std::string>	tokenize_first_line(std::string& request);
 	void						split_query(request_handler& request, std::string& url);
+	void						check_cookies(request_handler &request);
 	int							check_requested_url(request_handler& request);
 	int							check_main_configs(request_handler& request, std::vector<std::string>& locations);
 	int							check_location_config(request_handler& request, std::vector<std::string>& locations);

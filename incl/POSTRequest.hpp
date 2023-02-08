@@ -14,12 +14,12 @@ private:
 	CGI					_cgi;
 	request_handler&	_request;
 	Env					_environment;
-	Session				_cookie;
+	Session				&_cookie;
 
 	int		check_for_cookies();
-	int		set_interpreter_path();
+
 public:
-	POSTRequest(request_handler &request);
+	POSTRequest(request_handler &request, Session &cookies);
 	~POSTRequest();
 
 	int		create_response(std::string &response);

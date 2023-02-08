@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/07 18:13:52 by doreshev          #+#    #+#             */
-/*   Updated: 2023/02/08 15:19:24 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/08 18:16:24 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,12 @@ int Session::create(const std::string& username, const std::string& password) {
     key = generate_key();
     _cookies[key] = User(username, password);
     return key;
+}
+
+bool    Session::exists(const int& key) const {
+    if (_cookies.find(key) == _cookies.end())
+        return false;
+    return true;
 }
 
 int    Session::get_key(const std::string& username) const {

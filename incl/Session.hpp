@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/07 18:12:06 by doreshev          #+#    #+#             */
-/*   Updated: 2023/02/08 13:08:47 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/08 18:40:39 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ public:
 	~Session();
 
 	int				create(const std::string& username, const std::string& password);
+	bool    		exists(const int& key) const;
 	std::string		username(const int& key) const;
 	void			delete_session(const int& key);
 

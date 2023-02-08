@@ -2,7 +2,8 @@
 #include "POSTRequest.hpp"
 
 //BASIC CLASS SETUP
-POSTRequest::POSTRequest(request_handler &request) : _request(request), _environment(_request) {}
+POSTRequest::POSTRequest(request_handler &request, Session &cookies)
+        : _request(request), _cookie(cookies), _environment(_request) {}
 
 POSTRequest::~POSTRequest() {}
 
@@ -29,6 +30,6 @@ int POSTRequest::check_for_cookies() {
 		return EXIT_FAILURE;
 	pass += std::strlen("password=");
 
-	_request.cookies = _cookie.create(_request.query.substr(name, end), _request.query.substr(pass));
+	_request.cookies = _cookie.create(_request.query.substr(name, end - name), _request.query.substr(pass));
 	return EXIT_SUCCESS;
 }

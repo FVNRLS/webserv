@@ -22,14 +22,14 @@ ResponseGenerator::ResponseGenerator(ResponseGenerator &src)
 ResponseGenerator::~ResponseGenerator() {}
 
 // MEMBER FUNCTIONS
-std::string ResponseGenerator::generate_response() {
+std::string ResponseGenerator::generate_response(Session &cookie) {
   if (_request.status == EXIT_SUCCESS) {
     if (_request.method == "GET") {
       GETRequest get(_request);
       _request.status = get.create_response(_response_body);
     }
     else if (_request.method == "POST") {
-      POSTRequest post(_request);
+      POSTRequest post(_request, cookie);
       _request.status = post.create_response(_response_body);
     }
     else if (_request.method == "DELETE") {
@@ -66,8 +66,8 @@ std::string ResponseGenerator::generate_response_header(int status_code) {
 		status_code = OK;
 
 	std::string cookies;
-	if (_request.cookies == true)
-		cookies = "\nSet-Cookie: " + toString<int>(_request.cookies);
+	if (_request.cookies)
+		cookies = "\nSet-Cookie: key=" + toString<int>(_request.cookies);
 	
     return  "HTTP/1.1 " + toString(status_code) + " " +
             _reasonPhrases.find(status_code)->second +
