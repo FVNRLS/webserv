@@ -15,4 +15,5 @@ struct request_handler { //todo: delete item from map
 	std::vector<std::string>						env;
 	std::string													interpreter;
 	std::string													query;
+	std::vector<std::string>						cookies;
 };

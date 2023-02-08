@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ResponseGenerator.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 12:20:38 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/07 17:38:11 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/08 08:50:18 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,8 @@ std::string ResponseGenerator::generate_response_header(int status_code) {
           _reasonPhrases.find(status_code)->second +
           "\nContent-Type: text/html\nContent-Length: " +
           toString(_response_body.length()) +
+          "\nSet-Cookie: color_theme=orange" +
+          "\nSet-Cookie: image=cat" +
           END_OF_REQUEST;
 }
 
