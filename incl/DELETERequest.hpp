@@ -21,5 +21,5 @@ public:
 	DELETERequest();
 	~DELETERequest();
 
-	int 		create_response(const request_handler &request);
+	int		create_response(const request_handler &request);
 };

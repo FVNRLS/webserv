@@ -13,7 +13,7 @@
 #include "GETRequest.hpp"
 
 //BASIC CLASS SETUP
-GETRequest::GETRequest(request_handler& request) : _request(request), _environment(request)  {}
+GETRequest::GETRequest(request_handler& request) : _request(request), _environment(request) {}
 
 GETRequest::~GETRequest() {}
 

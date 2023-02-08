@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   defines.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
+/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 13:28:14 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/02 10:38:56 by hoomen           ###   ########.fr       */
+/*   Updated: 2023/02/08 12:56:08 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,9 @@ void	print_vector(T vector, size_t size) {
 
 //CHARACTERS
 enum chars {
-	NOT_FOUND 			= (-1),
-	SPEC_IDENTIFIER 	= (-2),
-	OPEN_CURLY_BRACE 	= '{',
+	NOT_FOUND			= (-1),
+	SPEC_IDENTIFIER		= (-2),
+	OPEN_CURLY_BRACE	= '{',
 	CLOSED_CURLY_BRACE	= '}',
 	NEWLINE				= '\n',
 	SPACE				= ' ',
@@ -67,20 +67,20 @@ enum num_constants {
 //STRINGS SEPARATORS
 const std::string STR_CLOSED_CURLY_BRACE	=	"}";
 const std::string STR_SEMICOLON 			=	";";
-const std::string EQUAL_SIGN 				=	"=";
+const std::string EQUAL_SIGN				=	"=";
 const std::string EMPTY_STRING;
 
 //DEFAULT STRING CONSTANTS
-const std::string RESPONSE_HEADER 			= "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: ";
-const std::string DEFAULT_CONF_PATH 		= "config/clion_test.conf";
-const std::string DEFAULT_INDEX_PAGE 		= "html/index.html";
+const std::string RESPONSE_HEADER			= "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: ";
+const std::string DEFAULT_CONF_PATH			= "config/clion_test.conf";
+const std::string DEFAULT_INDEX_PAGE		= "html/index.html";
 const std::string DEFAULT_ERROR_PAGES_DIR 	= "html/error_pages/";
-const std::string DEFAULT_REDIR_FIRST 		= "config";
-const std::string DEFAULT_REDIR_SECOND 		= "welcome page"; //unsure about the values
-const std::string DEFAULT_CGI_PATH 			= "config/cgi/cgi.py"; //unsure about the values
+const std::string DEFAULT_REDIR_FIRST		= "config";
+const std::string DEFAULT_REDIR_SECOND		= "welcome page"; //unsure about the values
+const std::string DEFAULT_CGI_PATH			= "config/cgi/cgi.py"; //unsure about the values
 const std::string DEFAULT_PAGE_ERROR		= "SERVER ERROR: ERROR PAGE UNAVAILABLE!"; //if error page can not be opened
 const std::string END_OF_REQUEST			= "\r\n\r\n";
-const std::string DEFAULT_UPLOAD_DIR        = "../uploads/"; //todo change to work with makefile
+const std::string DEFAULT_UPLOAD_DIR		= "../uploads/"; //todo change to work with makefile
 #define DATABASE_PATH "../upload/data.txt" //todo change to work with makefile
 #define OK_PAGE "../html/200.html"
 #define PHP_PATH "/usr/bin/php"

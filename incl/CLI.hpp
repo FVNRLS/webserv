@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CLI.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rmazurit <rmazurit@student.42.fr>          +#+  +:+       +#+        */
+/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/22 13:36:33 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/22 13:36:33 by rmazurit         ###   ########.fr       */
+/*   Updated: 2023/02/08 12:49:43 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,9 @@ public:
 	CLI &operator=(const CLI &src);
 	~CLI();
 
-	int 	start();
-	int 	check_input();
-	int 	read_input();
+	int		start();
+	int		check_input();
+	int		read_input();
 
-	pollfd 	get_pollfd();
+	pollfd	get_pollfd();
 };
