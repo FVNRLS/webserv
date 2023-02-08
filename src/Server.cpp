@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/07 17:30:58 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/08 10:05:25 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ int Server::handle_pollout(pollfd &pfd) {
 	std::string 		response;
 
 	request = &_requests.find(pfd.fd)->second;
-	std::cout << request->buf << std::endl;
+	std::cout << request->raw << std::endl;
 	ResponseGenerator resp_gen(*request);
 	response = resp_gen.generate_response();
 	if (!response.empty()) {
@@ -129,13 +129,13 @@ int Server::check_connection(pollfd &pfd) {
 }
 
 int	Server::accumulate(request_handler &request, int request_fd) {
-	char 										buffer[2000];
+	char 										rawfer[2000];
 	long 										bytes;
 
-	bytes = recv(request_fd, buffer, sizeof(buffer), MSG_DONTWAIT);
+	bytes = recv(request_fd, rawfer, sizeof(rawfer), MSG_DONTWAIT);
 	if (bytes < 0)
 		return (system_call_error(RECV_ERROR));
-	request.buf += std::string(buffer, bytes);
+	request.raw += std::string(rawfer, bytes);
 	set_request_end_flags(request);
 	return EXIT_SUCCESS;
 }
@@ -143,11 +143,11 @@ int	Server::accumulate(request_handler &request, int request_fd) {
 void	Server::set_request_end_flags(request_handler &request) {
 	long long	max_client_body_size = request.socket.get_config().get_max_client_body_size();
 
-	if ((static_cast<long long>(request.buf.length()) > max_client_body_size)) {
+	if ((static_cast<long long>(request.raw.length()) > max_client_body_size)) {
 		request.status = BAD_REQUEST;
 		return;
 	}
-	request.head_length = request.buf.find(END_OF_REQUEST);
+	request.head_length = request.raw.find(END_OF_REQUEST);
 	if (request.head_length != std::string::npos) {
 		request.head_length += std::strlen(END_OF_REQUEST.c_str());
 		request.head_received = true;
@@ -155,7 +155,7 @@ void	Server::set_request_end_flags(request_handler &request) {
 }
 
 int Server::handle_request_header(request_handler &request) {
-	std::vector<std::string> tokens = tokenize_first_line(request.buf);
+	std::vector<std::string> tokens = tokenize_first_line(request.raw);
 
 	if (tokens.size() < 3)
 		return BAD_REQUEST;
@@ -193,7 +193,7 @@ int	Server::check_main_configs(request_handler &request, std::vector<std::string
 		return METHOD_NOT_ALLOWED;
 	request.file_path = get_server_filepath(request, locations);
 	request.body_length = get_body_length(request);
-	if(request.buf.size() >= request.head_length + request.body_length)
+	if(request.raw.size() >= request.head_length + request.body_length)
 		request.body_received = true;
 	return EXIT_SUCCESS;
 }
@@ -207,7 +207,7 @@ int Server::check_location_config(request_handler &request, std::vector<std::str
 		return METHOD_NOT_ALLOWED;
 	request.file_path = get_location_filepath(loc, locations);
 	request.body_length = get_body_length(request);
-	if(request.buf.size() >= request.head_length + request.body_length)
+	if(request.raw.size() >= request.head_length + request.body_length)
 		request.body_received = true;
 	return check_allowed_scripts(loc, request);
 }
@@ -265,8 +265,8 @@ size_t Server::get_body_length(request_handler &request) {
 	if (request.method == "GET")
 		return 0;
 
-	size_t pos = request.buf.find("Content-Length: ");
-	size_t length = static_cast<size_t> (std::atoll(request.buf.data() + pos + std::strlen("Content-Length: ")));
+	size_t pos = request.raw.find("Content-Length: ");
+	size_t length = static_cast<size_t> (std::atoll(request.raw.data() + pos + std::strlen("Content-Length: ")));
 	return length;
 }
 
@@ -332,7 +332,7 @@ int Server::process_request(const Socket &socket, pollfd &poll_fd) {
 }
 
 int Server::serve_on_virtual_host(const Socket &socket, pollfd &poll_fd) {
-	char				buf[4096];
+	char				raw[4096];
 	int 				client_socket;
 	std::string 		domain;
 	std::stringstream	ss;
@@ -344,8 +344,8 @@ int Server::serve_on_virtual_host(const Socket &socket, pollfd &poll_fd) {
 	alias = socket.get_config().get_alias();
 
 	client_socket = accept(poll_fd.fd, NULL, NULL);
-	recv(client_socket, buf, 4096, 0);
-	ss << recv(client_socket, buf, 4096, 0);
+	recv(client_socket, raw, 4096, 0);
+	ss << recv(client_socket, raw, 4096, 0);
 	request = ss.str();
 
 	//todo: probalby unuseful! but that's how we can get the domain name!

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 12:56:14 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/01/23 14:50:37 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/08 10:32:50 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,14 @@ struct	location {
 	std::string					root;	//if root empty -> uses the server_root
 	std::string					index;
 	std::vector<std::string>	methods;
-	long long 					max_client_body_size; // limit on body sent from client;
+	long long 					max_client_body_size(); // limit on body sent from client;
 	bool 						directory_listing;
 	std::string 				limit_client_body_size; //limit_client_body_size - authorization header;
 	std::string 				cgi_path;
 	std::vector<std::pair<std::string, std::string> >	redirect;
 	std::vector<std::pair<std::string, std::string> >	scripts;
+
+	location() {};
 };
 
 class Config {
