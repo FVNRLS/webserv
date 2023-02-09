@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:52 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/08 18:11:37 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/09 11:17:25 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ private:
 	int							check_requested_url(request_handler& request);
 	int							check_main_configs(request_handler& request, std::vector<std::string>& locations);
 	int							check_location_config(request_handler& request, std::vector<std::string>& locations);
-	int							check_allowed_scripts(location& loc, request_handler& request);
+	void						set_interpreter(location& loc, request_handler& request);
 	location					get_location_config(request_handler &request, std::vector<std::string>& locations);
 	int							check_method(const std::vector<std::string> &methods, std::string &method);
 	std::string					get_server_filepath(request_handler& request, std::vector<std::string> &locations);

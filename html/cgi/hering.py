@@ -9,7 +9,6 @@ import os
 import cgi
 import http.cookies
 
-
 cookie = http.cookies.SimpleCookie(os.environ.get("HTTP_COOKIE"))
 if 'key' in cookie:
     # Print the HTTP header

@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/08 18:17:18 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/09 12:34:50 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,9 +105,13 @@ int Server::handle_pollout(pollfd &pfd) {
 	std::cout << request->buf << std::endl;
 	ResponseGenerator resp_gen(*request);
 	response = resp_gen.generate_response(_cookies);
+
 	if (!response.empty()) {
-		if (send(pfd.fd, response.c_str(), response.length(), 0) == EXIT_FAILURE) //todo: check if chunked!
-			return EXIT_FAILURE;
+		ssize_t	bytes = 0;
+		ssize_t	length = response.size();
+		while (length > bytes) {
+			bytes += send(pfd.fd, response.data() + bytes, length - bytes, 0);
+		}
         memset(request, 0, sizeof(request_handler));
 	}
 	close(pfd.fd);
@@ -193,7 +197,7 @@ int	Server::check_requested_url(request_handler &request) {
 		case 0:
 			return check_main_configs(request, locations);
 		case 1:
-			if(locations[0].find(".html") != std::string::npos)
+			if(locations[0].find('.', locations[0].find('?')) != std::string::npos)
 				return check_main_configs(request, locations);
 		default:
 			return check_location_config(request, locations);
@@ -221,22 +225,19 @@ int Server::check_location_config(request_handler &request, std::vector<std::str
 	request.body_length = get_body_length(request);
 	if(request.buf.size() >= request.head_length + request.body_length)
 		request.body_received = true;
-	return check_allowed_scripts(loc, request);
+    set_interpreter(loc, request);
+	return request.status;
 }
 
-int Server::check_allowed_scripts(location& loc, request_handler& request) {
-	if (request.file_path.find(".html") != std::string::npos)
-        return EXIT_SUCCESS;
-
+void Server::set_interpreter(location& loc, request_handler& request) {
     size_t index = request.file_path.find_last_of('.');
 	std::string extension = request.file_path.substr(index + 1);
 	for (size_t	i = 0; i < loc.scripts.size(); i++) {
 		if (extension == loc.scripts[i].first) {
 			request.interpreter = loc.scripts[i].second;
-			return EXIT_SUCCESS;
+			break;
 		}
 	}
-	return METHOD_NOT_ALLOWED;
 }
 
 location	Server::get_location_config(request_handler &request, std::vector<std::string> &locations) {

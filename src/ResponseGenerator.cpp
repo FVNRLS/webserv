@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 12:20:38 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/08 13:38:56 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/09 11:38:53 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,8 @@ std::string ResponseGenerator::create_error_code_response(int status_code) {
 std::string ResponseGenerator::generate_response_header(int status_code) {
 	if (status_code == EXIT_SUCCESS)
 		status_code = OK;
-
+  
+  std::cerr << _request.file_path << '\n';
 	std::string cookies;
 	if (_request.cookies)
 		cookies = "\nSet-Cookie: key=" + toString<int>(_request.cookies);
