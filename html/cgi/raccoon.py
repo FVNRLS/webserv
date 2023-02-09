@@ -12,9 +12,10 @@ import http.cookies
 cookie = http.cookies.SimpleCookie(os.environ.get("HTTP_COOKIE"))
 if 'key' in cookie:
     # Print the HTTP header
-    file_path = "html/cgi/src/hering.html"
+    file_path = "html/cgi/src/raccoon.html"
 else:
     # Print the HTTP header
+    print("SCRIPT WORKED, no cookies")
     file_path = "html/login.html"
 try:
     open(file_path)

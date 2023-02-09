@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/09 12:34:50 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/09 15:24:39 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,18 +98,14 @@ int Server::handle_pollin(pollfd &pfd) {
 }
 
 int Server::handle_pollout(pollfd &pfd) {
-	request_handler*	request;
-	std::string 		response;
-
-	request = &_requests.find(pfd.fd)->second;
-	std::cout << request->buf << std::endl;
+	request_handler* request = &_requests.find(pfd.fd)->second;
+	
 	ResponseGenerator resp_gen(*request);
-	response = resp_gen.generate_response(_cookies);
-
+	std::string  response = resp_gen.generate_response(_cookies);
 	if (!response.empty()) {
 		ssize_t	bytes = 0;
 		ssize_t	length = response.size();
-		while (length > bytes) {
+		while (bytes < length) {
 			bytes += send(pfd.fd, response.data() + bytes, length - bytes, 0);
 		}
         memset(request, 0, sizeof(request_handler));
@@ -164,19 +160,10 @@ int Server::handle_request_header(request_handler &request) {
 	if (tokens.size() < 3)
 		return BAD_REQUEST;
 	request.method = tokens[0];
-	split_query(request, tokens[1]);
 	check_cookies(request);
+	split_query(request, tokens[1]);
+	request.cookies = check_logout(request.cookies, request.query);
 	return check_requested_url(request);
-}
-
-void	Server::split_query(request_handler& request, std::string& url) {
-	size_t position = url.find('?');
-	request.file_path = url.substr(0, position);
-
-	if (position != std::string::npos) {
-		request.query = url.substr(position + 1);
-		request.body_length = request.query.length();
-	}
 }
 
 void	Server::check_cookies(request_handler &request) {
@@ -189,6 +176,25 @@ void	Server::check_cookies(request_handler &request) {
 	if (!_cookies.exists(request.cookies))
 		request.cookies = false;
 }
+
+void	Server::split_query(request_handler& request, std::string& url) {
+	size_t position = url.find('?');
+	request.file_path = url.substr(0, position);
+
+	if (position != std::string::npos) {
+		request.query = url.substr(position + 1);
+		request.body_length = request.query.length();
+	}
+}
+
+int	Server::check_logout(const int &key, const std::string &query) {
+	if (key && query.find("action=logout") != std::string::npos) {
+		_cookies.delete_session(key);
+		return false;
+	}
+	return key;
+}
+
 
 int	Server::check_requested_url(request_handler &request) {
 	std::vector<std::string> locations = split(request.file_path, '/');

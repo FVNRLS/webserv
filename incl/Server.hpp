@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:52 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/09 11:17:25 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/09 15:24:52 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,9 @@ private:
 	int 						handle_request_header(request_handler& request);
 	size_t						get_body_length(request_handler &request);
 	std::vector<std::string>	tokenize_first_line(std::string& request);
-	void						split_query(request_handler& request, std::string& url);
 	void						check_cookies(request_handler &request);
+	void						split_query(request_handler& request, std::string& url);
+	int							check_logout(const int &key, const std::string &query);
 	int							check_requested_url(request_handler& request);
 	int							check_main_configs(request_handler& request, std::vector<std::string>& locations);
 	int							check_location_config(request_handler& request, std::vector<std::string>& locations);
