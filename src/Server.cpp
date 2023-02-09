@@ -438,7 +438,10 @@ void	Server::print_configurations() {
 }
 
 void 	Server::show_manual() {
-	std::cout << "CALLED HELP\n";
+	std::cout << "Let me help you!\nSIGINT was silenced in order to close webserver correctly!\n"
+    << "Commands:\n"
+    << "ls     prints server configuration\n"
+    << "exit   exits webserver properly!\n";
 }
 
 
