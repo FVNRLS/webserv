@@ -1,5 +1,3 @@
-# if cookie is not present, the script will redirect to another html page where user is prompted to log in
-
 import os
 import cgi
 import http.cookies

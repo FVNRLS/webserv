@@ -1,28 +1,5 @@
 import cgi, fileinput, os, sys, http.cookies
 
-
-cookie = http.cookies.SimpleCookie(os.environ.get("HTTP_COOKIE"))
-if 'key' in cookie:
-    # Print the HTTP header
-    file_path = "html/cgi/src/hering.html"
-else:
-    # Print the HTTP header
-    print("SCRIPT WORKED, no cookies")
-    file_path = "html/login.html"
-try:
-    open(file_path)
-except:
-    print("HTML NOT FOUND, cwd = ")
-    print(os.getcwd())
-    exit()
-# Open the file in read mode
-with open(file_path, 'r') as file:
-# Read the contents of the file into a variable
-    content = file.read()
-# If the requested file was not found, return "other.html"
-if content is None:
-    content = "COULD NOT READ FROM FILE"
-
 try:
 	parsed = cgi.FieldStorage()
 	# # message = parsed['name']
@@ -36,14 +13,44 @@ try:
 		path += "/uploads/"
 		path += fn
 		if (os.path.exists(path)):
-			message = 'File already exists'
+			content = 'File already exists!'
 		else:
 			open(path, 'wb').write(fileitem.file.read())
+			content = 'Success!'
 	else:
-	    content = 'No file was uploaded'
+	    content = 'File is not uploaded!'
 except:
-	message = 'EXCEPTION: No file was uploaded'
+	content = 'File is not uploaded!'
 
 
-# todo this is actually already generating a header (Content-Type: .... )
-print(content)
+print("""\
+<html>
+  <head>
+    <title>Upload Status</title>
+    <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button a {
+      color: #fff;
+      text-decoration: none;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>Status of Upload</h1>
+    <p>%s</p>
+    <button><a href="javascript:history.back()">Back</a></button>
+  </body>
+</html>
+""" % (content))
