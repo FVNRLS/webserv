@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+         #
+#    By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/11/26 23:28:55 by hoomen            #+#    #+#              #
-#    Updated: 2023/02/08 16:01:23 by hoomen           ###   ########.fr        #
+#    Updated: 2023/02/09 17:00:20 by doreshev         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,7 +30,7 @@ DDIR		=	$(ODIR)/.deps
 DEP			=	$(SRC:%.cpp=$(DDIR)/%.d)
 
 
-.PHONY : all clean fclean re run
+.PHONY : all clean fclean re run bonus
 
 $(NAME) : $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) -o $@
@@ -56,6 +56,8 @@ re : fclean all
 
 run : $(NAME)
 	./$(NAME) config/vs_code.conf
+
+bonus: all
 
 $(DEP):
 -include $(DEP)
