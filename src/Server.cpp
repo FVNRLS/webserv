@@ -53,7 +53,6 @@ int Server::accept_requests() {
 	socklen_t 			client_len;
 	struct sockaddr 	client_addr = {};
 	pollfd				client_pollfd = {};
-	request_handler		request = {};
 
 	for (size_t i = 1; i < _sockets.size(); i++) {
 		if (_pfds[i].revents & POLLIN) {
@@ -65,8 +64,8 @@ int Server::accept_requests() {
 				return EXIT_FAILURE;
 			client_pollfd.events = POLLIN;
 			_pfds.push_back(client_pollfd);
-			request.socket = _sockets[i];
-			_requests[client_pollfd.fd] = request;
+			_requests[client_pollfd.fd] = request_handler();
+            _requests[client_pollfd.fd].socket = _sockets[i];
 		}
 	}
 	return EXIT_SUCCESS;
@@ -108,9 +107,10 @@ int Server::handle_pollout(pollfd &pfd) {
 		while (bytes < length) {
 			bytes += send(pfd.fd, response.data() + bytes, length - bytes, 0);
 		}
-        memset(request, 0, sizeof(request_handler));
+        _requests.erase(pfd.fd);
 	}
 	close(pfd.fd);
+    pfd.fd = -1;
 	return EXIT_SUCCESS;
 }
 

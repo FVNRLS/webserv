@@ -16,4 +16,8 @@ struct request_handler { //todo: delete item from map
 	std::string						interpreter;
 	std::string						query;
 	int								cookies;
+
+    request_handler ();
+    request_handler(const request_handler &src);
+    request_handler& operator= (const request_handler &rhs);
 };

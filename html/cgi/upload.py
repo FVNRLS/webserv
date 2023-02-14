@@ -11,6 +11,8 @@ try:
 		fn = os.path.basename(fileitem.filename)
 		path = os.path.abspath(os.getcwd())
 		path += "/uploads/"
+		if not os.path.exists(path):
+			os.mkdir(path)
 		path += fn
 		if (os.path.exists(path)):
 			content = 'File already exists!'
