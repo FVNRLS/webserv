@@ -6,7 +6,7 @@
 /*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/14 15:49:00 by hoomen           ###   ########.fr       */
+/*   Updated: 2023/02/14 16:47:33 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,7 +208,6 @@ int	Server::check_requested_url(request_handler &request) {
 	std::vector<std::string> locations = split(request.file_path, '/');
 
 	if (request.method == "POST" && empty_request(request.buf))
-		return NO_CONTENT;
 		return NO_CONTENT;
 	switch (locations.size()) {
 		case 0:
