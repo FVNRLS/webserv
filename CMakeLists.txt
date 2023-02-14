@@ -40,6 +40,9 @@ add_executable(webserver
         src/DELETERequest.cpp
         incl/DELETERequest.hpp
 
+        src/Session.cpp
+        incl/Session.hpp
+
         src/CGI.cpp
         incl/CGI.hpp
 
@@ -49,5 +52,5 @@ add_executable(webserver
         #TOOLS
         src/tools.cpp
         incl/tools.hpp
-        src/Session.cpp incl/Session.hpp src/request_handler.cpp)
+        )
 
