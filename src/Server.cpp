@@ -209,7 +209,6 @@ int	Server::check_requested_url(request_handler &request) {
 
 	if (request.method == "POST" && empty_request(request.buf))
 		return NO_CONTENT;
-		return NO_CONTENT;
 	switch (locations.size()) {
 		case 0:
 			return check_main_configs(request, locations);
