@@ -21,7 +21,7 @@ INCFLAGS = -I incl
 VPATH		= src
 SRC			=	CGI.cpp CLI.cpp Config.cpp ConfigParser.cpp DELETERequest.cpp \
 					Env.cpp GETRequest.cpp main.cpp POSTRequest.cpp ResponseGenerator.cpp \
-					Server.cpp Socket.cpp tools.cpp Session.cpp request_handler.cpp
+					Server.cpp Socket.cpp tools.cpp Session.cpp request_handler.cpp requestParser.cpp \
 
 ODIR		=	obj
 OBJ			=	$(SRC:%.cpp=$(ODIR)/%.o)

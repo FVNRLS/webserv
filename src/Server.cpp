@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
+/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/14 16:47:33 by hoomen           ###   ########.fr       */
+/*   Updated: 2023/02/14 17:50:29 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,36 +156,15 @@ void	Server::set_request_end_flags(request_handler &request) {
 }
 
 int Server::handle_request_header(request_handler &request) {
-	std::vector<std::string> tokens = tokenize_first_line(request.buf);
+    requestParser	request_parser(request);
 
-	if (tokens.size() < 3)
-		return BAD_REQUEST;
-	request.method = tokens[0];
-	check_cookies(request);
-	split_query(request, tokens[1]);
-	request.cookies = check_logout(request.cookies, request.query);
-	return check_requested_url(request);
-}
-
-void	Server::check_cookies(request_handler &request) {
-	size_t position = request.buf.find("Cookie: key=");
-
-	if (position == std::string::npos)
-		return;
-	position += std::strlen("Cookie: key=");
-	request.cookies = std::atoi(request.buf.substr(position).c_str());
+    request_parser.parse();
+    if (request.status)
+        return request.status;
 	if (!_cookies.exists(request.cookies))
 		request.cookies = false;
-}
-
-void	Server::split_query(request_handler& request, std::string& url) {
-	size_t position = url.find('?');
-	request.file_path = url.substr(0, position);
-
-	if (position != std::string::npos) {
-		request.query = url.substr(position + 1);
-		request.body_length = request.query.length();
-	}
+	request.cookies = check_logout(request.cookies, request.query);
+    return request.status;
 }
 
 int	Server::check_logout(const int &key, const std::string &query) {
@@ -195,121 +174,6 @@ int	Server::check_logout(const int &key, const std::string &query) {
 	}
 	return key;
 }
-
-bool Server::empty_request(std::string const& requestbuf) {
-	size_t begin = requestbuf.find("Content-Length: ");
-	begin += std::strlen("Content-Length: ");
-	if (std::atoi(requestbuf.data() + begin) == 0)
-		return true;
-	return false;
-}
-
-int	Server::check_requested_url(request_handler &request) {
-	std::vector<std::string> locations = split(request.file_path, '/');
-
-	if (request.method == "POST" && empty_request(request.buf))
-		return NO_CONTENT;
-	switch (locations.size()) {
-		case 0:
-			return check_main_configs(request, locations);
-		case 1:
-			if(locations[0].find('.', locations[0].find('?')) != std::string::npos)
-				return check_main_configs(request, locations);
-		default:
-			return check_location_config(request, locations);
-	}
-}
-
-int	Server::check_main_configs(request_handler &request, std::vector<std::string> &locations) {
-	if (check_method(request.socket.get_config().get_methods(), request.method) == EXIT_FAILURE)
-		return METHOD_NOT_ALLOWED;
-	request.file_path = get_server_filepath(request, locations);
-	request.body_length = get_body_length(request);
-	if(request.buf.size() >= request.head_length + request.body_length)
-		request.body_received = true;
-	return EXIT_SUCCESS;
-}
-
-int Server::check_location_config(request_handler &request, std::vector<std::string> &locations) {
-	location loc = get_location_config(request, locations);
-
-	if (request.status)
-		return request.status;
-	if (check_method(loc.methods, request.method) == EXIT_FAILURE)
-		return METHOD_NOT_ALLOWED;
-	request.file_path = get_location_filepath(loc, locations);
-	request.body_length = get_body_length(request);
-	if(request.buf.size() >= request.head_length + request.body_length)
-		request.body_received = true;
-    set_interpreter(loc, request);
-	return request.status;
-}
-
-void Server::set_interpreter(location& loc, request_handler& request) {
-    size_t index = request.file_path.find_last_of('.');
-	std::string extension = request.file_path.substr(index + 1);
-	for (size_t	i = 0; i < loc.scripts.size(); i++) {
-		if (extension == loc.scripts[i].first) {
-			request.interpreter = loc.scripts[i].second;
-			break;
-		}
-	}
-}
-
-location	Server::get_location_config(request_handler &request, std::vector<std::string> &locations) {
-	for (size_t	i = 0; i < request.socket.get_config().get_locations().size(); i++) {
-		if (request.socket.get_config().get_locations()[i].prefix.compare(1, locations[0].size(), locations[0]) == 0) {
-			return request.socket.get_config().get_locations()[i];
-		}
-	}
-	request.status = PAGE_NOT_FOUND;
-	return location();
-}
-
-int	Server::check_method(const std::vector<std::string> &methods, std::string &method) {
-	for (size_t	i = 0; i < methods.size(); i++) {
-		if	(methods[i] == method)
-			return EXIT_SUCCESS;
-	}
-	return EXIT_FAILURE;
-}
-
-std::string	Server::get_server_filepath(request_handler &request, std::vector<std::string> &locations) {
-	if (locations.empty())
-		return (request.socket.get_config().get_root() + request.socket.get_config().get_index());
-	return (request.socket.get_config().get_root() + locations[0]);
-}
-
-std::string	Server::get_location_filepath(location &loc, std::vector<std::string> &locations) {
-	if (locations.size() == 1)
-		return (loc.root + loc.index);
-	if (locations.back().find("html") != std::string::npos)
-		return (loc.root + locations.back());
-	if (loc.cgi_path == EMPTY_STRING)
-		return EMPTY_STRING;
-	return (loc.root + loc.cgi_path + locations.back());
-}
-
-size_t Server::get_body_length(request_handler &request) {
-	if (request.method == "GET")
-		return 0;
-
-	size_t pos = request.buf.find("Content-Length: ");
-	size_t length = static_cast<size_t> (std::atoll(request.buf.data() + pos + std::strlen("Content-Length: ")));
-	return length;
-}
-
-std::vector<std::string> Server::tokenize_first_line(std::string &request) {
-	std::string					first_line;
-
-	size_t	new_line_position = request.find(NEWLINE);
-	if (new_line_position != std::string::npos) {
-		first_line =  request.substr(0, new_line_position);
-		return split(first_line, SPACE);
-	}
-	return std::vector<std::string>();
-}
-
 void	Server::delete_invalid_fds() {
 	std::vector<pollfd>::iterator it = _pfds.begin() + _sockets.size();
 
