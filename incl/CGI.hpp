@@ -1,6 +1,6 @@
 #pragma once
 
-#include "request-handler.hpp"
+#include "request_handler.hpp"
 
 class CGI {
 private:
