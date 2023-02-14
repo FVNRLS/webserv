@@ -136,6 +136,7 @@ int	Server::accumulate(request_handler &request, int request_fd) {
 	if (bytes < 0)
 		return (system_call_error(RECV_ERROR));
 	request.buf += std::string(buffer, bytes);
+    std::cout << request.buf << '\n';
 	set_request_end_flags(request);
 	return EXIT_SUCCESS;
 }
