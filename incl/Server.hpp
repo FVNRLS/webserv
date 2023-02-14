@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:52 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/09 15:24:52 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/14 15:45:52 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ private:
 	std::string					get_location_filepath(location& loc, std::vector<std::string> &locations);
 	int							check_connection(pollfd& pfd);
 	void						delete_invalid_fds();
+	bool						empty_request(std::string const& requestbuf);
 
 
 	//VIRTUAL HOSTING //todo: later!

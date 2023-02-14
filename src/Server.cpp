@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/09 15:24:39 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/14 15:49:00 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,10 +196,20 @@ int	Server::check_logout(const int &key, const std::string &query) {
 	return key;
 }
 
+bool Server::empty_request(std::string const& requestbuf) {
+	size_t begin = requestbuf.find("Content-Length: ");
+	begin += std::strlen("Content-Length: ");
+	if (std::atoi(requestbuf.data() + begin) == 0)
+		return true;
+	return false;
+}
 
 int	Server::check_requested_url(request_handler &request) {
 	std::vector<std::string> locations = split(request.file_path, '/');
 
+	if (request.method == "POST" && empty_request(request.buf))
+		return NO_CONTENT;
+		return NO_CONTENT;
 	switch (locations.size()) {
 		case 0:
 			return check_main_configs(request, locations);
