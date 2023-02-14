@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ResponseGenerator.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hoomen <hoomen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/26 12:20:38 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/09 11:38:53 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/14 16:33:52 by hoomen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,8 @@ std::string ResponseGenerator::create_error_code_response(int status_code) {
   std::ifstream file;
   std::string error_page_path;
 
+  if (status_code == NO_CONTENT) 
+    return generate_response_header(NO_CONTENT);
   error_page_path = _request.socket.get_config().get_error_pages_dir() +
                     toString(status_code) + ".html";
   if (access(error_page_path.c_str(), F_OK) < 0 ||
