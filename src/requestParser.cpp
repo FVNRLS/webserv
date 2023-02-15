@@ -83,21 +83,18 @@ void    requestParser::set_url_type() {
             _url_type = SERVER_INDEX;
             break;
         case 1:
-            if (_locations[0].find('.') != std::string::npos)  {
+            if (_locations[0].find('.') != std::string::npos)
                 _url_type = SERVER;
-                break;
-            }
-        default:
-            if (_locations.back().find('.') != std::string::npos) {
-                _url_type = LOCATION;
-            }
             else
                 _url_type = LOCATION_INDEX;
+            break;
+        default:
+            _url_type = LOCATION;
     }
 }
 
 void    requestParser::set_location_config() {
-    if (_url_type != LOCATION)
+    if (_url_type != LOCATION && _url_type != LOCATION_INDEX)
         return;
 
     for (size_t	i = 0; i < _request.socket.get_config().get_locations().size(); i++) {
@@ -135,7 +132,10 @@ void	requestParser::translate_path() {
             _request.file_path = _location_config.root + _location_config.index;
             break;
         case LOCATION:
-            _request.file_path = _location_config.root + _locations.back();
+            _request.file_path = _location_config.root + _locations[1];
+            for (size_t i = 2; i < _locations.size(); i++) {
+                _request.file_path += "/" + _locations[i];
+            }
     }
 }
 

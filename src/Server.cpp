@@ -102,6 +102,7 @@ int Server::handle_pollout(pollfd &pfd) {
 	request_handler* request = &_requests.find(pfd.fd)->second;
 	
 	ResponseGenerator resp_gen(*request);
+    std::cerr << "FILE PATH: " << request->file_path << '\n';
 	std::string  response = resp_gen.generate_response(_cookies);
 	if (!response.empty()) {
 		ssize_t	bytes = 0;
