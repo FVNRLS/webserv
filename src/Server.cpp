@@ -89,8 +89,10 @@ int Server::handle_pollin(pollfd &pfd) {
 	if (accumulate(*request, pfd.fd) == EXIT_FAILURE)
 		return EXIT_FAILURE;
 	if (request->head_received) {
-		request->status = handle_request_header(*request);
-	}
+        request->status = handle_request_header(*request);
+        if (request->buf.size() >= request->head_length + request->body_length)
+            request->body_received = true;
+    }
 	if (request->status || request->method == "GET" || request->body_received)
 		pfd.events = POLLOUT;
 	return EXIT_SUCCESS;
@@ -158,6 +160,8 @@ void	Server::set_request_end_flags(request_handler &request) {
 int Server::handle_request_header(request_handler &request) {
     requestParser	request_parser(request);
 
+    if (!request.file_path.empty())
+        return request.status;
     request_parser.parse();
     if (request.status)
         return request.status;
@@ -184,93 +188,6 @@ void	Server::delete_invalid_fds() {
 			it++;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//TODO:implement later
-//---------------------------------------------------------------------------------------------------------------------
-
-//VIRTUAL HOSTING
-int Server::process_request(const Socket &socket, pollfd &poll_fd) {
-	(void )poll_fd;
-	(void )socket;
-	//	bool	socket_is_unique;
-
-//	socket_is_unique = socket.get_is_unique();
-//	if (socket_is_unique) {
-//		if (resolve_requests(socket, poll_fd) == EXIT_FAILURE)
-//			return EXIT_FAILURE;
-//	}
-//	else if (serve_on_virtual_host(socket, poll_fd) < 0)
-//		return EXIT_FAILURE;
-	return EXIT_SUCCESS;
-}
-
-int Server::serve_on_virtual_host(const Socket &socket, pollfd &poll_fd) {
-	char				buf[4096];
-	int 				client_socket;
-	std::string 		domain;
-	std::stringstream	ss;
-	std::string 		request;
-	std::string 		name;
-	std::string 		alias;
-
-	name = socket.get_config().get_name();
-	alias = socket.get_config().get_alias();
-
-	client_socket = accept(poll_fd.fd, NULL, NULL);
-	recv(client_socket, buf, 4096, 0);
-	ss << recv(client_socket, buf, 4096, 0);
-	request = ss.str();
-
-	//todo: probalby unuseful! but that's how we can get the domain name!
-//	struct hostent *host = gethostbyname(alias.c_str());
-//	if (host == NULL)
-//		std::cout << "Error: Invalid domain name" << std::endl;
-//	std::cout << host << std::endl;
-
-
-	domain = extract_domain(request);
-	std::cout << domain << std::endl;
-	if (domain == name || domain == alias) {
-		char response[] = "Hello from server!";
-		send(client_socket, response, sizeof(response), 0);
-	}
-	close(client_socket);
-	return EXIT_SUCCESS;
-}
-
-std::string Server::extract_domain(std::string &request) {
-	std::string domain;
-	std::stringstream ss(request);
-	std::string line;
-	while (std::getline(ss, line)) {
-		if (line.find("Host:") == 0) {
-			domain = line.substr(6);
-			break;
-		}
-	}
-	return domain;
-}
-
 
 //TERMINAL FUNCTIONS
 int	Server::process_cli_input() {

@@ -49,8 +49,6 @@ std::string ResponseGenerator::create_error_code_response(int status_code) {
   std::ifstream file;
   std::string error_page_path;
 
-  if (status_code == NO_CONTENT) 
-    return generate_response_header(METHOD_NOT_ALLOWED);
   error_page_path = _request.socket.get_config().get_error_pages_dir() +
                     toString(status_code) + ".html";
   if (access(error_page_path.c_str(), F_OK) < 0 ||

@@ -32,7 +32,6 @@ void    requestParser::parse() {
     translate_path();
     set_interpreter();
     set_body_length();
-
 }
 
 void    requestParser::parse_request_line() {
@@ -68,12 +67,12 @@ void	requestParser::set_cookies() {
 
 void	requestParser::split_query() {
 	size_t position = _request.file_path.find('?');
-    _request.file_path = _request.file_path.substr(0, position);
 
 	if (position != std::string::npos) {
         _request.query = _request.file_path.substr(position + 1);
         _request.body_length = _request.query.length();
 	}
+    _request.file_path = _request.file_path.substr(0, position);
 }
 
 void    requestParser::set_url_type() {
@@ -144,7 +143,7 @@ void	requestParser::set_interpreter() {
     if (_url_type == SERVER_INDEX || _url_type == SERVER)
         return;
 
-    size_t  position = _request.file_path.find('.');
+    size_t  position = _request.file_path.find_last_of('.');
     if (position == std::string::npos)
         return;
 
@@ -167,4 +166,3 @@ void requestParser::set_body_length() {
     if (_request.body_length == 0)
         _request.status = NO_CONTENT;
 }
-

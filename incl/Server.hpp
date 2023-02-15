@@ -43,12 +43,7 @@ private:
 
 
 
-	//VIRTUAL HOSTING //todo: later!
-	int							process_request(const Socket &socket, pollfd &poll_fd);
-	int							serve_on_virtual_host(const Socket &socket, pollfd &poll_fd);
-	std::string					extract_domain(std::string &request);
-
-	//TERMINAL INTERACTION
+    //TERMINAL INTERACTION
 	int							process_cli_input();
 	void						exit_server();
 	int							terminate_with_error(int);
