@@ -71,7 +71,7 @@ std::string ResponseGenerator::generate_response_header(int status_code) {
 	if (status_code == EXIT_SUCCESS)
 		status_code = OK;
   
-  std::cerr << _request.file_path << '\n';
+//  std::cerr << _request.file_path << '\n';
 	std::string cookies;
 	if (_request.cookies)
 		cookies = "\nSet-Cookie: key=" + toString<int>(_request.cookies);
