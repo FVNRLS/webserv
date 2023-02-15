@@ -229,6 +229,6 @@ enum cli_flags {
 };
 
 enum server_constants {
-	TIMEOUT	 	= 15000,
-    CHUNK_SIZE  = 1024,
+	TIMEOUT	 	= 5000,
+    CHUNK_SIZE  = 40000,
 };

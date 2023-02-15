@@ -51,8 +51,8 @@ int	Server::check_cli() {
 
 int Server::accept_requests() {
 	socklen_t 			client_len;
-	struct sockaddr 	client_addr = {};
-	pollfd				client_pollfd = {};
+	struct sockaddr 	client_addr;
+	pollfd				client_pollfd;
 
 	for (size_t i = 1; i < _sockets.size(); i++) {
 		if (_pfds[i].revents & POLLIN) {
@@ -84,7 +84,8 @@ int Server::resolve_requests() {
 }
 
 int Server::handle_pollin(pollfd &pfd) {
-	request_handler* request = &_requests.find(pfd.fd)->second;
+    request_handler* request = &_requests.find(pfd.fd)->second;
+
 
 	if (accumulate(*request, pfd.fd) == EXIT_FAILURE)
 		return EXIT_FAILURE;
@@ -114,16 +115,16 @@ int Server::handle_pollout(pollfd &pfd) {
 
 
 int Server::send_response(int fd, request_handler *request) {
-    ssize_t	bytes = 0;
-    size_t	chunksize = CHUNK_SIZE;
-    if (chunksize > request->response.size() - request->bytes_sent)
-        chunksize = request->response.size() - request->bytes_sent;
-    bytes = send(fd, request->response.data() + request->bytes_sent, chunksize, 0);
+
+    ssize_t bytes = send(fd, request->response.data(), request->response.size(), 0);
+
     if (bytes == -1)
         return EXIT_FAILURE;
     request->bytes_sent += bytes;
     if (bytes == 0 || request->bytes_sent == request->response.size())
         request->response_sent = true;
+    else
+        request->response = request->response.substr(bytes);
     return EXIT_SUCCESS;
 }
 

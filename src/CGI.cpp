@@ -1,12 +1,13 @@
 #include "CGI.hpp"
 
-CGI::CGI() : _response_fd(fileno(tmpfile())) {}
+CGI::CGI() {}
 
 CGI::~CGI() {}
 
 
 //MEMBER FUNCTIONS
 int CGI::create_response(const request_handler &request, std::string &response) {
+    _response_fd = tmpfilefd();
     if (_response_fd < 0)
         return error("tmpfile creation failed!");
 	switch (fork()) {
@@ -44,7 +45,7 @@ void	CGI::child_process(const request_handler &request) {
 }
 
 int CGI::dup_request_to_stdin(const request_handler& request) {
-    int fd = fileno(tmpfile());
+    int fd = tmpfilefd(); // todo check tmpfile() is not NULL
 
 	if (fd < 0 || write(fd, request.query.c_str(), request.query.length())  < 0)
        return EXIT_FAILURE;
@@ -88,4 +89,12 @@ int CGI::write_response(std::string &response) {
 int	CGI::error(const char* message) {
 	std::cerr << message << '\n';
 	return INTERNAL_SERVER_ERROR;
+}
+
+int CGI::tmpfilefd() {
+    FILE*   tmp = tmpfile();
+
+    if (tmp == NULL)
+        return -1;
+    return fileno(tmp);
 }
