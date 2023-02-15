@@ -100,20 +100,31 @@ int Server::handle_pollin(pollfd &pfd) {
 
 int Server::handle_pollout(pollfd &pfd) {
 	request_handler* request = &_requests.find(pfd.fd)->second;
-	
-	ResponseGenerator resp_gen(*request);
-	std::string  response = resp_gen.generate_response(_cookies);
-	if (!response.empty()) {
-		ssize_t	bytes = 0;
-		ssize_t	length = response.size();
-		while (bytes < length) {
-			bytes += send(pfd.fd, response.data() + bytes, length - bytes, 0);
-		}
-        _requests.erase(pfd.fd);
-	}
-	close(pfd.fd);
-    pfd.fd = -1;
+
+    if (request->response.empty()) {
+        ResponseGenerator resp_gen(*request);
+        request->response = resp_gen.generate_response(_cookies);
+    }
+	if (send_response(pfd.fd, request) || request->response_sent) {
+        request->clear();
+        pfd.events = POLLIN;
+    }
 	return EXIT_SUCCESS;
+}
+
+
+int Server::send_response(int fd, request_handler *request) {
+    ssize_t	bytes = 0;
+    size_t	chunksize = CHUNK_SIZE;
+    if (chunksize > request->response.size() - request->bytes_sent)
+        chunksize = request->response.size() - request->bytes_sent;
+    bytes = send(fd, request->response.data() + request->bytes_sent, chunksize, 0);
+    if (bytes == -1)
+        return EXIT_FAILURE;
+    request->bytes_sent += bytes;
+    if (bytes == 0 || request->bytes_sent == request->response.size())
+        request->response_sent = true;
+    return EXIT_SUCCESS;
 }
 
 int Server::check_connection(pollfd &pfd) {
@@ -138,7 +149,7 @@ int	Server::accumulate(request_handler &request, int request_fd) {
 	if (bytes < 0)
 		return (system_call_error(RECV_ERROR));
 	request.buf += std::string(buffer, bytes);
-    std::cout << request.buf << '\n';
+//    std::cout << request.buf << '\n';
 	set_request_end_flags(request);
 	return EXIT_SUCCESS;
 }

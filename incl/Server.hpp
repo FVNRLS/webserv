@@ -34,6 +34,7 @@ private:
 	int							resolve_requests();
 	int							handle_pollin(pollfd& pfd);
 	int							handle_pollout(pollfd& pfd);
+    int                         send_response(int fd, request_handler *request);
 	int							accumulate(request_handler& request, int request_fd);
 	void 						set_request_end_flags(request_handler& request);
 	int 						handle_request_header(request_handler& request);
