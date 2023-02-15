@@ -13,13 +13,14 @@
 #pragma once
 
 #include "defines.hpp"
+#include <sys/stat.h>
 
 std::string 				trim(std::string &s);
 std::vector<std::string>	split(std::string &s, char sep);
 void						silence_sigint();
 int							open_file(const std::string &file_path, std::ifstream &file);
 int							count_occurrences(const std::string &haystack, const std::string &needle);
-
+bool                        is_regular_file(const char* fileName);
 
 template <class T>
 std::string	toString(T i) {

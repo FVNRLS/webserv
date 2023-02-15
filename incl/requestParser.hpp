@@ -32,6 +32,7 @@ private:
     void                        check_method();
     void	                    set_interpreter();
     void	                    translate_path();
+    void	                    check_file_path();
     void                        set_body_length();
 
 

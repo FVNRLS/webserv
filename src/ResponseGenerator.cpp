@@ -23,21 +23,25 @@ ResponseGenerator::~ResponseGenerator() {}
 
 // MEMBER FUNCTIONS
 std::string ResponseGenerator::generate_response(Session &cookie) {
-  if (_request.status == EXIT_SUCCESS) {
-    if (_request.method == "GET") {
-      GETRequest get(_request);
-      _request.status = get.create_response(_response_body);
-    }
-    else if (_request.method == "POST") {
-      POSTRequest post(_request, cookie);
-      _request.status = post.create_response(_response_body);
-    }
-    else if (_request.method == "DELETE") {
-      DELETERequest delete_method;
-      _request.status = delete_method.create_response(_request);
-    }
-    else
-      _request.status = METHOD_NOT_ALLOWED;
+  if (_request.method == "PUT") {
+      PUTRequest put(_request);
+      _request.status = put.create_response(_response_body);
+  }
+  else if (_request.status == EXIT_SUCCESS) {
+      if (_request.method == "GET") {
+          GETRequest get(_request);
+          _request.status = get.create_response(_response_body);
+      }
+      else if (_request.method == "POST") {
+          POSTRequest post(_request, cookie);
+          _request.status = post.create_response(_response_body);
+      }
+      else if (_request.method == "DELETE") {
+          DELETERequest delete_method;
+          _request.status = delete_method.create_response(_request);
+      }
+      else
+        _request.status = METHOD_NOT_ALLOWED;
   }
   if (_request.status)
       return create_error_code_response(_request.status);
@@ -58,6 +62,8 @@ std::string ResponseGenerator::create_error_code_response(int status_code) {
   }
   _response_body.append((std::istreambuf_iterator<char>(file)),
                         std::istreambuf_iterator<char>());
+  if (_request.method == "HEAD")
+      return generate_response_header(status_code);
   return generate_response_header(status_code) + _response_body;
 }
 

@@ -15,6 +15,7 @@
 #include "GETRequest.hpp"
 #include "POSTRequest.hpp"
 #include "DELETERequest.hpp"
+#include "PUTRequest.hpp"
 
 
 class ResponseGenerator {
