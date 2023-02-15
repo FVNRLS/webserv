@@ -1,0 +1,138 @@
+Welcome in this little webserver tester.
+Passing the test here is the minimum before going to an evaluation.
+
+press enter to continue
+THIS TEST IS NOT MEANT TO BE THE ONLY TEST IN THE EVALUATION!!!
+	
+press enter to continue
+Before starting please follow the next few steps (files content can be anything and will be shown to you by the test):
+- Download the cgi_test executable on the host
+- Create a directory YoupiBanane with:
+	-a file name youpi.bad_extension
+	-a file name youpi.bla
+	-a sub directory called nop
+		-a file name youpi.bad_extension in nop
+		-a file name other.pouic in nop
+	-a sub directory called Yeah
+		-a file name not_happy.bad_extension in Yeah
+press enter to continue
+Setup the configuration file as follow:
+- / must answer to GET request ONLY
+- /put_test/* must answer to PUT request and save files to a directory of your choice
+- any file with .bla as extension must answer to POST request by calling the cgi_test executable
+- /post_body must answer anything to POST request with a maxBody of 100
+- /directory/ must answer to GET request and the root of it would be the repository YoupiBanane and if no file are requested, it should search for youpi.bad_extension files
+
+press enter to continue
+Before starting please verify that the server is launched
+press enter to continue
+
+Test GET http://localhost:6969/
+content returned: 
+
+Test POST http://localhost:6969/ with a size of 0
+
+Test HEAD http://localhost:6969/     /// TODO: Server returns malformed response
+
+Test GET http://localhost:6969/directory
+2023/02/15 16:10:19 Unsolicited response received on idle HTTP channel starting with "<!DOCTYPE html>\n<html>\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Error 405: Method Not Allowed</title>\n    <style>\n        body {\n            background-color: #f4f4f4;\n            font-family: Arial, sans-serif;\n            color: #333;\n        }\n        .error-container {\n            margin: 50px auto;\n            width: 70%;\n            text-align: center;\n            border: 1px solid #ccc;\n            box-shadow: 0 0 10px #ccc;\n            padding: 20px;\n            background-color: #fff;\n        }\n        h1 {\n            font-size: 50px;\n            color: #d9534f;\n        }\n        p {\n            font-size: 18px;\n            margin-top: 20px;\n        }\n        a {\n            color: #337ab7;\n            text-decoration: none;\n        }\n    </style>\n</head>\n<body>\n<div class=\"error-container\">\n    <h1>405: Method Not Allowed</h1>\n    <p>The method used in the request is not supported by the server.</p>\n    <p>Please try again using a different method or contact the site administrator for assistance.</p>\n    <a href=\"/\" >Return to Homepage</a>\n</div>\n</body>\n</html>"; err=<nil>
+content returned: 
+
+Test GET http://localhost:6969/directory/youpi.bad_extension
+content returned: 
+
+Test GET http://localhost:6969/directory/youpi.bla
+content returned: cgi: invalid SERVER_PROTOCOL version
+
+
+Test GET Expected 404 on http://localhost:6969/directory/oulalala
+content returned: <!DOCTYPE html>
+<html>
+<head>
+	<title>404 Error</title>
+	<style>
+		body {
+			text-align: center;
+			font-family: Arial, sans-serif;
+			background-color: #f0f0f0;
+			color: #333;
+		}
+		h1 {
+			font-size: 4em;
+			margin-top: 50px;
+			color: #cc0000;
+		}
+		p {
+			font-size: 2em;
+			margin-top: 20px;
+		}
+		a {
+			color: #0000cc;
+			text-decoration: none;
+			font-size: 1.5em;
+			margin-top: 40px;
+			display: inline-block;
+		}
+		a:hover {
+			text-decoration: underline;
+		}
+	</style>
+</head>
+<body>
+<h1>404 Error</h1>
+<p>The page you were looking for could not be found.</p>
+<a href="/">Go back to the home page</a>
+</body>
+</html>
+
+Test GET http://localhost:6969/directory/nop
+content returned: 
+
+Test GET http://localhost:6969/directory/nop/
+content returned: 
+
+Test GET http://localhost:6969/directory/nop/other.pouic
+content returned: 
+
+Test GET Expected 404 on http://localhost:6969/directory/nop/other.pouac
+content returned: <!DOCTYPE html>
+<html>
+<head>
+	<title>404 Error</title>
+	<style>
+		body {
+			text-align: center;
+			font-family: Arial, sans-serif;
+			background-color: #f0f0f0;
+			color: #333;
+		}
+		h1 {
+			font-size: 4em;
+			margin-top: 50px;
+			color: #cc0000;
+		}
+		p {
+			font-size: 2em;
+			margin-top: 20px;
+		}
+		a {
+			color: #0000cc;
+			text-decoration: none;
+			font-size: 1.5em;
+			margin-top: 40px;
+			display: inline-block;
+		}
+		a:hover {
+			text-decoration: underline;
+		}
+	</style>
+</head>
+<body>
+<h1>404 Error</h1>
+<p>The page you were looking for could not be found.</p>
+<a href="/">Go back to the home page</a>
+</body>
+</html>
+
+Test GET Expected 404 on http://localhost:6969/directory/Yeah
+FATAL ERROR ON LAST TEST: bad status code

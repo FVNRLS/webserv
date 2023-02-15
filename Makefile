@@ -6,7 +6,7 @@
 #    By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/11/26 23:28:55 by hoomen            #+#    #+#              #
-#    Updated: 2023/02/09 17:00:20 by doreshev         ###   ########.fr        #
+#    Updated: 2023/02/15 15:49:44 by hoomen           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -55,7 +55,7 @@ fclean : clean
 re : fclean all
 
 run : $(NAME)
-	./$(NAME) config/vs_code.conf
+	./$(NAME) config/tester.conf
 
 bonus: all
 
