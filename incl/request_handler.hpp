@@ -19,6 +19,7 @@ struct request_handler { //todo: delete item from map
     bool                            response_sent;
     std::string                     response;
     size_t                          bytes_sent;
+    std::string                     cgi_path;
 
     request_handler ();
     request_handler(const request_handler &src);

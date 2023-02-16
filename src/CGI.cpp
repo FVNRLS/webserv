@@ -34,13 +34,17 @@ void	CGI::child_process(const request_handler &request) {
 
 	char *arguments[3];
 	arguments[0] = const_cast<char*>(request.interpreter.c_str());
-	arguments[1] = const_cast<char*>(request.file_path.c_str());
+	arguments[1] = realpath(request.file_path.c_str(), NULL);
+    std::cerr << "REALPATH: " << arguments[1] << std::endl;
+    std::cerr << "cgi_path: " << request.cgi_path << std::endl;
 	arguments[2] = NULL;
 
     dup2(_response_fd, STDOUT_FILENO);
     if (dup_request_to_stdin(request) == EXIT_FAILURE)
         exit(error("tmpfile creation failed!"));
-	if (execve(arguments[0], arguments, environment) == -1)
+    if (!request.cgi_path.empty() && chdir(request.cgi_path.c_str()) == -1)
+        exit(error("chdir failed!"));
+    if (execve(arguments[0], arguments, environment) == -1)
 		exit(error("execve failed!"));
 }
 

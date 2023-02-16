@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/16 15:39:42 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/16 17:03:28 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,6 @@ int Server::handle_pollin(pollfd &pfd) {
         if (request->buf.size() >= request->head_length + request->body_length)
             request->body_received = true;
     }
-
 	if (request->status || request->method == "GET" || request->body_received)
 		pfd.events = POLLOUT;
 	return EXIT_SUCCESS;
@@ -107,12 +106,12 @@ int Server::handle_pollout(pollfd &pfd) {
     if (request->response.empty()) {
         ResponseGenerator resp_gen(*request);
         request->response = resp_gen.generate_response(_cookies);
-        // std::cerr << "----------------------------------------\n";
-        // std::cerr << "Request type: " << request->method << '\n';
-        // std::cerr << "Path: " << request->file_path << '\n';
-        // std::cerr << "Response of " << request->response.size() << " bytes" <<
-        //           std::endl;
-        // std::cerr << "Response: " << request->response << std::endl;
+//        std::cerr << "----------------------------------------\n";
+//        std::cerr << "Request type: " << request->method << '\n';
+//        std::cerr << "Path: " << request->file_path << '\n';
+//        std::cerr << "Response of " << request->response.size() << " bytes" <<
+//                  std::endl;
+//        std::cerr << "Response: " << request->response << std::endl;
     }
 //    std::cerr << "Total bytes sent: " << request->bytes_sent << std::endl;
 	if (send_response(pfd.fd, request) || request->response_sent) {
@@ -173,17 +172,19 @@ int	Server::accumulate(request_handler &request, int request_fd) {
 }
 
 void	Server::set_request_end_flags(request_handler &request) {
-	long long	max_client_body_size = request.socket.get_config().get_max_client_body_size();
-
-	if ((static_cast<long long>(request.buf.length()) > max_client_body_size)) {
-		request.status = BAD_REQUEST;
-		return;
-	}
 	request.head_length = request.buf.find(END_OF_REQUEST);
 	if (request.head_length != std::string::npos) {
 		request.head_length += std::strlen(END_OF_REQUEST.c_str());
 		request.head_received = true;
 	}
+    if (!request.head_received)
+        return;
+    long long	max_client_body_size = request.socket.get_config().get_max_client_body_size();
+    if ((static_cast<long long>(request.buf.length() - request.head_length) > max_client_body_size))
+    {
+        request.status = BAD_REQUEST;
+        return;
+    }
 }
 
 int Server::handle_request_header(request_handler &request) {

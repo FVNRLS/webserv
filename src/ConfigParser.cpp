@@ -699,6 +699,8 @@ int ConfigParser::set_cgi_path() {
 	size_t 		num_tokens;
 
 	num_tokens = _tokens.size();
+    if (_tokens.size() == 1)
+        return (EXIT_SUCCESS);
 	if (_serv_mode)
 		return (parsing_error_line(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
 	else if (!_serv[_i_serv]._locations[_i_loc].cgi_path.empty())
@@ -706,6 +708,7 @@ int ConfigParser::set_cgi_path() {
 	else if (num_tokens > 2)
 		return (parsing_error_line(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 	_serv[_i_serv]._locations[_i_loc].cgi_path = _tokens[1];
+    std::cerr << "_tokens[1] = " << _tokens[1] << std::endl;
 	return (EXIT_SUCCESS);
 }
 
@@ -821,8 +824,8 @@ void 	ConfigParser::check_cgi_path() {
 	std::string	*cgi;
 
 	cgi = &_serv[_i_serv]._locations[_i_loc].cgi_path;
-	if (cgi->empty())
-		*cgi = DEFAULT_CGI_PATH;
+//	if (cgi->empty())
+//		*cgi = DEFAULT_CGI_PATH;
 }
 
 
