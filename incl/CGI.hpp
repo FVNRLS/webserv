@@ -11,10 +11,11 @@ private:
 	int		parent_process();
 	int		write_response(std::string &response);
 	int		dup_request_to_stdin(const request_handler& request);
+    int     tmpfilefd();
 
 public:
 	CGI();
 	~CGI();
 
-	int			create_response(const request_handler &request, std::string &response);
+	int		create_response(const request_handler &request, std::string &response);
 };
