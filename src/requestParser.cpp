@@ -35,6 +35,7 @@ void    requestParser::parse() {
     if (_request.status)
         return;
     set_body_length();
+    set_cgi_path();
 }
 
 void    requestParser::parse_request_line() {
@@ -180,4 +181,10 @@ void requestParser::set_body_length() {
         _request.body_length = static_cast<size_t> (std::atoll(_request.buf.data() + pos + std::strlen("Content-Length: ")));
     if (_request.body_length == 0)
         _request.status = NO_CONTENT;
+}
+
+void requestParser::set_cgi_path() {
+    if (_url_type == SERVER || _url_type == SERVER_INDEX)
+        return ;
+    _request.cgi_path = _location_config.cgi_path;
 }

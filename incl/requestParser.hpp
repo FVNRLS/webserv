@@ -34,6 +34,7 @@ private:
     void	                    translate_path();
     void	                    check_file_path();
     void                        set_body_length();
+    void                        set_cgi_path();
 
 
 public:
