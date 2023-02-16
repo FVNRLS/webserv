@@ -56,6 +56,7 @@ int Server::accept_requests() {
 
 	for (size_t i = 1; i < _sockets.size(); i++) {
 		if (_pfds[i].revents & POLLIN) {
+//            std::cerr << "New request at " << i << std::endl;
 			client_len = sizeof(client_addr);
 			client_pollfd.fd = accept(_pfds[i].fd, &client_addr, &client_len);
 			if (client_pollfd.fd < 0)
@@ -86,7 +87,6 @@ int Server::resolve_requests() {
 int Server::handle_pollin(pollfd &pfd) {
     request_handler* request = &_requests.find(pfd.fd)->second;
 
-
 	if (accumulate(*request, pfd.fd) == EXIT_FAILURE)
 		return EXIT_FAILURE;
 	if (request->head_received) {
@@ -94,6 +94,7 @@ int Server::handle_pollin(pollfd &pfd) {
         if (request->buf.size() >= request->head_length + request->body_length)
             request->body_received = true;
     }
+
 	if (request->status || request->method == "GET" || request->body_received)
 		pfd.events = POLLOUT;
 	return EXIT_SUCCESS;
@@ -102,11 +103,25 @@ int Server::handle_pollin(pollfd &pfd) {
 int Server::handle_pollout(pollfd &pfd) {
 	request_handler* request = &_requests.find(pfd.fd)->second;
 
+
     if (request->response.empty()) {
         ResponseGenerator resp_gen(*request);
         request->response = resp_gen.generate_response(_cookies);
+        std::cerr << "----------------------------------------\n";
+        std::cerr << "Request type: " << request->method << '\n';
+        std::cerr << "Path: " << request->file_path << '\n';
+        std::cerr << "Response of " << request->response.size() << " bytes" <<
+                  std::endl;
+        std::cerr << "Response: " << request->response << std::endl;
     }
+//    std::cerr << "Total bytes sent: " << request->bytes_sent << std::endl;
 	if (send_response(pfd.fd, request) || request->response_sent) {
+//        std::cerr << "Total bytes sent at completion: " << request->bytes_sent
+//        <<
+//        std::endl;
+////        std::cerr << "----------------------------------------\n" << std::endl;
+//        if (request->response.size() < 200)
+//            sleep(1);
         request->clear();
         pfd.events = POLLIN;
     }
@@ -117,11 +132,13 @@ int Server::handle_pollout(pollfd &pfd) {
 int Server::send_response(int fd, request_handler *request) {
 
     ssize_t bytes = send(fd, request->response.data(), request->response.size(), 0);
-
+//    std::cerr << "Bytes sent: " << bytes << std::endl;
     if (bytes == -1)
         return EXIT_FAILURE;
     request->bytes_sent += bytes;
-    if (bytes == 0 || request->bytes_sent == request->response.size())
+//    std::cerr << "Request->bytes_sent after incrementing: " <<
+//    request->bytes_sent << std::endl;
+    if (bytes == 0 || request->bytes_sent >= request->response.size())
         request->response_sent = true;
     else
         request->response = request->response.substr(bytes);

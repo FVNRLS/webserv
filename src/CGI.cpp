@@ -19,10 +19,10 @@ int CGI::create_response(const request_handler &request, std::string &response) 
 	if (parent_process() != EXIT_SUCCESS){
 		return INTERNAL_SERVER_ERROR;
 	}
-	if (write_response(response) != EXIT_SUCCESS)
+	if (write_response(response) != EXIT_SUCCESS) // tmpfile is closed inside
 		return error("Reading from pipe failed!");
-	if (response.empty())
-		return error("EMPTY RESPONSE!");
+//	if (response.empty())
+//		return error("EMPTY RESPONSE!");
 	return EXIT_SUCCESS;
 }
 
@@ -45,9 +45,9 @@ void	CGI::child_process(const request_handler &request) {
 }
 
 int CGI::dup_request_to_stdin(const request_handler& request) {
-    int fd = tmpfilefd(); // todo check tmpfile() is not NULL
+    int fd = tmpfilefd();
 
-	if (fd < 0 || write(fd, request.query.c_str(), request.query.length())  < 0)
+	if (fd < 0 || write(fd, request.query.c_str(), request.query.length()) < 0)
        return EXIT_FAILURE;
     lseek(fd, 0, SEEK_SET);
 	dup2(fd, STDIN_FILENO);

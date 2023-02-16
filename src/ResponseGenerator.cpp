@@ -73,11 +73,11 @@ std::string ResponseGenerator::generate_response_header(int status_code) {
   
 	std::string cookies;
 	if (_request.cookies)
-		cookies = "\nSet-Cookie: key=" + toString<int>(_request.cookies);
+		cookies = "\r\nSet-Cookie: key=" + toString<int>(_request.cookies);
 	
     return  "HTTP/1.1 " + toString(status_code) + " " +
             _reasonPhrases.find(status_code)->second +
-            "\nContent-Type: text/html\nContent-Length: " +
+            "\r\nContent-Type: text/html\r\nContent-Length: " +
             toString(_response_body.length()) +
             cookies + END_OF_REQUEST;
 }
