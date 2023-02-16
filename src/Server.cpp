@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/14 17:50:29 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/16 15:39:42 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ int Server::run() {
 		if (resolve_requests() == EXIT_FAILURE)
 			return EXIT_FAILURE;
 		delete_invalid_fds();
-//		std::cout << "NUM FD'S:		" << _pfds.size() << std::endl;
+		// std::cout << "NUM FD'S:		" << _pfds.size() << std::endl;
 	}
 }
 
@@ -107,12 +107,12 @@ int Server::handle_pollout(pollfd &pfd) {
     if (request->response.empty()) {
         ResponseGenerator resp_gen(*request);
         request->response = resp_gen.generate_response(_cookies);
-        std::cerr << "----------------------------------------\n";
-        std::cerr << "Request type: " << request->method << '\n';
-        std::cerr << "Path: " << request->file_path << '\n';
-        std::cerr << "Response of " << request->response.size() << " bytes" <<
-                  std::endl;
-        std::cerr << "Response: " << request->response << std::endl;
+        // std::cerr << "----------------------------------------\n";
+        // std::cerr << "Request type: " << request->method << '\n';
+        // std::cerr << "Path: " << request->file_path << '\n';
+        // std::cerr << "Response of " << request->response.size() << " bytes" <<
+        //           std::endl;
+        // std::cerr << "Response: " << request->response << std::endl;
     }
 //    std::cerr << "Total bytes sent: " << request->bytes_sent << std::endl;
 	if (send_response(pfd.fd, request) || request->response_sent) {
