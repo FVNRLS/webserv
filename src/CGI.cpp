@@ -19,10 +19,8 @@ int CGI::create_response(const request_handler &request, std::string &response) 
 	if (parent_process() != EXIT_SUCCESS){
 		return INTERNAL_SERVER_ERROR;
 	}
-	if (write_response(response) != EXIT_SUCCESS) // tmpfile is closed inside
+	if (write_response(response) != EXIT_SUCCESS)
 		return error("Reading from pipe failed!");
-//	if (response.empty())
-//		return error("EMPTY RESPONSE!");
 	return EXIT_SUCCESS;
 }
 
@@ -35,8 +33,6 @@ void	CGI::child_process(const request_handler &request) {
 	char *arguments[3];
 	arguments[0] = const_cast<char*>(request.interpreter.c_str());
 	arguments[1] = realpath(request.file_path.c_str(), NULL);
-    std::cerr << "REALPATH: " << arguments[1] << std::endl;
-    std::cerr << "cgi_path: " << request.cgi_path << std::endl;
 	arguments[2] = NULL;
 
     dup2(_response_fd, STDOUT_FILENO);

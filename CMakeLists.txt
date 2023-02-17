@@ -55,5 +55,8 @@ add_executable(webserver
         #TOOLS
         src/tools.cpp
         incl/tools.hpp
-        src/PUTRequest.cpp incl/PUTRequest.hpp src/handleChunks.cpp incl/handleChunks.hpp)
+
+        src/Chunks.cpp
+        incl/Chunks.hpp
+        )
 

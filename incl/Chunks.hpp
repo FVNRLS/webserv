@@ -2,13 +2,15 @@
 
 #include "request_handler.hpp"
 
-class handleChunks {
+class Chunks {
 private:
     request_handler             &_request;
 
+    void                        cleanup_query();
+
 public:
-    handleChunks(request_handler &request);
-    ~handleChunks();
+    Chunks(request_handler &request);
+    ~Chunks();
 
     void                handle();
 };

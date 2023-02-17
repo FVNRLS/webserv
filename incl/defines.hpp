@@ -79,7 +79,7 @@ const std::string DEFAULT_REDIR_FIRST		= "config";
 const std::string DEFAULT_REDIR_SECOND		= "welcome page"; //unsure about the values
 const std::string DEFAULT_PAGE_ERROR		= "SERVER ERROR: ERROR PAGE UNAVAILABLE!"; //if error page can not be opened
 const std::string END_OF_REQUEST			= "\r\n\r\n";
-
+const std::string CRLF          			= "\r\n";
 
 //COVERING UINT32_MAX MACRO FOR ARCH LINUX
 #ifndef UINT32_MAX

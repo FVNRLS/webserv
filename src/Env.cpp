@@ -14,29 +14,13 @@ void	Env::create() {
     _request.env.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	_request.env.push_back("CONTENT_LENGTH=" + toString<size_t>(_request.body_length));
 	_request.env.push_back("REMOTE_ADDR=" + remote_addr());
-	_request.env.push_back("HTTP_USER_AGENT=" + get_header_value("User-Agent:"));
+	_request.env.push_back("HTTP_USER_AGENT=" + _request.user_agent);
 	_request.env.push_back("RESPONSE_HEADER=" + RESPONSE_HEADER);
-	_request.env.push_back("CONTENT_TYPE=" + get_header_value("Content-Type:"));
+	_request.env.push_back("CONTENT_TYPE=" + _request.content_type);
 	if (_request.cookies)
 		_request.env.push_back("HTTP_COOKIE=key=" + toString<int>(_request.cookies));
 	else
 		_request.env.push_back("HTTP_COOKIE=");
-}
-
-std::string Env::get_header_value(std::string key) {
-	size_t begin;
-	size_t end;
-
-	begin = _request.buf.find(key);
-	if (begin == std::string::npos)
-		return EMPTY_STRING;
-	begin += key.length();
-	while (_request.buf[begin] == SPACE)
-		begin++;
-	end = _request.buf.find(NEWLINE, begin);
-	if (end == std::string::npos)
-		return EMPTY_STRING;
-	return _request.buf.substr(begin, end - begin);
 }
 
 std::string Env::remote_addr() {

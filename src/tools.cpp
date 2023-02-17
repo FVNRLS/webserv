@@ -144,3 +144,19 @@ void   trim_first_line(std::string& buf) {
 void    trim_endofrequest(std::string& buf) {
     buf = buf.substr(0, buf.find_last_of(END_OF_REQUEST));
 }
+
+std::string get_header_value(const char* key, std::string &buf) {
+    size_t begin;
+    size_t end;
+
+    begin = buf.find(key);
+    if (begin == std::string::npos)
+        return EMPTY_STRING;
+    begin += std::strlen(key);
+    while (buf[begin] == SPACE)
+        begin++;
+    end = buf.find(NEWLINE, begin);
+    if (end == std::string::npos)
+        return EMPTY_STRING;
+    return buf.substr(begin, end - begin);
+}

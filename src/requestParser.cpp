@@ -17,13 +17,6 @@ requestParser::requestParser(request_handler &request) :  _request(request){}
 requestParser::~requestParser() {}
 
 void    requestParser::parse() {
-    check_chunked();
-    if (_request.status)
-        return;
-    if (_request.chunked) {
-        handle_chunked();
-        return ;
-    }
     parse_request_line();
     if (_request.status)
         return;
@@ -41,12 +34,13 @@ void    requestParser::parse() {
     check_file_path();
     if (_request.status)
         return;
-    set_body_length();
     set_cgi_path();
-}
-
-void    requestParser::handle_chunked() {
-
+    _request.user_agent = get_header_value("User-Agent:", _request.buf);
+    _request.content_type = get_header_value("Content-Type:", _request.buf);
+    check_chunked();
+    if (_request.chunked)
+        return;
+    set_body_length();
 }
 
 void    requestParser::parse_request_line() {
@@ -89,6 +83,10 @@ void    requestParser::check_chunked() {
     else
         get_body_length_chunked();
     _request.buf = _request.buf.substr(_request.head_length);
+    _request.head_length = 0;
+    _request.chunkfile.open("./uploads/curl_upload", O_CREAT | O_TRUNC);
+    if (!_request.chunkfile.is_open() || _request.chunkfile.fail())
+        _request.status = INTERNAL_SERVER_ERROR;
 }
 
 void    requestParser::get_body_length_chunked() {
@@ -96,7 +94,6 @@ void    requestParser::get_body_length_chunked() {
     _request.body_length = std::strtol(body.c_str(), NULL, 16);
     if (_request.body_length == 0) {
         _request.body_received = true; // todo remove crap from body ?
-
     }
 }
 

@@ -30,6 +30,7 @@ bool                        header_key_exists(const char* key, std::string
                                                     const& buf);
 void                        trim_first_line(std::string& buf);
 void                        trim_endofrequest(std::string& buf);
+std::string                 get_header_value(const char* key, std::string& buf);
 
 template <class T>
 std::string	toString(T i) {

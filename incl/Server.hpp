@@ -15,6 +15,7 @@
 #include "CLI.hpp"
 #include "ResponseGenerator.hpp"
 #include "requestParser.hpp"
+#include "Chunks.hpp"
 
 
 class Server {

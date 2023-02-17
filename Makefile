@@ -22,6 +22,7 @@ VPATH		= src
 SRC			=	CGI.cpp CLI.cpp Config.cpp ConfigParser.cpp DELETERequest.cpp \
 					Env.cpp GETRequest.cpp main.cpp POSTRequest.cpp ResponseGenerator.cpp \
 					Server.cpp Socket.cpp tools.cpp Session.cpp request_handler.cpp requestParser.cpp \
+					Chunks.cpp \
 
 ODIR		=	obj
 OBJ			=	$(SRC:%.cpp=$(ODIR)/%.o)
@@ -55,7 +56,7 @@ fclean : clean
 re : fclean all
 
 run : $(NAME)
-	./$(NAME) config/tester.conf
+	./$(NAME) config/vs_code.conf
 
 bonus: all
 

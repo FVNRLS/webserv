@@ -10,7 +10,8 @@ POSTRequest::~POSTRequest() {}
 // TODO check max client body size!!
 
 int POSTRequest::create_response(std::string &response) {
-	_request.query = _request.buf.substr(_request.head_length, _request.buf.length());
+	if (_request.query.empty())
+        _request.query = _request.buf.substr(_request.head_length, _request.buf.length());
 	check_for_cookies();
 	_environment.create();
 	return _cgi.create_response(_request, response);

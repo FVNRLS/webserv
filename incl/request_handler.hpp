@@ -22,8 +22,10 @@ struct request_handler { //todo: delete item from map
     std::string                     cgi_path;
     bool                            chunked;
     bool                            chunk_complete;
-    std::string                     chunked_body;
     size_t                          chunk_length;
+    std::string                     user_agent;
+    std::string                     content_type;
+    std::ofstream                   chunkfile;
 
     request_handler ();
     request_handler(const request_handler &src);
