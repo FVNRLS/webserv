@@ -56,7 +56,6 @@ int Server::accept_requests() {
 
 	for (size_t i = 1; i < _sockets.size(); i++) {
 		if (_pfds[i].revents & POLLIN) {
-//            std::cerr << "New request at " << i << std::endl;
 			client_len = sizeof(client_addr);
 			client_pollfd.fd = accept(_pfds[i].fd, &client_addr, &client_len);
 			if (client_pollfd.fd < 0)
@@ -91,7 +90,7 @@ int Server::handle_pollin(pollfd &pfd) {
 		return EXIT_FAILURE;
 	if (request->head_received) {
         request->status = handle_request_header(*request);
-        if (request->buf.size() >= request->head_length + request->body_length)
+        if (!request->chunked && request->buf.size() >= request->head_length + request->body_length)
             request->body_received = true;
     }
 	if (request->status || request->method == "GET" || request->body_received)
@@ -106,21 +105,8 @@ int Server::handle_pollout(pollfd &pfd) {
     if (request->response.empty()) {
         ResponseGenerator resp_gen(*request);
         request->response = resp_gen.generate_response(_cookies);
-//        std::cerr << "----------------------------------------\n";
-//        std::cerr << "Request type: " << request->method << '\n';
-//        std::cerr << "Path: " << request->file_path << '\n';
-//        std::cerr << "Response of " << request->response.size() << " bytes" <<
-//                  std::endl;
-//        std::cerr << "Response: " << request->response << std::endl;
     }
-//    std::cerr << "Total bytes sent: " << request->bytes_sent << std::endl;
 	if (send_response(pfd.fd, request) || request->response_sent) {
-//        std::cerr << "Total bytes sent at completion: " << request->bytes_sent
-//        <<
-//        std::endl;
-////        std::cerr << "----------------------------------------\n" << std::endl;
-//        if (request->response.size() < 200)
-//            sleep(1);
         request->clear();
         pfd.events = POLLIN;
     }
@@ -131,12 +117,9 @@ int Server::handle_pollout(pollfd &pfd) {
 int Server::send_response(int fd, request_handler *request) {
 
     ssize_t bytes = send(fd, request->response.data(), request->response.size(), 0);
-//    std::cerr << "Bytes sent: " << bytes << std::endl;
     if (bytes == -1)
         return EXIT_FAILURE;
     request->bytes_sent += bytes;
-//    std::cerr << "Request->bytes_sent after incrementing: " <<
-//    request->bytes_sent << std::endl;
     if (bytes == 0 || request->bytes_sent >= request->response.size())
         request->response_sent = true;
     else
@@ -166,13 +149,12 @@ int	Server::accumulate(request_handler &request, int request_fd) {
 	if (bytes < 0)
 		return (system_call_error(RECV_ERROR));
 	request.buf += std::string(buffer, bytes);
-//    std::cout << request.buf << '\n';
 	set_request_end_flags(request);
 	return EXIT_SUCCESS;
 }
 
 void	Server::set_request_end_flags(request_handler &request) {
-	request.head_length = request.buf.find(END_OF_REQUEST);
+    request.head_length = request.buf.find(END_OF_REQUEST);
 	if (request.head_length != std::string::npos) {
 		request.head_length += std::strlen(END_OF_REQUEST.c_str());
 		request.head_received = true;
@@ -208,6 +190,7 @@ int	Server::check_logout(const int &key, const std::string &query) {
 	}
 	return key;
 }
+
 void	Server::delete_invalid_fds() {
 	std::vector<pollfd>::iterator it = _pfds.begin() + _sockets.size();
 

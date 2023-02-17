@@ -35,7 +35,7 @@ private:
     void	                    check_file_path();
     void                        set_body_length();
     void                        set_cgi_path();
-
+    void                        handle_chunk();
 
 public:
 	requestParser(request_handler &request);

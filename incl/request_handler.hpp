@@ -20,6 +20,8 @@ struct request_handler { //todo: delete item from map
     std::string                     response;
     size_t                          bytes_sent;
     std::string                     cgi_path;
+    bool                            chunked;
+    std::string                     chunked_buf;
 
     request_handler ();
     request_handler(const request_handler &src);

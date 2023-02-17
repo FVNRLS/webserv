@@ -17,6 +17,8 @@ requestParser::requestParser(request_handler &request) :  _request(request){}
 requestParser::~requestParser() {}
 
 void    requestParser::parse() {
+    handle_chunk();
+
     parse_request_line();
     if (_request.status)
         return;
@@ -37,6 +39,19 @@ void    requestParser::parse() {
     set_body_length();
     set_cgi_path();
 }
+
+
+void    requestParser::handle_chunk() {
+    if (_request.buf.find("Transfer-Encoding: chunked") == std::string::npos)
+        return;
+
+    _request.chunked = true;
+
+    _request.chunked_buf = _request.buf.substr(_request.head_length);
+    if (_request.chunked_buf.find("\r\n") != std::string::npos)
+        _request.chunked_buf =
+}
+
 
 void    requestParser::parse_request_line() {
     std::vector<std::string> tokens = tokenize_first_line();
