@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/14 17:24:56 by doreshev          #+#    #+#             */
-/*   Updated: 2023/02/14 17:50:43 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/17 12:39:45 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,13 @@ requestParser::requestParser(request_handler &request) :  _request(request){}
 requestParser::~requestParser() {}
 
 void    requestParser::parse() {
-    handle_chunk();
-
+    check_chunked();
+    if (_request.status)
+        return;
+    if (_request.chunked) {
+        handle_chunked();
+        return ;
+    }
     parse_request_line();
     if (_request.status)
         return;
@@ -40,22 +45,15 @@ void    requestParser::parse() {
     set_cgi_path();
 }
 
+void    requestParser::handle_chunked() {
 
-void    requestParser::handle_chunk() {
-    if (_request.buf.find("Transfer-Encoding: chunked") == std::string::npos)
-        return;
-
-    _request.chunked = true;
-
-    _request.chunked_buf = _request.buf.substr(_request.head_length);
-    if (_request.chunked_buf.find("\r\n") != std::string::npos)
-        _request.chunked_buf =
 }
-
 
 void    requestParser::parse_request_line() {
     std::vector<std::string> tokens = tokenize_first_line();
 
+    if (_request.chunked)
+        return;
     if (tokens.size() < 3) {
         _request.status = BAD_REQUEST;
         return;
@@ -73,6 +71,33 @@ std::vector<std::string> requestParser::tokenize_first_line() {
 		return split(first_line, SPACE);
 	}
 	return std::vector<std::string>();
+}
+
+void    requestParser::check_chunked() {
+    if (!header_key_exists("Transfer-Encoding:", _request.buf))
+        return;
+    if (!header_value_is_equal_to("Transfer-Encoding:", "chunked", _request.buf))
+    {
+        _request.status = NOT_IMPLEMENTED;
+        return;
+    }
+    _request.chunked = true;
+    if (header_value_is_equal_to("Expect:", "100-continue", _request.buf)) {
+        _request.status = CONTINUE;
+        _request.response = "HTTP/1.1 100 Continue\r\n\r\n";
+    }
+    else
+        get_body_length_chunked();
+    _request.buf = _request.buf.substr(_request.head_length);
+}
+
+void    requestParser::get_body_length_chunked() {
+    std::string body = _request.buf.substr(_request.head_length);
+    _request.body_length = std::strtol(body.c_str(), NULL, 16);
+    if (_request.body_length == 0) {
+        _request.body_received = true; // todo remove crap from body ?
+
+    }
 }
 
 void	requestParser::set_cookies() {

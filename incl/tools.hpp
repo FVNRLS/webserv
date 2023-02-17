@@ -21,6 +21,15 @@ void						silence_sigint();
 int							open_file(const std::string &file_path, std::ifstream &file);
 int							count_occurrences(const std::string &haystack, const std::string &needle);
 bool                        is_regular_file(const char* fileName);
+std::string                 get_header_field_value(const char* key,
+                                                   std::string const& buf);
+bool                        header_value_is_equal_to(const char* key, const
+                                                    char* value, std::string
+                                                    const& buf);
+bool                        header_key_exists(const char* key, std::string
+                                                    const& buf);
+void                        trim_first_line(std::string& buf);
+void                        trim_endofrequest(std::string& buf);
 
 template <class T>
 std::string	toString(T i) {
