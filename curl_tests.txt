@@ -1,2 +1,7 @@
 // for chunked request:
 curl -H "Transfer-Encoding: chunked" -d @file http://example.com
+
+
+// send a pictur from hoomen as chunked request:
+curl -H "Transfer-Encoding: chunked" -d @/Users/hoomen/Documents/fr.png
+http://localhost:6969/hering/upload.py

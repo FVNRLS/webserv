@@ -89,10 +89,12 @@ int Server::handle_pollin(pollfd &pfd) {
 
 	if (accumulate(*request, pfd.fd) == EXIT_FAILURE)
 		return EXIT_FAILURE;
-	if (request->head_received) {
+	if (request->head_received && !request->status) {
         request->status = handle_request_header(*request);
         if (request->buf.size() >= request->head_length + request->body_length)
             request->body_received = true;
+        std::cerr << "Headers:\n" << request->buf << "--------------------"
+        << std::endl;
     }
 	if (request->status || request->method == "GET" || request->body_received)
 		pfd.events = POLLOUT;
@@ -102,7 +104,6 @@ int Server::handle_pollin(pollfd &pfd) {
 int Server::handle_pollout(pollfd &pfd) {
 	request_handler* request = &_requests.find(pfd.fd)->second;
 
-
     if (request->response.empty()) {
         ResponseGenerator resp_gen(*request);
         request->response = resp_gen.generate_response(_cookies);
@@ -111,7 +112,7 @@ int Server::handle_pollout(pollfd &pfd) {
 //        std::cerr << "Path: " << request->file_path << '\n';
 //        std::cerr << "Response of " << request->response.size() << " bytes" <<
 //                  std::endl;
-//        std::cerr << "Response: " << request->response << std::endl;
+        std::cerr << "Response: " << request->response << std::endl;
     }
 //    std::cerr << "Total bytes sent: " << request->bytes_sent << std::endl;
 	if (send_response(pfd.fd, request) || request->response_sent) {
@@ -121,8 +122,10 @@ int Server::handle_pollout(pollfd &pfd) {
 ////        std::cerr << "----------------------------------------\n" << std::endl;
 //        if (request->response.size() < 200)
 //            sleep(1);
-        request->clear();
-        pfd.events = POLLIN;
+        if (!request->chunked) {
+            request->clear();
+            pfd.events = POLLIN;
+        }
     }
 	return EXIT_SUCCESS;
 }
