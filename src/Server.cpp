@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/16 17:03:28 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/17 12:59:55 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,21 +106,14 @@ int Server::handle_pollout(pollfd &pfd) {
     if (request->response.empty()) {
         ResponseGenerator resp_gen(*request);
         request->response = resp_gen.generate_response(_cookies);
-<<<<<<< HEAD
-=======
 //        std::cerr << "----------------------------------------\n";
 //        std::cerr << "Request type: " << request->method << '\n';
 //        std::cerr << "Path: " << request->file_path << '\n';
 //        std::cerr << "Response of " << request->response.size() << " bytes" <<
 //                  std::endl;
         std::cerr << "Response: " << request->response << std::endl;
->>>>>>> 2c9a17da33b50afaf37e004b2c7823200147e026
     }
 	if (send_response(pfd.fd, request) || request->response_sent) {
-<<<<<<< HEAD
-        request->clear();
-        pfd.events = POLLIN;
-=======
 //        std::cerr << "Total bytes sent at completion: " << request->bytes_sent
 //        <<
 //        std::endl;
@@ -131,7 +124,6 @@ int Server::handle_pollout(pollfd &pfd) {
             request->clear();
             pfd.events = POLLIN;
         }
->>>>>>> 2c9a17da33b50afaf37e004b2c7823200147e026
     }
 	return EXIT_SUCCESS;
 }
