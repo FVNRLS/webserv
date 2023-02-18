@@ -114,6 +114,7 @@ int Server::handle_pollout(pollfd &pfd) {
 	if (send_response(pfd.fd, request) || request->response_sent) {
         if (request->status != CONTINUE)
             request->clear();
+        request->response.clear();
         request->status = EXIT_SUCCESS;
         pfd.events = POLLIN;
     }

@@ -46,8 +46,6 @@ void    requestParser::parse() {
 void    requestParser::parse_request_line() {
     std::vector<std::string> tokens = tokenize_first_line();
 
-    if (_request.chunked)
-        return;
     if (tokens.size() < 3) {
         _request.status = BAD_REQUEST;
         return;
@@ -84,7 +82,7 @@ void    requestParser::check_chunked() {
         get_body_length_chunked();
     _request.buf = _request.buf.substr(_request.head_length);
     _request.head_length = 0;
-    _request.chunkfile.open("./uploads/curl_upload", O_CREAT | O_TRUNC);
+    _request.chunkfile.open("../uploads/curl_upload.txt", std::ios::out | std::ios::trunc);
     if (!_request.chunkfile.is_open() || _request.chunkfile.fail())
         _request.status = INTERNAL_SERVER_ERROR;
 }

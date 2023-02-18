@@ -2,7 +2,7 @@
 
 #include "Socket.hpp"
 
-struct request_handler { //todo: delete item from map
+struct request_handler {
 	Socket							socket;
 	std::string						buf;
 	std::string						method;
