@@ -23,10 +23,6 @@ ResponseGenerator::~ResponseGenerator() {}
 
 // MEMBER FUNCTIONS
 std::string ResponseGenerator::generate_response(Session &cookie) {
-//  if (_request.method == "PUT") {
-//      PUTRequest put(_request);
-//      _request.status = put.create_response(_response_body);
-//  }
     if (_request.status == EXIT_SUCCESS) {
         if (_request.method == "GET") {
             GETRequest get(_request);
@@ -53,6 +49,8 @@ std::string ResponseGenerator::create_error_code_response(int status_code) {
   std::ifstream file;
   std::string error_page_path;
 
+  if (_request.status == MOVED_PERMANENTLY)
+      return redirection_response(status_code);
   error_page_path = _request.socket.get_config().get_error_pages_dir() +
                     toString(status_code) + ".html";
   if (access(error_page_path.c_str(), R_OK) < 0 ||
@@ -67,10 +65,15 @@ std::string ResponseGenerator::create_error_code_response(int status_code) {
   return generate_response_header(status_code) + _response_body;
 }
 
+std::string ResponseGenerator::redirection_response(int status_code) {
+    return  "HTTP/1.1 " + toString(status_code) + " " +
+            _reasonPhrases.find(status_code)->second +
+            "\r\nLocation: " + _request.buf + END_OF_REQUEST;
+}
+
 std::string ResponseGenerator::generate_response_header(int status_code) {
 	if (status_code == EXIT_SUCCESS)
 		status_code = OK;
-  
 	std::string cookies;
 	if (_request.cookies)
 		cookies = "\r\nSet-Cookie: key=" + toString<int>(_request.cookies);
@@ -81,6 +84,8 @@ std::string ResponseGenerator::generate_response_header(int status_code) {
             toString(_response_body.length()) +
             cookies + END_OF_REQUEST;
 }
+
+
 
 const std::map<int, std::string> ResponseGenerator::_reasonPhrases = make_pairs();
 

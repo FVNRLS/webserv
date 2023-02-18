@@ -26,9 +26,10 @@ private:
 	static const std::map<int, std::string>	_reasonPhrases;
 
 	//ERROR MANAGEMENT
-	std::string			create_error_code_response(int status_code);
+	std::string			                    create_error_code_response(int status_code);
 
-	std::string			generate_response_header(int status_code);
+	std::string			                    generate_response_header(int status_code);
+    std::string                             redirection_response(int status_code);
 	static const std::map<int, std::string> make_pairs();
 
 

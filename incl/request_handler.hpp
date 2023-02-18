@@ -26,6 +26,7 @@ struct request_handler {
     std::string                     user_agent;
     std::string                     content_type;
     std::ofstream                   chunkfile;
+    bool                            dir_list;
 
     request_handler ();
     request_handler(const request_handler &src);

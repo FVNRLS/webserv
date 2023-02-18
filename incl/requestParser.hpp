@@ -23,7 +23,6 @@ private:
     int                         _url_type;
     enum                        url_types{SERVER_INDEX, SERVER, LOCATION_INDEX, LOCATION};
 
-    void                        handle_chunked();
     void                        parse_request_line();
     std::vector<std::string>    tokenize_first_line();
     void                        check_chunked();
@@ -38,7 +37,7 @@ private:
     void                        set_body_length();
     void                        set_cgi_path();
     void                        get_body_length_chunked();
-
+    void                        check_redirection();
 
 public:
 	requestParser(request_handler &request);

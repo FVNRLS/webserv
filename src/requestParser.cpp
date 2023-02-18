@@ -23,12 +23,20 @@ void    requestParser::parse() {
     split_query();
     set_cookies();
     set_url_type();
+    check_redirection();
+    if (_request.status)
+        return;
     set_location_config();
     if (_request.status)
         return;
     check_method();
     if (_request.status)
         return;
+    if (_request.dir_list && _request.method == "GET") {
+        _request.body_received = true;
+        return;
+    }
+    _request.dir_list = false;
     translate_path();
     set_interpreter();
     check_file_path();
@@ -90,9 +98,8 @@ void    requestParser::check_chunked() {
 void    requestParser::get_body_length_chunked() {
     std::string body = _request.buf.substr(_request.head_length);
     _request.body_length = std::strtol(body.c_str(), NULL, 16);
-    if (_request.body_length == 0) {
+    if (_request.body_length == 0)
         _request.body_received = true;
-    }
 }
 
 void	requestParser::set_cookies() {
@@ -132,6 +139,19 @@ void    requestParser::set_url_type() {
     }
 }
 
+void    requestParser::check_redirection() {
+    if (_url_type != LOCATION_INDEX)
+        return;
+
+    for (size_t	i = 0; i < _request.socket.get_config().get_redirect().size(); i++) {
+        if (_request.socket.get_config().get_redirect()[i].first == _locations[0]) {
+            _request.status = MOVED_PERMANENTLY;
+            _request.buf = _request.socket.get_config().get_redirect()[i].second;
+            return;
+        }
+    }
+}
+
 void    requestParser::set_location_config() {
     if (_url_type != LOCATION && _url_type != LOCATION_INDEX)
         return;
@@ -139,6 +159,11 @@ void    requestParser::set_location_config() {
     for (size_t	i = 0; i < _request.socket.get_config().get_locations().size(); i++) {
         if (_request.socket.get_config().get_locations()[i].prefix.compare(1, _locations[0].size(), _locations[0]) == 0) {
              _location_config = _request.socket.get_config().get_locations()[i];
+            _request.dir_list = _location_config.directory_listing;
+            if (_request.dir_list && _url_type == LOCATION)
+                _request.file_path = _location_config.root;
+            else
+                _request.dir_list = false;
             return;
         }
     }

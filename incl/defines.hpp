@@ -27,6 +27,7 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <dirent.h>
 
 template <typename T>
 void	print_vector(T vector, size_t size) {

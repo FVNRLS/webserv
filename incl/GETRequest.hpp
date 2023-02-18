@@ -23,9 +23,11 @@ private:
 	Env					_environment;
 
 	int					create_html_response(std::string &_response);
+    int                 dir_list_response(std::string &response);
 
 
-public:
+
+        public:
 	GETRequest(request_handler& request);
 	~GETRequest();
 
