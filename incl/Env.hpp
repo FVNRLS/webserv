@@ -19,7 +19,6 @@ private:
 	request_handler&	_request;
 
 	std::string			remote_addr();
-	std::string			get_header_value(std::string key);
 
 public:
 	Env(request_handler& request);

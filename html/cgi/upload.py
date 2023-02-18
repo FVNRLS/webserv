@@ -1,4 +1,4 @@
-import cgi, fileinput, os, sys, http.cookies
+import cgi, os
 
 try:
 	parsed = cgi.FieldStorage()

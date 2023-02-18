@@ -1,7 +1,3 @@
-//
-// Created by Roman Mazuritskiy on 1/31/23.
-//
-
 #pragma once
 
 #include "Env.hpp"

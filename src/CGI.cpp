@@ -1,12 +1,13 @@
 #include "CGI.hpp"
 
-CGI::CGI() : _response_fd(fileno(tmpfile())) {}
+CGI::CGI() {}
 
 CGI::~CGI() {}
 
 
 //MEMBER FUNCTIONS
 int CGI::create_response(const request_handler &request, std::string &response) {
+    _response_fd = tmpfilefd();
     if (_response_fd < 0)
         return error("tmpfile creation failed!");
 	switch (fork()) {
@@ -20,8 +21,6 @@ int CGI::create_response(const request_handler &request, std::string &response) 
 	}
 	if (write_response(response) != EXIT_SUCCESS)
 		return error("Reading from pipe failed!");
-	if (response.empty())
-		return error("EMPTY RESPONSE!");
 	return EXIT_SUCCESS;
 }
 
@@ -33,20 +32,22 @@ void	CGI::child_process(const request_handler &request) {
 
 	char *arguments[3];
 	arguments[0] = const_cast<char*>(request.interpreter.c_str());
-	arguments[1] = const_cast<char*>(request.file_path.c_str());
+	arguments[1] = realpath(request.file_path.c_str(), NULL);
 	arguments[2] = NULL;
 
     dup2(_response_fd, STDOUT_FILENO);
     if (dup_request_to_stdin(request) == EXIT_FAILURE)
         exit(error("tmpfile creation failed!"));
-	if (execve(arguments[0], arguments, environment) == -1)
+    if (!request.cgi_path.empty() && chdir(request.cgi_path.c_str()) == -1)
+        exit(error("chdir failed!"));
+    if (execve(arguments[0], arguments, environment) == -1)
 		exit(error("execve failed!"));
 }
 
 int CGI::dup_request_to_stdin(const request_handler& request) {
-    int fd = fileno(tmpfile());
+    int fd = tmpfilefd();
 
-	if (fd < 0 || write(fd, request.query.c_str(), request.query.length())  < 0)
+	if (fd < 0 || write(fd, request.query.c_str(), request.query.length()) < 0)
        return EXIT_FAILURE;
     lseek(fd, 0, SEEK_SET);
 	dup2(fd, STDIN_FILENO);
@@ -88,4 +89,12 @@ int CGI::write_response(std::string &response) {
 int	CGI::error(const char* message) {
 	std::cerr << message << '\n';
 	return INTERNAL_SERVER_ERROR;
+}
+
+int CGI::tmpfilefd() {
+    FILE*   tmp = tmpfile();
+
+    if (tmp == NULL)
+        return -1;
+    return fileno(tmp);
 }

@@ -27,14 +27,13 @@ int GETRequest::create_response(std::string &response) {
 	return _cgi.create_response(_request, response);
 }
 
-
 int GETRequest::create_html_response(std::string &response) {
 	std::ifstream	file;
 	std::string		body;
 
 	if (access(_request.file_path.c_str(), F_OK) < 0)
 		return PAGE_NOT_FOUND;
-	if (open_file(_request.file_path, file) == EXIT_FAILURE)
+    if (open_file(_request.file_path, file) == EXIT_FAILURE)
 		return FORBIDDEN;
 	body.append((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	file.close();

@@ -8,3 +8,5 @@ a.out
 .vscode/**
 uploads/
 obj/
+venv/
+*.pdf

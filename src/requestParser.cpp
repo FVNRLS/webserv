@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/14 17:24:56 by doreshev          #+#    #+#             */
-/*   Updated: 2023/02/14 17:50:43 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/17 12:39:45 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,15 @@ void    requestParser::parse() {
         return;
     translate_path();
     set_interpreter();
+    check_file_path();
+    if (_request.status)
+        return;
+    set_cgi_path();
+    _request.user_agent = get_header_value("User-Agent:", _request.buf);
+    _request.content_type = get_header_value("Content-Type:", _request.buf);
+    check_chunked();
+    if (_request.chunked)
+        return;
     set_body_length();
 }
 
@@ -54,6 +63,36 @@ std::vector<std::string> requestParser::tokenize_first_line() {
 		return split(first_line, SPACE);
 	}
 	return std::vector<std::string>();
+}
+
+void    requestParser::check_chunked() {
+    if (!header_key_exists("Transfer-Encoding:", _request.buf))
+        return;
+    if (!header_value_is_equal_to("Transfer-Encoding:", "chunked", _request.buf))
+    {
+        _request.status = NOT_IMPLEMENTED;
+        return;
+    }
+    _request.chunked = true;
+    if (header_value_is_equal_to("Expect:", "100-continue", _request.buf)) {
+        _request.status = CONTINUE;
+        _request.response = "HTTP/1.1 100 Continue\r\n\r\n";
+    }
+    else
+        get_body_length_chunked();
+    _request.buf = _request.buf.substr(_request.head_length);
+    _request.head_length = 0;
+    _request.chunkfile.open("./uploads/curl_upload.txt", std::ios::out | std::ios::trunc);
+    if (!_request.chunkfile.is_open() || _request.chunkfile.fail())
+        _request.status = INTERNAL_SERVER_ERROR;
+}
+
+void    requestParser::get_body_length_chunked() {
+    std::string body = _request.buf.substr(_request.head_length);
+    _request.body_length = std::strtol(body.c_str(), NULL, 16);
+    if (_request.body_length == 0) {
+        _request.body_received = true;
+    }
 }
 
 void	requestParser::set_cookies() {
@@ -83,21 +122,18 @@ void    requestParser::set_url_type() {
             _url_type = SERVER_INDEX;
             break;
         case 1:
-            if (_locations[0].find('.') != std::string::npos)  {
+            if (_locations[0].find('.') != std::string::npos)
                 _url_type = SERVER;
-                break;
-            }
-        default:
-            if (_locations.back().find('.') != std::string::npos) {
-                _url_type = LOCATION;
-            }
             else
                 _url_type = LOCATION_INDEX;
+            break;
+        default:
+            _url_type = LOCATION;
     }
 }
 
 void    requestParser::set_location_config() {
-    if (_url_type != LOCATION)
+    if (_url_type != LOCATION && _url_type != LOCATION_INDEX)
         return;
 
     for (size_t	i = 0; i < _request.socket.get_config().get_locations().size(); i++) {
@@ -135,7 +171,12 @@ void	requestParser::translate_path() {
             _request.file_path = _location_config.root + _location_config.index;
             break;
         case LOCATION:
-            _request.file_path = _location_config.root + _locations.back();
+            _request.file_path = _location_config.root + _locations[1];
+            for (size_t i = 2; i < _locations.size(); i++) {
+                _request.file_path += "/" + _locations[i];
+            }
+            if (_locations.back().find('.') == std::string::npos)
+                _request.file_path += "/" + _location_config.index;
     }
 }
 
@@ -156,6 +197,16 @@ void	requestParser::set_interpreter() {
     }
 }
 
+void	requestParser::check_file_path() {
+    if (access(_request.file_path.data(), F_OK) == -1)
+        _request.status = PAGE_NOT_FOUND;
+    else if (!is_regular_file(_request.file_path.data())) {
+        _request.status = PAGE_NOT_FOUND;
+    }
+    else if (access(_request.file_path.data(), R_OK) == -1)
+        _request.status = PAGE_NOT_FOUND;
+}
+
 void requestParser::set_body_length() {
     if (_request.method == "GET")
         return;
@@ -165,4 +216,10 @@ void requestParser::set_body_length() {
         _request.body_length = static_cast<size_t> (std::atoll(_request.buf.data() + pos + std::strlen("Content-Length: ")));
     if (_request.body_length == 0)
         _request.status = NO_CONTENT;
+}
+
+void requestParser::set_cgi_path() {
+    if (_url_type == SERVER || _url_type == SERVER_INDEX)
+        return ;
+    _request.cgi_path = _location_config.cgi_path;
 }

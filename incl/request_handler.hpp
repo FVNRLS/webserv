@@ -2,7 +2,7 @@
 
 #include "Socket.hpp"
 
-struct request_handler { //todo: delete item from map
+struct request_handler {
 	Socket							socket;
 	std::string						buf;
 	std::string						method;
@@ -16,8 +16,20 @@ struct request_handler { //todo: delete item from map
 	std::string						interpreter;
 	std::string						query;
 	int								cookies;
+    bool                            response_sent;
+    std::string                     response;
+    size_t                          bytes_sent;
+    std::string                     cgi_path;
+    bool                            chunked;
+    bool                            chunk_complete;
+    size_t                          chunk_length;
+    std::string                     user_agent;
+    std::string                     content_type;
+    std::ofstream                   chunkfile;
 
     request_handler ();
     request_handler(const request_handler &src);
     request_handler& operator= (const request_handler &rhs);
+
+    void                            clear();
 };

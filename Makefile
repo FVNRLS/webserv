@@ -6,7 +6,7 @@
 #    By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/11/26 23:28:55 by hoomen            #+#    #+#              #
-#    Updated: 2023/02/09 17:00:20 by doreshev         ###   ########.fr        #
+#    Updated: 2023/02/15 17:56:43 by hoomen           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,6 +22,7 @@ VPATH		= src
 SRC			=	CGI.cpp CLI.cpp Config.cpp ConfigParser.cpp DELETERequest.cpp \
 					Env.cpp GETRequest.cpp main.cpp POSTRequest.cpp ResponseGenerator.cpp \
 					Server.cpp Socket.cpp tools.cpp Session.cpp request_handler.cpp requestParser.cpp \
+					Chunks.cpp \
 
 ODIR		=	obj
 OBJ			=	$(SRC:%.cpp=$(ODIR)/%.o)

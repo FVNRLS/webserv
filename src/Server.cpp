@@ -6,7 +6,7 @@
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/12 13:36:37 by rmazurit          #+#    #+#             */
-/*   Updated: 2023/02/14 17:50:29 by doreshev         ###   ########.fr       */
+/*   Updated: 2023/02/17 12:59:55 by doreshev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ int Server::run() {
 		if (resolve_requests() == EXIT_FAILURE)
 			return EXIT_FAILURE;
 		delete_invalid_fds();
-//		std::cout << "NUM FD'S:		" << _pfds.size() << std::endl;
+		// std::cout << "NUM FD'S:		" << _pfds.size() << std::endl;
 	}
 }
 
@@ -51,8 +51,8 @@ int	Server::check_cli() {
 
 int Server::accept_requests() {
 	socklen_t 			client_len;
-	struct sockaddr 	client_addr = {};
-	pollfd				client_pollfd = {};
+	struct sockaddr 	client_addr;
+	pollfd				client_pollfd;
 
 	for (size_t i = 1; i < _sockets.size(); i++) {
 		if (_pfds[i].revents & POLLIN) {
@@ -84,14 +84,20 @@ int Server::resolve_requests() {
 }
 
 int Server::handle_pollin(pollfd &pfd) {
-	request_handler* request = &_requests.find(pfd.fd)->second;
+    request_handler* request = &_requests.find(pfd.fd)->second;
 
 	if (accumulate(*request, pfd.fd) == EXIT_FAILURE)
 		return EXIT_FAILURE;
-	if (request->head_received) {
-        request->status = handle_request_header(*request);
-        if (request->buf.size() >= request->head_length + request->body_length)
-            request->body_received = true;
+	if (request->head_received && !request->status) {
+        if (!request->chunked) {
+            request->status = handle_request_header(*request);
+            if (!request->chunked && request->buf.size() >= request->head_length + request->body_length)
+                request->body_received = true;
+        }
+        if (request->chunked && !request->body_received) {
+            Chunks    chunks(*request);
+            chunks.handle();
+        }
     }
 	if (request->status || request->method == "GET" || request->body_received)
 		pfd.events = POLLOUT;
@@ -100,20 +106,32 @@ int Server::handle_pollin(pollfd &pfd) {
 
 int Server::handle_pollout(pollfd &pfd) {
 	request_handler* request = &_requests.find(pfd.fd)->second;
-	
-	ResponseGenerator resp_gen(*request);
-	std::string  response = resp_gen.generate_response(_cookies);
-	if (!response.empty()) {
-		ssize_t	bytes = 0;
-		ssize_t	length = response.size();
-		while (bytes < length) {
-			bytes += send(pfd.fd, response.data() + bytes, length - bytes, 0);
-		}
-        _requests.erase(pfd.fd);
-	}
-	close(pfd.fd);
-    pfd.fd = -1;
+
+    if (request->response.empty()) {
+        ResponseGenerator resp_gen(*request);
+        request->response = resp_gen.generate_response(_cookies);
+    }
+	if (send_response(pfd.fd, request) || request->response_sent) {
+        if (request->status != CONTINUE)
+            request->clear();
+        request->response.clear();
+        request->status = EXIT_SUCCESS;
+        pfd.events = POLLIN;
+    }
 	return EXIT_SUCCESS;
+}
+
+int Server::send_response(int fd, request_handler *request) {
+
+    ssize_t bytes = send(fd, request->response.data(), request->response.size(), 0);
+    if (bytes == -1)
+        return EXIT_FAILURE;
+    request->bytes_sent += bytes;
+    if (bytes == 0 || request->bytes_sent >= request->response.size())
+        request->response_sent = true;
+    else
+        request->response = request->response.substr(bytes);
+    return EXIT_SUCCESS;
 }
 
 int Server::check_connection(pollfd &pfd) {
@@ -138,23 +156,25 @@ int	Server::accumulate(request_handler &request, int request_fd) {
 	if (bytes < 0)
 		return (system_call_error(RECV_ERROR));
 	request.buf += std::string(buffer, bytes);
-    std::cout << request.buf << '\n';
-	set_request_end_flags(request);
+    if (!request.chunked)
+	    set_request_end_flags(request);
 	return EXIT_SUCCESS;
 }
 
 void	Server::set_request_end_flags(request_handler &request) {
-	long long	max_client_body_size = request.socket.get_config().get_max_client_body_size();
-
-	if ((static_cast<long long>(request.buf.length()) > max_client_body_size)) {
-		request.status = BAD_REQUEST;
-		return;
-	}
-	request.head_length = request.buf.find(END_OF_REQUEST);
+    request.head_length = request.buf.find(END_OF_REQUEST);
 	if (request.head_length != std::string::npos) {
 		request.head_length += std::strlen(END_OF_REQUEST.c_str());
 		request.head_received = true;
 	}
+    if (!request.head_received)
+        return;
+    long long	max_client_body_size = request.socket.get_config().get_max_client_body_size();
+    if ((static_cast<long long>(request.buf.length() - request.head_length) > max_client_body_size))
+    {
+        request.status = BAD_REQUEST;
+        return;
+    }
 }
 
 int Server::handle_request_header(request_handler &request) {
@@ -178,6 +198,7 @@ int	Server::check_logout(const int &key, const std::string &query) {
 	}
 	return key;
 }
+
 void	Server::delete_invalid_fds() {
 	std::vector<pollfd>::iterator it = _pfds.begin() + _sockets.size();
 
