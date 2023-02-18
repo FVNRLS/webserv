@@ -160,7 +160,7 @@ void    requestParser::set_location_config() {
         if (_request.socket.get_config().get_locations()[i].prefix.compare(1, _locations[0].size(), _locations[0]) == 0) {
              _location_config = _request.socket.get_config().get_locations()[i];
             _request.dir_list = _location_config.directory_listing;
-            if (_request.dir_list && _url_type == LOCATION)
+            if (_request.dir_list && _url_type == LOCATION_INDEX)
                 _request.file_path = _location_config.root;
             else
                 _request.dir_list = false;
