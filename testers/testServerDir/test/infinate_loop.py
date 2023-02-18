@@ -1,4 +1,0 @@
-
-
-while True:
-	continue
