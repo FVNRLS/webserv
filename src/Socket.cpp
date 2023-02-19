@@ -25,7 +25,7 @@ Socket::Socket(const Socket &src) : _config(src._config),
     _serv_addr(src._serv_addr), _socket(src._socket),
     _port(src._port), _is_unique(src._is_unique) { }
 
-Socket &Socket::operator=(const Socket &src) { //todo: check after finishing the class
+Socket &Socket::operator=(const Socket &src) {
 	if (this == &src)
 		return (*this);
 	_config = src._config;

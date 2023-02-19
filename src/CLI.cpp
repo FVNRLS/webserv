@@ -21,7 +21,6 @@ CLI::CLI(const CLI &src) {
 	*this = src;
 }
 
-//TODO: complete in the end!
 CLI &CLI::operator=(const CLI &src) {
 	if (this == &src)
 		return (*this);

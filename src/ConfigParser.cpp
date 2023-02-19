@@ -708,7 +708,6 @@ int ConfigParser::set_cgi_path() {
 	else if (num_tokens > 2)
 		return (parsing_error_line(INVALID_NUM_OF_PARAMETERS, _config_file, get_line_num(_tokens[0])));
 	_serv[_i_serv]._locations[_i_loc].cgi_path = _tokens[1];
-    std::cerr << "_tokens[1] = " << _tokens[1] << std::endl;
 	return (EXIT_SUCCESS);
 }
 

@@ -167,7 +167,7 @@ void    requestParser::set_location_config() {
             return;
         }
     }
-    _request.status = PAGE_NOT_FOUND;
+    _request.status = FORBIDDEN;
 }
 
 void	requestParser::check_method() {
@@ -200,8 +200,8 @@ void	requestParser::translate_path() {
             for (size_t i = 2; i < _locations.size(); i++) {
                 _request.file_path += "/" + _locations[i];
             }
-            if (_locations.back().find('.') == std::string::npos)
-                _request.file_path += "/" + _location_config.index;
+//            if (_locations.back().find('.') == std::string::npos)
+//                _request.file_path += "/" + _location_config.index;
     }
 }
 
@@ -226,10 +226,10 @@ void	requestParser::check_file_path() {
     if (access(_request.file_path.data(), F_OK) == -1)
         _request.status = PAGE_NOT_FOUND;
     else if (!is_regular_file(_request.file_path.data())) {
-        _request.status = PAGE_NOT_FOUND;
+        _request.status = PAYMENT_REQUIRED;
     }
     else if (access(_request.file_path.data(), R_OK) == -1)
-        _request.status = PAGE_NOT_FOUND;
+        _request.status = FORBIDDEN;
 }
 
 void requestParser::set_body_length() {
