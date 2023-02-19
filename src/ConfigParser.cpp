@@ -841,10 +841,6 @@ void	ConfigParser::set_unique_flags() {
 		for (size_t j = i + 1; j < _configs->size(); j++) {
 			port2 = (*_configs)[j].get_port();
 			ip2 = (*_configs)[j].get_ip();
-			if (port1 == port2 && ip1 == ip2) {
-				(*_configs)[i]._is_unique = false;
-				(*_configs)[j]._is_unique = false;
-			}
 		}
 	}
 }

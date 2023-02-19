@@ -18,12 +18,11 @@ Socket::Socket() {}
 Socket::Socket(Config &server_config) {
 	_config = &server_config;
 	_port = _config->get_port();
-	_is_unique = _config->get_is_unique();
 }
 
 Socket::Socket(const Socket &src) : _config(src._config),
     _serv_addr(src._serv_addr), _socket(src._socket),
-    _port(src._port), _is_unique(src._is_unique) { }
+    _port(src._port) {}
 
 Socket &Socket::operator=(const Socket &src) {
 	if (this == &src)
@@ -32,7 +31,6 @@ Socket &Socket::operator=(const Socket &src) {
 	_serv_addr = src._serv_addr;
 	_socket = src._socket;
 	_port = src._port;
-	_is_unique = src._is_unique;
 	return (*this);
 }
 
@@ -90,14 +88,6 @@ int Socket::init_unblock_sockets() {
 	setsockopt(_socket.fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 	if (fcntl(_socket.fd, F_SETFL, O_NONBLOCK) < 0)
 		return (socket_error(SOCKET_OPEN_ERROR));
-
-	//virtual part
-	if (!_is_unique) { //todo: find out, what is right: SO_REUSEADDR or SO_REUSEPORT ????
-		if (setsockopt(_socket.fd, SOL_SOCKET, SO_REUSEADDR, server_name.c_str(), server_name.length()) < 0)
-			return (socket_error(BIND_ERROR));
-		if (setsockopt(_socket.fd, SOL_SOCKET, SO_REUSEADDR, server_alias.c_str(), server_alias.length()) < 0)
-			return (socket_error(BIND_ERROR));
-	}
 	return (EXIT_SUCCESS);
 }
 

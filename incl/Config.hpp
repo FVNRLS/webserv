@@ -43,7 +43,6 @@ private:
 	std::string											_error_pages_dir;
 	std::vector<location>								_locations;
 	std::vector<std::pair<std::string, std::string> >	_redirect;
-	bool												_is_unique;
 
 public:
 	//BASIC CLASS SETUP
@@ -66,7 +65,6 @@ public:
 	long long											get_max_client_body_size() const;
 	std::string											get_error_pages_dir() const;
 	std::vector<location>								get_locations() const;
-	bool												get_is_unique() const;
 	std::vector<std::pair<std::string, std::string> >	get_redirect() const;
 
 };

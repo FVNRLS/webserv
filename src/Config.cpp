@@ -13,7 +13,7 @@
 #include "Config.hpp"
 
 //BASIC CLASS SETUP
-Config::Config() : _ports(0), _max_client_body_size(UINT32_MAX), _is_unique(true) {}
+Config::Config() : _ports(0), _max_client_body_size(UINT32_MAX) {}
 
 Config::Config(const Config &src) {
 	*this = src;
@@ -34,7 +34,6 @@ Config &Config::operator=(const Config &src) {
 	_error_pages_dir = src._error_pages_dir;
 	_redirect = src._redirect;
 	_locations = src._locations;
-	_is_unique = src._is_unique;
 	return (*this);
 }
 
@@ -174,10 +173,6 @@ std::string	Config::get_error_pages_dir() const {
 
 std::vector<location>	Config::get_locations() const {
 	return (_locations);
-}
-
-bool Config::get_is_unique() const {
-	return (_is_unique);
 }
 
 std::vector<std::pair<std::string, std::string> >	Config::get_redirect() const {

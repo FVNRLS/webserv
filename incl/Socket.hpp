@@ -22,7 +22,6 @@ private:
 	sockaddr_in				_serv_addr;
 	pollfd					_socket;
 	size_t					_port;
-	bool					_is_unique;
 
 	//CORE FUNCTIONS
 	void					set_serv_addr();
