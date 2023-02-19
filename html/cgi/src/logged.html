@@ -8,7 +8,7 @@
       text-align: center;
     }
     h1 {
-      margin-top: 50px;
+      margin-top: 0px;
       font-size: 36px;
       color: #333;
     }
@@ -44,32 +44,50 @@
       border-radius: 5px;
       cursor: pointer;
     }
+    .card {
+            background-color: #adaeae;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+        }
+        .card2 {
+            background-color: #7c7f7d;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+        }
   </style>
 </head>
 <body>
-  <h1>Thank you for providing us your Username and Password! ^_^</h1>
-  <button><a href="/about.html">&nbsp;About</a></button>
-  <br>
-
-  <button><a href="hering.py">Hering</a></button>
-  <button><a href="turkmen_khan.py">Turkmen Khan</a></button>
-  <button><a href="hollandic_people.py">Hollandic People</a></button>
-  <button><a href="maxwell.php">&nbsp;&nbsp;Maxwell&nbsp;&nbsp;</a></button>
-  <br>
-
-  <button><a href="current_time.py">&nbsp;Time&nbsp;</a></button>
-  <button><a href="/">&nbsp;Home&nbsp;</a></button>
-  <br>
-
-  <button><a href="start.py?action=logout">Logout</a></button>
-  <br>
-
-  <br>
-  <form action="upload.py" method="post" enctype="multipart/form-data">
-    <input type="file" name="name">
-    <br><br>
-    <input type="submit" value="Upload">
-  </form>
   <br><br>
+  <h1>Thank you for providing us your Username and Password! ^_^</h1>
+  <br>
+   
+  <div class="card2">
+    <h1>Meet Contributors!</h1>
+    <button><a href="/about.html">About</a></button>
+    <br>
+    <button><a href="hering.py">Hering</a></button>
+    <button><a href="turkmen_khan.py">Turkmen Khan</a></button>
+    <button><a href="hollandic_people.py">Hollandic&nbsp;People</a></button>
+    <button><a href="maxwell.php">&nbsp;&nbsp;Maxwell&nbsp;&nbsp;</a></button>
+  </div>
+  
+  <div class="card">
+    <h1>What we can do!</h1>
+    <button><a href="current_time.py">&nbsp;Show&nbsp;Time&nbsp;</a></button>
+    <button><a href="/">Go&nbsp;Home&nbsp;</a></button>
+    <button><a href="magic.py">Vzhuuuh!!!</a></button>
+    <br>
+    <form action="upload.py" method="post" enctype="multipart/form-data">
+      <input type="file" name="name">
+      <input type="submit" value="Upload">
+    </form>
+  </div>
+  
+  <br><br>
+  <button><a href="start.py?action=logout">Logout</a></button>
 </body>
 </html>
