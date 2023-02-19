@@ -167,7 +167,7 @@ void    requestParser::set_location_config() {
             return;
         }
     }
-    _request.status = FORBIDDEN;
+    _request.status = PAGE_NOT_FOUND;
 }
 
 void	requestParser::check_method() {
