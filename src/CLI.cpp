@@ -43,11 +43,8 @@ int CLI::check_input() {
 		return (EXIT_FAILURE);
 	if (_input.empty())
 		return (CLI_EMPTY);
-
 	for (std::string::iterator it = _input.begin(); it != _input.end(); it++)
 		*it = std::toupper(*it);
-	std::cout << _input << std::endl;
-
 	if (_input == "EXIT\n")
 		return (CLI_EXIT);
 	if (_input == "LS\n")

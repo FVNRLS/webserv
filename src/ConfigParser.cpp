@@ -798,7 +798,6 @@ int ConfigParser::check_loc_config() {
 		if (check_loc_index() == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 		check_loc_root();
-		check_cgi_path();
 	}
 	return (EXIT_SUCCESS);
 }
@@ -819,15 +818,6 @@ void 	ConfigParser::check_loc_root() {
 	if (root->empty())
 		*root = _serv[_i_serv]._root;
 }
-
-void 	ConfigParser::check_cgi_path() {
-	std::string	*cgi;
-
-	cgi = &_serv[_i_serv]._locations[_i_loc].cgi_path;
-//	if (cgi->empty())
-//		*cgi = DEFAULT_CGI_PATH;
-}
-
 
 void	ConfigParser::extract_configs() {
 	Config new_config;
@@ -859,7 +849,6 @@ void	ConfigParser::set_unique_flags() {
 		}
 	}
 }
-
 
 //ERROR MANAGEMENT
 int	ConfigParser::parsing_error_basic(int error, const std::string &config_file) {

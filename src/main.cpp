@@ -15,7 +15,6 @@
 
 int main(int argc, char **argv) {
 
-    std::cerr << "PROCESS ID = " << getpid();
 	//PARSING
 	if (argc > 2) {
 		std::cerr << "Error: invalid number of arguments" << std::endl;

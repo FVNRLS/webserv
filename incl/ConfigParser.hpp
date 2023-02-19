@@ -86,7 +86,6 @@ private:
 	int		check_loc_config();
 	int		check_loc_index();
 	void	check_loc_root();
-	void	check_cgi_path();
 
 	//FORMING OF UNIQUE CONFIGS
 	void	extract_configs();
