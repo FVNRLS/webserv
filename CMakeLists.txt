@@ -37,8 +37,8 @@ add_executable(webserver
         incl/request_handler.hpp
         src/request_handler.cpp
 
-        incl/requestParser.hpp
-        src/requestParser.cpp
+        incl/RequestParser.hpp
+        src/RequestParser.cpp
 
         src/DELETERequest.cpp
         incl/DELETERequest.hpp

@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   requestParser.cpp                                  :+:      :+:    :+:   */
+/*   RequestParser.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,13 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "requestParser.hpp"
+#include "RequestParser.hpp"
 
-requestParser::requestParser(request_handler &request) :  _request(request) {}
+RequestParser::RequestParser(request_handler &request) : _request(request) {}
 
-requestParser::~requestParser() {}
+RequestParser::~RequestParser() {}
 
-void    requestParser::parse() {
+void    RequestParser::parse() {
     parse_request_line();
     if (_request.status)
         return;
@@ -51,7 +51,7 @@ void    requestParser::parse() {
     set_body_length();
 }
 
-void    requestParser::parse_request_line() {
+void    RequestParser::parse_request_line() {
     std::vector<std::string> tokens = tokenize_first_line();
 
     if (tokens.size() < 3) {
@@ -62,7 +62,7 @@ void    requestParser::parse_request_line() {
     _request.file_path = tokens[1];
 }
 
-std::vector<std::string> requestParser::tokenize_first_line() {
+std::vector<std::string> RequestParser::tokenize_first_line() {
 	std::string					first_line;
 
 	size_t	new_line_position = _request.buf.find(NEWLINE);
@@ -73,7 +73,7 @@ std::vector<std::string> requestParser::tokenize_first_line() {
 	return std::vector<std::string>();
 }
 
-void    requestParser::check_chunked() {
+void    RequestParser::check_chunked() {
     if (!header_key_exists("Transfer-Encoding:", _request.buf))
         return;
     if (!header_value_is_equal_to("Transfer-Encoding:", "chunked", _request.buf))
@@ -95,14 +95,14 @@ void    requestParser::check_chunked() {
         _request.status = INTERNAL_SERVER_ERROR;
 }
 
-void    requestParser::get_body_length_chunked() {
+void    RequestParser::get_body_length_chunked() {
     std::string body = _request.buf.substr(_request.head_length);
     _request.body_length = std::strtol(body.c_str(), NULL, 16);
     if (_request.body_length == 0)
         _request.body_received = true;
 }
 
-void	requestParser::set_cookies() {
+void	RequestParser::set_cookies() {
 	size_t position = _request.buf.find("Cookie: key=");
 
 	if (position == std::string::npos)
@@ -111,7 +111,7 @@ void	requestParser::set_cookies() {
     _request.cookies = std::atoi(_request.buf.substr(position).c_str());
 }
 
-void	requestParser::split_query() {
+void	RequestParser::split_query() {
 	size_t position = _request.file_path.find('?');
 
 	if (position != std::string::npos) {
@@ -121,7 +121,7 @@ void	requestParser::split_query() {
     _request.file_path = _request.file_path.substr(0, position);
 }
 
-void    requestParser::set_url_type() {
+void    RequestParser::set_url_type() {
     _locations = split(_request.file_path, '/');
 
     switch (_locations.size()) {
@@ -139,7 +139,7 @@ void    requestParser::set_url_type() {
     }
 }
 
-void    requestParser::check_redirection() {
+void    RequestParser::check_redirection() {
     if (_url_type != LOCATION_INDEX)
         return;
 
@@ -152,7 +152,7 @@ void    requestParser::check_redirection() {
     }
 }
 
-void    requestParser::set_location_config() {
+void    RequestParser::set_location_config() {
     if (_url_type != LOCATION && _url_type != LOCATION_INDEX)
         return;
 
@@ -170,7 +170,7 @@ void    requestParser::set_location_config() {
     _request.status = PAGE_NOT_FOUND;
 }
 
-void	requestParser::check_method() {
+void	RequestParser::check_method() {
     std::vector<std::string> allowed_methods;
 
     if (_url_type == LOCATION)
@@ -184,7 +184,7 @@ void	requestParser::check_method() {
     _request.status = METHOD_NOT_ALLOWED;
 }
 
-void	requestParser::translate_path() {
+void	RequestParser::translate_path() {
     switch (_url_type) {
         case SERVER_INDEX:
             _request.file_path = _request.socket.get_config().get_root() + _request.socket.get_config().get_index();
@@ -205,7 +205,7 @@ void	requestParser::translate_path() {
     }
 }
 
-void	requestParser::set_interpreter() {
+void	RequestParser::set_interpreter() {
     if (_url_type == SERVER_INDEX || _url_type == SERVER)
         return;
 
@@ -222,7 +222,7 @@ void	requestParser::set_interpreter() {
     }
 }
 
-void	requestParser::check_file_path() {
+void	RequestParser::check_file_path() {
     if (access(_request.file_path.data(), F_OK) == -1)
         _request.status = PAGE_NOT_FOUND;
     else if (!is_regular_file(_request.file_path.data())) {
@@ -232,7 +232,7 @@ void	requestParser::check_file_path() {
         _request.status = FORBIDDEN;
 }
 
-void requestParser::set_body_length() {
+void RequestParser::set_body_length() {
     if (_request.method == "GET")
         return;
 
@@ -243,7 +243,7 @@ void requestParser::set_body_length() {
         _request.status = NO_CONTENT;
 }
 
-void requestParser::set_cgi_path() {
+void RequestParser::set_cgi_path() {
     if (_url_type == SERVER || _url_type == SERVER_INDEX)
         return ;
     _request.cgi_path = _location_config.cgi_path;

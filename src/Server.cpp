@@ -178,7 +178,7 @@ void	Server::set_request_end_flags(request_handler &request) {
 }
 
 int Server::handle_request_header(request_handler &request) {
-    requestParser	request_parser(request);
+    RequestParser	request_parser(request);
 
     if (!request.file_path.empty())
         return request.status;

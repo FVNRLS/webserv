@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   requestParser.hpp                                  :+:      :+:    :+:   */
+/*   RequestParser.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: doreshev <doreshev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -14,7 +14,7 @@
 #include "request_handler.hpp"
 
 
-class requestParser {
+class RequestParser {
 
 private:
     request_handler             &_request;
@@ -40,8 +40,8 @@ private:
     void                        check_redirection();
 
 public:
-	requestParser(request_handler &request);
-	~requestParser();
+	RequestParser(request_handler &request);
+	~RequestParser();
 
 	void                        parse();
 };
