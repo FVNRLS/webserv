@@ -131,10 +131,6 @@ size_t 	Socket::get_port()	const {
 	return _port;
 }
 
-//bool	Socket::get_is_unique() const {
-//	return (_is_unique);
-//}
-
 //ERROR MANAGEMENT
 int Socket::socket_error(int error) const {
 	switch(error) {
