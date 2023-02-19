@@ -4,7 +4,9 @@ Env::Env(request_handler& request) : _request(request) {
 }
 Env::~Env() {}
 
-
+/*
+ * Fills the _request.env vector with environmental variables
+ * */
 void	Env::create() {
 	_request.env.push_back("REQUEST_METHOD=" + _request.method);
 	_request.env.push_back("QUERY_STRING=" + _request.query);
@@ -23,6 +25,11 @@ void	Env::create() {
 		_request.env.push_back("HTTP_COOKIE=");
 }
 
+/*
+ * Provides a convenient way to retrieve the IP address of the remote client that made the current request.
+ * It accomplishes this by retrieving the relevant information from the socket object associated with the request
+ * and converting the resulting binary data to a human-readable string.
+ * */
 std::string Env::remote_addr() {
 	struct sockaddr_in	socket_in_address = _request.socket.get_serv_addr();
 	struct sockaddr *socket_address = reinterpret_cast<struct sockaddr *>(&socket_in_address);

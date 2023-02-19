@@ -19,6 +19,11 @@ GETRequest::~GETRequest() {}
 
 
 //MEMBER FUNCTIONS
+
+/*
+ * Handles a GET request by either generating a simple HTML response or by using a CGI script to create a more complex response.
+ * It delegates the responsibility for generating the response to the appropriate method based on whether a CGI script is present or not.
+ * */
 int GETRequest::create_response(std::string &response) {
 	if (_request.interpreter.empty()) {
 		return create_html_response(response);
@@ -27,6 +32,12 @@ int GETRequest::create_response(std::string &response) {
 	return _cgi.create_response(_request, response);
 }
 
+/*
+ * Generates an HTML response based on the contents of the requested file path.
+ * If directory listing is switched on for the location, uses dir_list_response to generate response.
+ * If the file does not exist or cannot be opened, an appropriate error code is returned.
+ * If the file is successfully opened, its contents are read into a string and returned as the response.
+ * */
 int GETRequest::create_html_response(std::string &response) {
 	std::ifstream	file;
 	std::string		body;
@@ -42,7 +53,11 @@ int GETRequest::create_html_response(std::string &response) {
 	response = body;
 	return EXIT_SUCCESS;
 }
-
+/*
+ * Handles GET requests for directory listing.
+ * It opens the specified directory, creates an HTML response that lists the contents, and returns it as a string.
+ * If the directory can't be opened, it returns a PAGE_NOT_FOUND error code.
+ * */
 int GETRequest::dir_list_response(std::string &response) {
     DIR* dir = opendir(_request.file_path.c_str());
 
