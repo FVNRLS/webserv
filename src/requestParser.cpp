@@ -12,7 +12,7 @@
 
 #include "requestParser.hpp"
 
-requestParser::requestParser(request_handler &request) :  _request(request){}
+requestParser::requestParser(request_handler &request) :  _request(request) {}
 
 requestParser::~requestParser() {}
 
