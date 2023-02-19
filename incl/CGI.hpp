@@ -11,7 +11,7 @@ private:
 	int		parent_process();
 	int		write_response(std::string &response);
 	int		dup_request_to_stdin(const request_handler& request);
-    int     tmpfilefd();
+    int     tmp_fd();
 
 public:
 	CGI();
