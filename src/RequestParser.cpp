@@ -173,7 +173,7 @@ void    RequestParser::set_location_config() {
 void	RequestParser::check_method() {
     std::vector<std::string> allowed_methods;
 
-    if (_url_type == LOCATION)
+    if (_url_type == LOCATION || _url_type == LOCATION_INDEX)
         allowed_methods = _location_config.methods;
     else
         allowed_methods = _request.socket.get_config().get_methods();

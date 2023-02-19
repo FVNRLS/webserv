@@ -6,6 +6,20 @@ CGI::~CGI() {}
 
 
 //MEMBER FUNCTIONS
+/*
+	The function creates a response for a CGI request.
+	It takes a reference to a request_handler object and a reference to a string that will hold the response.
+	It first creates a temporary file descriptor to store the response.
+	If the temporary file descriptor creation fails, the function returns an error.
+	It then forks a child process to handle the request.
+	If the fork fails, the function returns an error.
+	If the fork is successful, the child process is executed using the child_process function.
+	The parent process waits for the child process to finish executing.
+	If the child process returns an error, the function returns an internal server error.
+	If the child process completes successfully, the response is written to the string reference passed in as a parameter.
+	If writing to the string fails, the function returns an error.
+	Finally, the function returns EXIT_SUCCESS if everything was successful.
+ * */
 int CGI::create_response(const request_handler &request, std::string &response) {
     _response_fd = tmpfilefd();
     if (_response_fd < 0)
