@@ -75,6 +75,7 @@ const std::string EMPTY_STRING;
 const std::string RESPONSE_HEADER			= "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: ";
 const std::string DEFAULT_CONF_PATH			= "config/clion_test.conf";
 const std::string DEFAULT_INDEX_PAGE		= "html/index.html";
+const std::string DEFAULT_LOCATION_ROOT		= "html/cgi/";
 const std::string DEFAULT_ERROR_PAGES_DIR 	= "html/error_pages/";
 const std::string DEFAULT_REDIR_FIRST		= "config";
 const std::string DEFAULT_REDIR_SECOND		= "welcome page"; //unsure about the values

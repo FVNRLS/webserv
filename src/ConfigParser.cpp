@@ -13,6 +13,13 @@
 #include "ConfigParser.hpp"
 
 //BASIC CLASS SETUP
+
+/*
+ * Solid foundation for processing and organizing server configurations.
+ * Initializes various internal variables to default values.
+ * Creates a vector of valid special characters and pairs of valid configuration identifiers and corresponding function pointers.
+ * Additionally, it creates vectors of valid HTTP methods and special identifiers for servers and locations.
+ * */
 ConfigParser::ConfigParser(std::vector<Config> &servers, char *path) : _config_file(DEFAULT_CONF_PATH), _serv_mode(false),
 																	   _line_num(1), _pos(0), _conf_pos(0), _serv_cnt(0), _serv_def_start(0), _serv_def_end(0),
 																	   _i_serv(-1), _i_loc(-1), _configs(&servers) {
@@ -86,6 +93,13 @@ ConfigParser::~ConfigParser() {}
 
 
 //MEMBER FUNCTIONS
+
+/*
+ * Is responsible for parsing a configuration file and returning the status of the parsing process.
+ * The function checks if the configuration file exists and has a valid extension, reads the file,
+ * splits it into server blocks, creates the server objects, extracts server configurations, and sets unique flags.
+ * It returns EXIT_SUCCESS if the total parsing process is successful or EXIT_FAILURE if one of the processes fails.
+ * */
 int	ConfigParser::parse() {
 	if (access(_config_file.c_str(), F_OK) < 0)
 		return (parsing_error_basic(NO_FILE, _config_file));
@@ -107,6 +121,17 @@ int	ConfigParser::parse() {
 	return EXIT_SUCCESS;
 }
 
+/*
+ * Checks the extension of the configuration file to ensure that it is a .conf file.
+ * The function first finds the position of the last . character in the _config_file member variable.
+ * It then checks if the _config_file string is empty or if the . character is not found.
+ *
+ * 	If either condition is true, the function returns EXIT_FAILURE.
+ * 	Otherwise, the function checks if the extension of the file is .conf by comparing the substring after the . character to the string ".conf".
+ *
+ * 	If the extension is .conf, the function returns EXIT_SUCCESS.
+ * 	Otherwise, it returns EXIT_FAILURE.
+ * */
 int	ConfigParser::check_extension() {
 	std::size_t dot_pos;
 
@@ -118,6 +143,11 @@ int	ConfigParser::check_extension() {
 	return (EXIT_FAILURE);
 }
 
+/*
+ * Is used to read a configuration file to be able to parse it.
+ * It opens the file, reads each line and adds it to a content string while trimming it.
+ * It then returns EXIT_SUCCESS upon completion of reading the file.
+ * */
 int	ConfigParser::read_conf_file() {
 	std::ifstream	file;
 	std::string		line;
@@ -133,6 +163,11 @@ int	ConfigParser::read_conf_file() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * The function calculates the position of the string in the configuration file and then counts the number of newlines
+ * before that position to determine the line number.
+ * It returns the line number as a size_t value.
+ * */
 size_t ConfigParser::get_line_num(std::string &str) {
 	size_t 	pos;
 
@@ -152,6 +187,14 @@ size_t ConfigParser::get_line_num(std::string &str) {
 	return (_line_num);
 }
 
+/*
+ * Is responsible for splitting the configuration file content into server blocks and to store them in a vector.
+ * It goes through th content and looks for server blocks, adding the data to a buffer until a full block has been read,
+ * at which point it is added to vector of server blocks.
+ *
+ * Returns EXIT_SUCCESS if it is successful in splitting the file into server blocks.
+ * Returns EXIT_FAILURE, when no server identifier was found.
+ * */
 int	ConfigParser::split_in_server_blocks() {
 	size_t	len;
 
@@ -179,6 +222,9 @@ int	ConfigParser::split_in_server_blocks() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Creates an empty Config class and pushes it to the vector of server configurations
+ * */
 void	ConfigParser::create_servers() {
 	for (size_t i = 0; i < _serv_cnt; i++) {
 		Config	serv;
@@ -186,6 +232,9 @@ void	ConfigParser::create_servers() {
 	}
 }
 
+/*
+ * Ignores comments from being parsed if HASh-sign is encountered
+ * */
 void	ConfigParser::ignore_comments(size_t len) {
 	if (_content[_conf_pos] == HASH) {
 		while (_content[_conf_pos] != NEWLINE && _conf_pos < len)
@@ -193,6 +242,10 @@ void	ConfigParser::ignore_comments(size_t len) {
 	}
 }
 
+/*
+ * Compares the char against specific chars, defined in the _spec_chars vector
+ * If the char is found in either list, it returns EXIT_SUCCESS. Otherwise, it returns EXIT_FAILURE.
+ * */
 int ConfigParser::find_in_spec_chars(char c) const {
 	for (size_t i = 0; i < _spec_chars.size(); i++) {
 		if (c == _spec_chars[i])
@@ -201,6 +254,10 @@ int ConfigParser::find_in_spec_chars(char c) const {
 	return (EXIT_FAILURE);
 }
 
+/*
+ * Searches for a given string in a list of valid and special valid identifiers.
+ * If the string is found in either list, it returns EXIT_SUCCESS. Otherwise, it returns EXIT_FAILURE.
+ * */
 int ConfigParser::find_in_valid_identifiers(std::string &s) const {
 	size_t	len;
 
@@ -217,6 +274,16 @@ int ConfigParser::find_in_valid_identifiers(std::string &s) const {
 	return (EXIT_FAILURE);
 }
 
+/*
+ * Searches for the "server" keyword in the configuration file and sets the server mode.
+ * It then performs some checks based on the current state of the parser, such as checking if the server has already been
+ * defined or if there are any invalid characters, unclosed braces or invalid definitions in the line.
+ *
+ * If everything is fine, the function increments some counters and returns a success code.
+ * Otherwise, it returns an error code with an appropriate message.
+ *
+ * This function is essential for the parsing process and helps ensure that the configuration file is properly defined.
+ * */
 int ConfigParser::search_for_server() {
 	_pos = _buf.find("server");
 	if (_pos == 0) {
@@ -239,11 +306,15 @@ int ConfigParser::search_for_server() {
 	return (NOT_FOUND);
 }
 
+/*
+ * Searches the position from where to start parsing the contents for a server.
+ * The OPEN_CURLY_BRACE is an indicator of this position.
+ * */
 int ConfigParser::find_open_brace() {
 	size_t	j;
 	size_t	len;
 
-	j = _conf_pos - _buf.length() + 8; //offset from the activate of the word 'server'
+	j = _conf_pos - _buf.length() + 8; //offset from the word 'server'
 	len = _content.length();
 	while (j < len) {
 		if (_content[j] != SPACE && _content[j] != NEWLINE && _content[j] != OPEN_CURLY_BRACE)
@@ -257,6 +328,10 @@ int ConfigParser::find_open_brace() {
 	return (EXIT_FAILURE);
 }
 
+/*
+ * Checks for closed curly braces in the parsed content.
+ * Returns EXIT_FAILURE if not, which leads to the respective parsing error.
+ * */
 int	ConfigParser::check_closed_braces() {
 	size_t	open_braces;
 	size_t	closed_braces;
@@ -279,6 +354,10 @@ int	ConfigParser::check_closed_braces() {
 	return (EXIT_FAILURE);
 }
 
+/*
+ * This function extracts server configurations from the server blocks vector and sets the config parameters.
+ * Returns either EXIT_SUCCESS or EXIT_FAILURE based on the success of the operation.
+ * */
 int	ConfigParser::extract_servers() {
 	_conf_pos = 0;
 	replace_open_braces(_serv_blocks);
@@ -289,6 +368,10 @@ int	ConfigParser::extract_servers() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Replaces open braces with semicolons to properly tokenize things like server { or location {.
+ * The closed } brace remains and will be always be an indicator to change the mode between server/location.
+ * */
 void	ConfigParser::replace_open_braces(std::vector<std::string> &v) {
 	size_t	pos;
 
@@ -299,6 +382,14 @@ void	ConfigParser::replace_open_braces(std::vector<std::string> &v) {
 	}
 }
 
+/*
+ * This function plays a crucial role in accurately parsing server configurations for the system.
+ * It extracts and parses server configuration parameters from the input string.
+ * It then iterates through the server block, splitting the buffer into tokens and checking if the first token is a valid identifier.
+ * If so, it sets the server parameter, calling the appropriate function pointer on the same index as the found identifier.
+ * If any parsing errors are encountered, it returns EXIT_FAILURE.
+ * Once all parameters have been extracted, it returns EXIT_SUCCESS.
+ * */
 int ConfigParser::extract_server_block() {
 	size_t len;
 	size_t j;
@@ -337,6 +428,11 @@ int ConfigParser::extract_server_block() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Is responsible for setting the mode based on the tokens extracted from the configuration file.
+ * If the first token is "location", the mode is set to false and if the server mode is already false, an error is returned.
+ * If the first token is "}", the server mode is set to true and the function removes the } from the token list.
+ * */
 int	ConfigParser::set_mode() {
 	if (_tokens[0] == "location") {
 		if (!_serv_mode)
@@ -357,6 +453,13 @@ int	ConfigParser::set_mode() {
 
 
 //***** CONFIG FILE SETTERS *****
+
+/*
+ * Is responsible for setting server parameters.
+ * It searches in valid identifiers a gets the vector index.
+ * If the _valid_identifiers vector on index is == location, calls a function to add new location to the server config.
+ * If the index is a setter function, calls the respective function pointer from associated _func_tab vector.
+ * */
 int	ConfigParser::set_server_parameter() {
 	int i;
 
@@ -371,6 +474,11 @@ int	ConfigParser::set_server_parameter() {
 	return ((this->*_func_tab[i])());
 }
 
+/*
+ * Retrieves the index of a given member from a list of valid identifiers.
+ * It loops through the list and compares each identifier with the given member, returning the index when it finds a match.
+ * If no match is found, it returns SPEC_IDENTIFIER.
+ * */
 int	ConfigParser::get_func_index() {
 	std::string	member;
 
@@ -382,6 +490,14 @@ int	ConfigParser::get_func_index() {
 	return (SPEC_IDENTIFIER);
 }
 
+/*
+ * Adds a new location to the configuration parser.
+ * This function plays a critical role in configuring the parser and ensuring that new locations are added properly to the system.
+ * It creates a new location structure object and sets its maximum client body size to the maximum value possible.
+ * It then checks if the location prefix can be set and if it fails, it returns an exit failure.
+ * If successful, it sets the directory listing to false and adds the location to the list of locations in the current service.
+ * Finally, it increments the location index and returns an exit success.
+ * */
 int ConfigParser::add_location() {
 	location loc;
 
@@ -396,6 +512,15 @@ int ConfigParser::add_location() {
 
 
 //SERVER SPECIFIC SETTERS
+
+/*
+ * Sets the location name (prefix)
+ *
+ * Required number of parameters:		2
+ * Definition as server identifier:		mandatory
+ * Definition as location identifier:	forbidden
+ * Redefinition of the parameter:		forbidden
+ * */
 int ConfigParser::set_loc_prefix(location &loc) {
 	std::vector<location>	*locs;
 
@@ -410,6 +535,14 @@ int ConfigParser::set_loc_prefix(location &loc) {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Sets server name and alias (derived from server name) - basically preliminaries to setup virtual hosting
+ *
+ * Required number of parameters:		2
+ * Definition as server identifier:		allowed
+ * Definition as location identifier:	forbidden
+ * Redefinition of the parameter:		forbidden
+ * */
 int ConfigParser::set_server_name_and_alias() {
 	size_t		num_tokens;
 	std::string *server_name;
@@ -436,6 +569,14 @@ int ConfigParser::set_server_name_and_alias() {
 	return (parsing_error_line(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 }
 
+/*
+ * Sets server ip address
+ *
+ * Required number of parameters:		2
+ * Definition as server identifier:		mandatory
+ * Definition as location identifier:	forbidden
+ * Redefinition of the parameter:		forbidden / allowed only in another server block if no ip/ports conflicts
+ * */
 int ConfigParser::set_ip_address() {
 	char 						*endptr;
 	std::vector<std::string>	_octets;
@@ -467,6 +608,14 @@ int ConfigParser::set_ip_address() {
 	return (parsing_error_line(REDEFINITION_OF_SERVER_IDENT, _config_file, get_line_num(_tokens[0])));
 }
 
+/*
+ * Sets server ports
+ *
+ * Required number of parameters:		2
+ * Definition as server identifier:		mandatory
+ * Definition as location identifier:	forbidden
+ * Redefinition of the parameter:		forbidden / allowed only in another server block if no ip/ports conflicts
+ * */
 int ConfigParser::set_port() {
 	char 						*endptr;
 	long 						port;
@@ -498,6 +647,14 @@ int ConfigParser::set_port() {
 		return (parsing_error_line(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
 }
 
+/*
+ * Sets root path to search for files and locations - is added to HTTP headers on response
+ *
+ * Required number of parameters:		2
+ * Definition as server identifier:		mandatory
+ * Definition as location identifier:	allowed
+ * Redefinition of the parameter:		forbidden
+ * */
 int ConfigParser::set_root() {
 	std::string *param;
 
@@ -513,6 +670,15 @@ int ConfigParser::set_root() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Sets allowed HTTP request methods. This server handles following methods:
+ * GET POST DELETE
+ *
+ * Required number of parameters:		max 5
+ * Definition as server identifier:		allowed
+ * Definition as location identifier:	allowed
+ * Redefinition of the parameter:		forbidden
+ * */
 int ConfigParser::set_allowed_methods() {
 	size_t 						num_methods;
 	size_t 						num_valid_methods;
@@ -547,6 +713,14 @@ int ConfigParser::set_allowed_methods() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Sets index page to be opened by default request to server/location
+ *
+ * Required number of parameters:		2
+ * Definition as server identifier:		allowed
+ * Definition as location identifier:	allowed
+ * Redefinition of the parameter:		forbidden
+ * */
 int ConfigParser::set_index() {
 	std::string *param;
 	size_t 		num_tokens;
@@ -567,6 +741,14 @@ int ConfigParser::set_index() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Sets maximum client body size, which a request can contain. By default, is set to UINT32_MAX
+ *
+ * Required number of parameters:		2
+ * Definition as server identifier:		voluntary
+ * Definition as location identifier:	voluntary
+ * Redefinition of the parameter:		allowed
+ * */
 int ConfigParser::set_max_client_body_size() {
 	long long 	*param;
 	size_t 		num_tokens;
@@ -590,6 +772,14 @@ int ConfigParser::set_max_client_body_size() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Sets directory to search for status-code-html-files (incl. error pages)
+ *
+ * Required number of parameters:		2
+ * Definition as server identifier:		allowed
+ * Definition as location identifier:	forbidden
+ * Redefinition of the parameter:		allowed
+ * */
 int ConfigParser::set_error_pages_dir() {
 	std::string *param;
 	size_t 		num_tokens;
@@ -610,6 +800,14 @@ int ConfigParser::set_error_pages_dir() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Sets default redirection for specified location
+ *
+ * Required number of parameters:		4
+ * Definition as server identifier:		allowed
+ * Definition as location identifier:	allowed (has no effect on functionality in current server implementation)
+ * Redefinition of the parameter:		allowed
+ * */
 int ConfigParser::set_redirection() {
 	std::vector<std::pair<std::string, std::string> > *param;
 	size_t 		num_tokens;
@@ -644,6 +842,15 @@ int ConfigParser::set_redirection() {
 
 
 //LOCATION SPECIFIC SETTERS
+
+/*
+ * Sets allowed scripts to execute on specified location
+ *
+ * Required number of parameters:		4
+ * Definition as server identifier:		forbidden
+ * Definition as location identifier:	allowed
+ * Redefinition of the parameter:		allowed
+ * */
 int ConfigParser::set_allowed_scripts() {
 	std::vector<std::pair<std::string, std::string> >	*param;
 	size_t	num_tokens;
@@ -674,6 +881,14 @@ int ConfigParser::set_allowed_scripts() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Turns directory listing (lists contents of the requested location root directory) on/off
+ *
+ * Required number of parameters:		2
+ * Definition as server identifier:		forbidden
+ * Definition as location identifier:	allowed
+ * Redefinition of the parameter:		forbidden
+ * */
 int ConfigParser::set_directory_listing() {
 	size_t 		num_tokens;
 
@@ -695,6 +910,14 @@ int ConfigParser::set_directory_listing() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Sets the path to search for CGI script
+ *
+ * Required number of parameters:		2
+ * Definition as server identifier:		forbidden
+ * Definition as location identifier:	allowed
+ * Redefinition of the parameter:		forbidden
+ * */
 int ConfigParser::set_cgi_path() {
 	size_t 		num_tokens;
 
@@ -713,6 +936,15 @@ int ConfigParser::set_cgi_path() {
 
 
 //POST PARSING CHECKERS
+
+/*
+ * Checks that all required configuration parameters for each server and location have been provided
+ * and if any configuration is missing or incomplete.
+ * If either of these checks returns a failure status code (EXIT_FAILURE),
+ * the function returns that same failure status code.
+ * Otherwise, if all checks pass for all server configurations, the function returns a success status code (EXIT_SUCCESS).
+
+ * */
 int ConfigParser::check_required_param_def() {
 	for (_i_serv = 0; _i_serv < _serv_cnt; _i_serv++) {
 		if (check_serv_config() == EXIT_FAILURE || check_loc_config() == EXIT_FAILURE)
@@ -721,6 +953,16 @@ int ConfigParser::check_required_param_def() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Ensures that all required parameters for a server configuration are present and valid.
+ * If any parameters are missing or invalid, the function returns a failure status code,
+ *
+ * Identifiers to check for each server:
+ * 		NAME (should be unique)
+ * 		IP ADDRESS
+ * 		PORT(S)
+ * 		ROOT DIRECTORY
+ * */
 int ConfigParser::check_serv_config() {
 	if (check_server_name() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
@@ -734,6 +976,11 @@ int ConfigParser::check_serv_config() {
 	return (EXIT_SUCCESS);
 }
 
+
+/*
+ * Checks if server name is set and if it's  unique.
+ * In case if it's not set - sets to default one, based on server index.
+ * */
 int ConfigParser::check_server_name() {
 	std::stringstream 	ss;
 	std::string			*name;
@@ -753,6 +1000,10 @@ int ConfigParser::check_server_name() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Checks if IP was specified.
+ * If not - parsing returns with respective error message.
+ * */
 int ConfigParser::check_ip_address() {
 	std::string	*ip;
 
@@ -762,6 +1013,10 @@ int ConfigParser::check_ip_address() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Checks if port(s) were specified.
+ * If not - parsing returns with respective error message.
+ * */
 int ConfigParser::check_ports() {
 	std::vector <long>	*ports;
 
@@ -771,6 +1026,10 @@ int ConfigParser::check_ports() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Checks if root is specified.
+ * If not - parsing returns with respective error message.
+ * */
 int ConfigParser::check_root() {
 	std::string	*root;
 
@@ -780,6 +1039,10 @@ int ConfigParser::check_root() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Checks if a directory to search for status-code-html-files (incl. error pages) was speciified
+ * If not - specifies a default one from the defined MACROS in defines header.
+ * */
 void	ConfigParser::check_default_error_pages_dir() {
 	std::string	*err_pag_dir;
 
@@ -788,7 +1051,10 @@ void	ConfigParser::check_default_error_pages_dir() {
 		*err_pag_dir = DEFAULT_ERROR_PAGES_DIR;
 }
 
-
+/*
+ * Checks if the location index identifier is specified
+ * If not - returns with respective error message.
+ * */
 int ConfigParser::check_loc_config() {
 	size_t		num_locs;
 
@@ -810,12 +1076,16 @@ int ConfigParser::check_loc_index() {
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * Checks if the location root identifier is specified.
+ * If not - specifies a default one from the defined MACROS in defines header.
+ * */
 void 	ConfigParser::check_loc_root() {
 	std::string	*root;
 
 	root = &_serv[_i_serv]._locations[_i_loc].root;
 	if (root->empty())
-		*root = _serv[_i_serv]._root;
+		*root = DEFAULT_LOCATION_ROOT;
 }
 
 void	ConfigParser::extract_configs() {
@@ -846,6 +1116,10 @@ void	ConfigParser::set_unique_flags() {
 }
 
 //ERROR MANAGEMENT
+
+/*
+ * Error printer for basic configuration file errors.
+ * */
 int	ConfigParser::parsing_error_basic(int error, const std::string &config_file) {
 
 	std::string	filename;
@@ -869,6 +1143,9 @@ int	ConfigParser::parsing_error_basic(int error, const std::string &config_file)
 	return (EXIT_FAILURE);
 }
 
+/*
+ * Error printer to print specific parser error on specified line in the configuration file.
+ * */
 int	ConfigParser::parsing_error_line(int error, const std::string &config_file, size_t line) {
 	std::string	filename;
 	size_t 		slash_pos;
@@ -921,6 +1198,9 @@ int	ConfigParser::parsing_error_line(int error, const std::string &config_file, 
 	return (EXIT_FAILURE);
 }
 
+/*
+ * Error printer for missing or duplicating parameters in server definition
+ * */
 int	ConfigParser::parsing_error_param(int error, const std::string &config_file, std::string &param) {
 	std::string	filename;
 	size_t 		slash_pos;
