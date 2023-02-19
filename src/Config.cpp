@@ -12,6 +12,9 @@
 
 #include "Config.hpp"
 
+/* Container for server identifiers and respective parameters.
+ * The class is a friend of ConfigParser class to be able to access and modify the values directly */
+
 //BASIC CLASS SETUP
 Config::Config() : _ports(0), _max_client_body_size(UINT32_MAX) {}
 
@@ -37,6 +40,7 @@ Config &Config::operator=(const Config &src) {
 	return (*this);
 }
 
+/* stream overload to print the identifiers */
 std::ostream	&operator<<(std::ostream &o, Config *s) {
 
 	std::string	s_upper_name;
@@ -127,7 +131,6 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 }
 
 Config::~Config() {}
-
 
 
 //GETTERS
