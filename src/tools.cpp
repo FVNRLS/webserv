@@ -87,6 +87,8 @@ bool is_regular_file(const char* fileName)
 {
     struct stat path;
 
+
+
     stat(fileName, &path);
 
     return S_ISREG(path.st_mode);

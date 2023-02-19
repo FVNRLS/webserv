@@ -42,6 +42,7 @@ int GETRequest::create_html_response(std::string &response) {
 	response = body;
 	return EXIT_SUCCESS;
 }
+
 int GETRequest::dir_list_response(std::string &response) {
     DIR* dir = opendir(_request.file_path.c_str());
 
