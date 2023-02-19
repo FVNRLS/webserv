@@ -109,7 +109,7 @@ std::ostream	&operator<<(std::ostream &o, Config *s) {
 					o << s->get_locations()[i].scripts[j].first << " = "
 						<< s->get_locations()[i].scripts[j].second << std::endl;
 				else
-					o <<  "							" << s->get_locations()[i].scripts[j].first <<
+					o <<  "			    " << s->get_locations()[i].scripts[j].first <<
 					" = " << s->get_locations()[i].scripts[j].second << std::endl;
 			}
 		}

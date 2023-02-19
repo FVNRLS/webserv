@@ -30,12 +30,20 @@ CLI &CLI::operator=(const CLI &src) {
 
 CLI::~CLI() {}
 
+/* Unblock the cli_fd to be polled in Server poll() */
 int CLI::start() {
 	if (fcntl(_std_in.fd, F_SETFL, O_NONBLOCK) < 0)
 		return  (cli_error(SOCKET_OPEN_ERROR));
 	return (EXIT_SUCCESS);
 }
 
+/*
+ * The function is used to check the user input from the command line interface.
+ * It clears the input buffer and reads input from the standard input.
+ * It converts the input to upper case and checks for specific input commands.
+ * If the input is "EXIT\n", it returns CLI_EXIT. If the input is "LS\n", it returns CLI_LS.
+ * Otherwise, it returns CLI_HELP.
+ * */
 int CLI::check_input() {
 	_input.clear();
 	if (read_input() == EXIT_FAILURE)
@@ -51,6 +59,12 @@ int CLI::check_input() {
 	return (CLI_HELP);
 }
 
+/*
+ * The function in reads data from the standard input and appends it to the _input member variable.
+ * The function first opens the standard input device using the open function and checks if it was successfully opened.
+ * It then reads the contents of the standard input and
+ * returns EXIT_SUCCESS if the input was read successfully, or CLI_FAIL if there was an error.
+ * */
 int CLI::read_input() {
 	std::ifstream	std_in;
 
@@ -68,6 +82,7 @@ pollfd CLI::get_pollfd() {
 	return (_std_in);
 }
 
+/* error message for failed opening of CLI socket */
 int		CLI::cli_error(int error)	const {
 	switch(error) {
 		case SOCKET_OPEN_ERROR:
