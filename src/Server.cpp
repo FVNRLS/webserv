@@ -26,6 +26,12 @@ Server::Server(std::vector<Socket> &sockets) : _sockets(sockets) {
 Server::~Server() {}
 
 //MEMBER FUNCTIONS
+
+/*
+ * Core function.
+ * Runs the server indefinitely by continuously polling the descriptors, checking for incoming data from the client socket,
+ * accepting requests from the other sockets, resolving these requests and deleting invalid file descriptors.
+ * */
 int Server::run() {
 	while (true) {
 		if (poll(_pfds.data(), _pfds.size(), TIMEOUT) < 0)
@@ -41,6 +47,10 @@ int Server::run() {
 	}
 }
 
+/*
+ * Checks whether there is incoming data from the Command Line Interface socket.
+ * If there is, it processes the data.
+ * */
 int	Server::check_cli() {
 	if (_pfds[0].revents & POLLIN) {
 		if (process_cli_input() == EXIT_FAILURE)
@@ -49,6 +59,12 @@ int	Server::check_cli() {
 	return EXIT_SUCCESS;
 }
 
+/*
+ * Loops through all sockets in the list of Socket objects, and checks for incoming data using the pollfd-revents-flag.
+ * If there is incoming data, it accepts the request and sets up the new polling descriptor for the new connection.
+ * Then it sets the pollfd (connection) to non-blocking, and adds the new polling descriptor to the vector of pollfd descriptors.
+ * It also sets up a new request handler for the new socket and adds the new connection to the _requests map.
+ * */
 int Server::accept_requests() {
 	socklen_t 			client_len;
 	struct sockaddr 	client_addr;
@@ -71,6 +87,13 @@ int Server::accept_requests() {
 	return EXIT_SUCCESS;
 }
 
+/*
+ * Loops through all sockets in the list of Socket objects, and checks for incoming data.
+ * If there is incoming data, it accepts the request, sets the new socket to non-blocking,
+ * sets up the new polling descriptor for the new socket, and adds the new polling descriptor to the list of pollfd descriptors.
+ * It also sets up a new request handler for the new socket.
+ * The POLLIN/POLLOUT flag indicates reading of the request or sending of the response to the client.
+ * */
 int Server::resolve_requests() {
 	for (size_t i = _sockets.size(); i < _pfds.size(); i++) {
 		if (check_connection(_pfds[i]) == EXIT_FAILURE)
@@ -83,6 +106,11 @@ int Server::resolve_requests() {
 	return EXIT_SUCCESS;
 }
 
+/*
+ * Handles the input for the socket by accumulating data from the socket and parsing the accumulated data to determine
+ * whether the request header has been fully received, the request body has been fully received,
+ * and whether the request is chunked or not.
+ * */
 int Server::handle_pollin(pollfd &pfd) {
     request_handler* request = &_requests.find(pfd.fd)->second;
 
@@ -104,6 +132,9 @@ int Server::handle_pollin(pollfd &pfd) {
 	return EXIT_SUCCESS;
 }
 
+/*
+ * Handles the output for the socket by sending the response to the socket and setting the event for the polling descriptor to POLLIN.
+ * */
 int Server::handle_pollout(pollfd &pfd) {
 	request_handler* request = &_requests.find(pfd.fd)->second;
 
@@ -121,6 +152,9 @@ int Server::handle_pollout(pollfd &pfd) {
 	return EXIT_SUCCESS;
 }
 
+/*
+ * Sends the response to the client, and sets the response_sent flag to true when the entire response has been sent.
+ * */
 int Server::send_response(int fd, request_handler *request) {
 
     ssize_t bytes = send(fd, request->response.data(), request->response.size(), 0);
@@ -134,6 +168,10 @@ int Server::send_response(int fd, request_handler *request) {
     return EXIT_SUCCESS;
 }
 
+/*
+ * Checks the validity of the connection for the socket, and closes the socket and removes the polling descriptor
+ * for the socket if the connection is invalid.
+ * */
 int Server::check_connection(pollfd &pfd) {
 	if (pfd.revents & POLLERR || pfd.revents & POLLHUP || pfd.revents & POLLNVAL) {
 		std::map<int, request_handler>::iterator it = _requests.find(pfd.fd);
@@ -148,6 +186,9 @@ int Server::check_connection(pollfd &pfd) {
 	return EXIT_SUCCESS;
 }
 
+/*
+ * Accumulates data from the socket and appends it to the request buffer.
+ * */
 int	Server::accumulate(request_handler &request, int request_fd) {
 	char 										buffer[2000];
 	long 										bytes;
@@ -161,6 +202,13 @@ int	Server::accumulate(request_handler &request, int request_fd) {
 	return EXIT_SUCCESS;
 }
 
+/*
+ * Sets flags for the end of an HTTP request.
+ * It looks for the position of ehd of the request in the request buffer, and if found, updates the head_length attribute
+ * of the request object and sets the head_received flag to true.
+ * If the end of the request is not found, the function simply returns.
+ * It also checks if the length of the request body exceeds a specified limit and sets the status of the request to BAD_REQUEST if it does.
+ * */
 void	Server::set_request_end_flags(request_handler &request) {
     request.head_length = request.buf.find(END_OF_REQUEST);
 	if (request.head_length != std::string::npos) {
@@ -177,6 +225,13 @@ void	Server::set_request_end_flags(request_handler &request) {
     }
 }
 
+/*
+ * Handles the header of an HTTP request.
+ * Creates a RequestParser object to parse the request.
+ * If the file_path attribute of the request object is not empty, it returns the status of the request.
+ * Otherwise, parses and checks the status of the request.
+ * If the request object has cookies, it checks if the cookies are valid and updates them accordingly.
+ * */
 int Server::handle_request_header(request_handler &request) {
     RequestParser	request_parser(request);
 
@@ -191,6 +246,11 @@ int Server::handle_request_header(request_handler &request) {
     return request.status;
 }
 
+/*
+ * Checks if a user has initiated a logout action.
+ * If the key is not 0 and the query contains "action=logout", the function deletes the user's session and returns false.
+ * Otherwise, it returns the key value.
+ * */
 int	Server::check_logout(const int &key, const std::string &query) {
 	if (key && query.find("action=logout") != std::string::npos) {
 		_cookies.delete_session(key);
@@ -199,6 +259,9 @@ int	Server::check_logout(const int &key, const std::string &query) {
 	return key;
 }
 
+/*
+ * Deletes invalid file descriptors from a vector of pollfds if their fd value is set to -1.
+ * */
 void	Server::delete_invalid_fds() {
 	std::vector<pollfd>::iterator it = _pfds.begin() + _sockets.size();
 
@@ -211,6 +274,19 @@ void	Server::delete_invalid_fds() {
 }
 
 //TERMINAL FUNCTIONS
+
+/*
+ * Is responsible for processing the input received from the command-line interface (CLI).
+ *
+ * Checks for any input from the command-line interface.
+ * Based on the return value of check_input(), the function performs one of the following actions:
+ * 		If the input is empty, the function returns EXIT_SUCCESS.
+ * 		If the input is invalid, the function returns an error using the terminate_with_error() function with a system_call_error object.
+ * 		If the input is CLI_EXIT, the function calls the exit_server() function.
+ * 		If the input is CLI_LS, the function calls the show_connections() function.
+ * 		If the input is any other value, the function calls the show_manual() function.
+ * Returns EXIT_SUCCESS by default.
+ * */
 int	Server::process_cli_input() {
 	switch (_cli.check_input()) {
 		case CLI_EMPTY:

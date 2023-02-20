@@ -22,6 +22,15 @@ ResponseGenerator::ResponseGenerator(ResponseGenerator &src)
 ResponseGenerator::~ResponseGenerator() {}
 
 // MEMBER FUNCTIONS
+
+/*
+ * Generates a response for an HTTP request.
+ *
+ * It first checks the method of the request and creates the appropriate request object (e.g. GETRequest, POSTRequest, or DELETERequest).
+ * The create_response() method of the request object is then called to generate the response body,
+ * and the response status is set based on the result.
+ * If there was an error, it creates an error code response, otherwise, it generates the response header and returns the concatenated response.
+ * */
 std::string ResponseGenerator::generate_response(Session &cookie) {
     if (_request.status == EXIT_SUCCESS) {
         if (_request.method == "GET") {
@@ -44,7 +53,16 @@ std::string ResponseGenerator::generate_response(Session &cookie) {
   return generate_response_header(_request.status) + _response_body;
 }
 
-// ERROR MANAGEMENT
+/*
+ * Creates a response body for HTTP error codes.
+ *
+ * It first checks if there is a custom error page for the specific error code, and if there is,
+ * it reads the content of the file and adds it to the response body.
+ * If there is no custom error page, it sets a default error page to the response body.
+ *
+ * If the HTTP method is HEAD, it only generates the response header and returns it.
+ * Finally, it returns the response header and the response body concatenated for all other HTTP methods.
+ * */
 std::string ResponseGenerator::create_error_code_response(int status_code) {
   std::ifstream file;
   std::string error_page_path;
@@ -65,12 +83,30 @@ std::string ResponseGenerator::create_error_code_response(int status_code) {
   return generate_response_header(status_code) + _response_body;
 }
 
+/*
+ * Generates a redirection response using the specified status code, reason phrase and location.
+ * Returns a string that includes the HTTP version, status code, phrase, "Location" header and the end of request marker.
+ * */
 std::string ResponseGenerator::redirection_response(int status_code) {
     return  "HTTP/1.1 " + toString(status_code) + " " +
             _reasonPhrases.find(status_code)->second +
             "\r\nLocation: " + _request.buf + END_OF_REQUEST;
 }
 
+/*
+ * Generates the response header for the HTTP response.
+ *
+ * It takes an integer status code as an argument and uses it to determine the HTTP status code for the response.
+ * If the status code is EXIT_SUCCESS, it is converted to the OK status code.
+ *
+ * Then checks if there are any cookies to be set in the response, and if so,
+ * it includes them in the header using the Set-Cookie field.
+ *
+ * Finally, returns the HTTP response header as a string, which includes the HTTP version,
+ * the status code, the reason phrase for the status code, the content type (always text/html),
+ * the length of the response body, and any cookies that were set.
+ * The header ends with the special sequence "\r\n\r\n", which indicates the end of the header and the start of the response body.
+ * */
 std::string ResponseGenerator::generate_response_header(int status_code) {
 	if (status_code == EXIT_SUCCESS)
 		status_code = OK;
@@ -89,6 +125,9 @@ std::string ResponseGenerator::generate_response_header(int status_code) {
 
 const std::map<int, std::string> ResponseGenerator::_reasonPhrases = make_pairs();
 
+/*
+ * Pairs of status codes and respective phrases to form a response header.
+ * */
 const std::map<int, std::string> ResponseGenerator::make_pairs() {
     std::map<int, std::string> pairs;
     pairs[100] = "Continue";
