@@ -1,0 +1,7 @@
+1.  Copy the upload-file to the directory with the script or use rel./abs. filepath to reach the file
+2.  set the FILENAME envp:
+    export FILENAME=<filename>
+3.  Make the script executable with:
+    chmod +x curl_test.sh
+4.  Run the script, wait for the response and search for the file in uploads folder
+5.  Manually change the file extension to the requested one (by default all requests are uploaded in txt-format)
