@@ -12,6 +12,15 @@
 
 #pragma once
 
+//ADDITIONAL INCLUDES FOR ARCH
+#include <cstdlib>
+#include <malloc.h>
+#include <algorithm>
+#include <iomanip>
+#include <cstring>
+#include <sys/wait.h>
+
+//MANDATORY INCLUDES
 #include <iostream>
 #include <vector>
 #include <map>
