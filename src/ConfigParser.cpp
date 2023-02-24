@@ -117,7 +117,6 @@ int	ConfigParser::parse() {
 	if (check_required_param_def() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	extract_configs();
-	set_unique_flags();
 	return EXIT_SUCCESS;
 }
 
@@ -922,8 +921,8 @@ int ConfigParser::set_cgi_path() {
 	size_t 		num_tokens;
 
 	num_tokens = _tokens.size();
-    if (_tokens.size() == 1)
-        return (EXIT_SUCCESS);
+	if (_tokens.size() == 1)
+		return (EXIT_SUCCESS);
 	if (_serv_mode)
 		return (parsing_error_line(INVALID_SCOPE, _config_file, get_line_num(_tokens[0])));
 	else if (!_serv[_i_serv]._locations[_i_loc].cgi_path.empty())
@@ -1098,20 +1097,6 @@ void	ConfigParser::extract_configs() {
 			_configs->push_back(new_config);
 		}
 		new_config._ports.clear();
-	}
-}
-
-void	ConfigParser::set_unique_flags() {
-	std::string	ip1, ip2;
-	long		port1, port2;
-
-	for (size_t i = 0; i < _configs->size() - 1; i++) {
-		port1 = (*_configs)[i].get_port();
-		ip1 = (*_configs)[i].get_ip();
-		for (size_t j = i + 1; j < _configs->size(); j++) {
-			port2 = (*_configs)[j].get_port();
-			ip2 = (*_configs)[j].get_ip();
-		}
 	}
 }
 

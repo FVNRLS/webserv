@@ -89,7 +89,6 @@ private:
 
 	//FORMING OF UNIQUE CONFIGS
 	void	extract_configs();
-	void	set_unique_flags();
 
 	//ERROR MANAGEMENT
 	int		parsing_error_basic(int error, const std::string &config_file);

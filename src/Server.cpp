@@ -238,8 +238,8 @@ int Server::handle_request_header(request_handler &request) {
     if (!request.file_path.empty())
         return request.status;
     request_parser.parse();
-    if (request.status)
-        return request.status;
+	if (request.status)
+		return request.status;
 	if (!_cookies.exists(request.cookies))
 		request.cookies = false;
 	request.cookies = check_logout(request.cookies, request.query);
@@ -288,15 +288,19 @@ void	Server::delete_invalid_fds() {
  * Returns EXIT_SUCCESS by default.
  * */
 int	Server::process_cli_input() {
-	switch (_cli.check_input()) {
+	int cli_input;
+
+	cli_input = _cli.check_input();
+	switch (cli_input) {
 		case CLI_EMPTY:
 			return EXIT_SUCCESS;
 		case CLI_FAIL:
 			return terminate_with_error(system_call_error(CLI_ERROR, _sockets.front()));
-		case CLI_EXIT:
-			exit_server();
 		case CLI_LS:
 			show_connections();
+			break;
+		case CLI_EXIT:
+			exit_server();
 			break;
 		default:
 			show_manual();

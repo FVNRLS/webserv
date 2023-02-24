@@ -52,9 +52,9 @@ int CLI::check_input() {
 		return (CLI_EMPTY);
 	for (std::string::iterator it = _input.begin(); it != _input.end(); it++)
 		*it = std::toupper(*it);
-	if (_input == "EXIT\n")
+	if (_input == "EXIT")
 		return (CLI_EXIT);
-	if (_input == "LS\n")
+	if (_input == "LS")
 		return (CLI_LS);
 	return (CLI_HELP);
 }
@@ -66,15 +66,19 @@ int CLI::check_input() {
  * returns EXIT_SUCCESS if the input was read successfully, or CLI_FAIL if there was an error.
  * */
 int CLI::read_input() {
-	std::ifstream	std_in;
+	int				std_in;
+	std::string 	line;
+	char 			buf[100];
 
-	std_in.open("/dev/stdin");
-	if (!std_in.is_open() || std_in.fail()) {
+	std_in = open("/dev/stdin", O_RDONLY);
+	if (std_in < 0) {
 		cli_error(SOCKET_OPEN_ERROR);
 		return (CLI_FAIL);
 	}
-	_input.append((std::istreambuf_iterator<char>(std_in)), std::istreambuf_iterator<char>());
-	std_in.close();
+	read(std_in, &buf, sizeof(buf));
+	_input += buf;
+	close(std_in);
+	_input = _input.substr(0, _input.find(NEWLINE));
 	return (EXIT_SUCCESS);
 }
 

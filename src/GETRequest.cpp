@@ -42,8 +42,8 @@ int GETRequest::create_html_response(std::string &response) {
 	std::ifstream	file;
 	std::string		body;
 
-    if (_request.dir_list)
-        return dir_list_response(response);
+	if (_request.dir_list)
+		return dir_list_response(response);
 	if (access(_request.file_path.c_str(), F_OK) < 0)
 		return PAGE_NOT_FOUND;
     if (open_file(_request.file_path, file) == EXIT_FAILURE)
