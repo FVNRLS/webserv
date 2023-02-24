@@ -3,7 +3,7 @@
 webserv is a C++ HTTP server that provides basic functionalities for serving web pages, handling HTTP requests and responses, and managing sockets.
 
 ## Installation
-1. Clone the repository: git clone https://github.com/johantron/webserv.git
+1. Clone the repository: git clone https://github.com/FVNRLS/webserv
 2. Build the project: make
 3. Run the server: ./webserv config_file
 
