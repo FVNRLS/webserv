@@ -15,8 +15,8 @@ CGI::~CGI() {}
  * */
 int CGI::create_response(const request_handler &request, std::string &response) {
     _response_fd = tmp_fd();
-    if (_response_fd < 0)
-        return error("tmpfile creation failed!");
+	if (_response_fd < 0)
+		return error("tmpfile creation failed!");
 	switch (fork()) {
 		case -1:
 			return error("fork failed!");
