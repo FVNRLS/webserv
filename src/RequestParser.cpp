@@ -187,7 +187,7 @@ void	RequestParser::split_query() {
 
 	if (position != std::string::npos) {
         _request.query = _request.file_path.substr(position + 1);
-        _request.body_length = _request.query.length();
+//        _request.body_length = _request.query.length();
 	}
     _request.file_path = _request.file_path.substr(0, position);
 }
