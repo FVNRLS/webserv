@@ -14,7 +14,7 @@
 
 //ADDITIONAL INCLUDES FOR ARCH
 #include <cstdlib>
-#include <malloc.h>
+//#include <malloc.h> //edit on arch - find another header!
 #include <algorithm>
 #include <iomanip>
 #include <cstring>
